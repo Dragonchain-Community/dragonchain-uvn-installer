@@ -1,8 +1,5 @@
 #!/bin/bash
 
-DRGN_L2_PUBLIC_CHAIN_ID=TACO_TUESDAY
-
-
 # Begin Main
 
 # Expect to exist from bootstrap_server_software.sh
