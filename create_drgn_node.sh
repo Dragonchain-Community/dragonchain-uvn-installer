@@ -9,8 +9,8 @@ SECURE_LOG_FILE=/home/ubuntu/secure.drgn.log
 touch $SECURE_LOG_FILE
 
 # Source our umanaged_verification_node.config
-chmod u+x umanaged_verification_node.config
-. ./umanaged_verification_node.config
+chmod u+x unmanaged_verification_node.config
+. ./unmanaged_verification_node.config
 
 # assume user executing is ubuntu with sudo privs
 mkdir /home/ubuntu/setup
