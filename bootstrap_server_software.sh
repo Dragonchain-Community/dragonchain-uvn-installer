@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-DRAGONCHAIN_NODE_PORT=30000
+DRAGONCHAIN_UVN_NODE_PORT=30000
 LOG_FILE=/home/ubuntu/drgn.log
 
 # Generate logfile
@@ -30,7 +30,7 @@ sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1
 # This should be reviewed - confident we can restrict this further
 sudo ufw default allow routed >> $LOG_FILE 2>&1
 sudo ufw default allow outgoing >> $LOG_FILE 2>&1
-sudo ufw allow $DRAGONCHAIN_NODE_PORT/tcp >> $LOG_FILE 2>&1
+sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1
 sudo ufw allow in on cbr0 >> $LOG_FILE 2>&1
 sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1
 
