@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-DRAGONCHAIN_UVN_NODE_PORT=30000
+DRAGONCHAIN_UVN_NODE_PORT=30000 #duck need to source this from config file
 LOG_FILE=/home/ubuntu/drgn.log
 
 # Generate logfile
