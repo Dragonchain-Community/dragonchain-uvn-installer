@@ -13,7 +13,7 @@ sudo apt-get upgrade -y >> $LOG_FILE 2>&1
 
 # Make vm.max_map change current and for next reboot
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
-SYSCTL_CONF_MOD="vm.max_map=262144"
+SYSCTL_CONF_MOD="vm.max_map_count=262144"
 echo $SYSCTL_CONF_MOD| sudo tee -a /etc/sysctl.conf > /dev/null
 sudo sysctl -w vm.max_map=262144 >> $LOG_FILE 2>&1
 
@@ -49,4 +49,3 @@ sudo helm init --history-max 200 >> $LOG_FILE 2>&1
 sudo microk8s.enable registry >> $LOG_FILE 2>&1
 sudo microk8s.enable ingress >> $LOG_FILE 2>&1
 sudo microk8s.enable fluentd >> $LOG_FILE 2>&1
-
