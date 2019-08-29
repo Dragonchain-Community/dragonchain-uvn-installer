@@ -37,7 +37,7 @@ sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1
 # Enable Microk8s modules
 sudo microk8s.enable dns >> $LOG_FILE 2>&1
 sudo microk8s.enable storage >> $LOG_FILE 2>&1
-sudo microk8s.enable helm  >> $LOG_FILE 2>&1 #duck ; is this necessary? enable before installing? wtf
+sudo microk8s.enable helm  >> $LOG_FILE 2>&1
 
 # Install helm classic via snap package
 sudo snap install helm --classic >> $LOG_FILE 2>&1
