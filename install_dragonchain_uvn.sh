@@ -9,14 +9,14 @@ DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd"
-LOG_FILE=/home/ubuntu/drgn.log
-SECURE_LOG_FILE=/home/ubuntu/secure.drgn.log
+#duck note: would just assume keep any files generated in a subfolder of the executing directory
+LOG_FILE=./dragonchain-setup/drgn.log
+SECURE_LOG_FILE=./dragonchain-setup/secure.drgn.log
 
 #duck note: don't think we need this (can hardcode); not a value that should change or is configurable
 SYSCTL_CONF_MOD="vm.max_map_count=262144"
 
 #Variables may be in .config or from user input
-DRAGONCHAIN_UVN_NODE_PORT=30000 #duck need to source this from config file
 
 ##########################################################################
 ## Function errchk
@@ -46,17 +46,17 @@ cmd_exists() {
 ## Function preflight_check
 preflight_check() {
     #duck
+
+    # assume user executing is ubuntu with sudo privs
+    rm -r ./dragonchain-setup
+    mkdir ./dragonchain-setup
+    errchk $? "mkdir ./dragonchain-setup"
+
     # Generate logfiles
     touch $LOG_FILE >/dev/null 2>&1
     errchk $? "touch $LOG_FILE"
     touch $SECURE_LOG_FILE >/dev/null 2>&1
     errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
-
-    # assume user executing is ubuntu with sudo privs
-    mkdir /home/ubuntu/setup
-    errchk $? "mkdir /home/ubuntu/setup"
-    cd /home/ubuntu/setup
-    errchk $? "cd /home/ubuntu/setup"
 
     # Check for existance of necessary commands
     for CMD in $REQUIRED_COMMANDS ; do
@@ -74,21 +74,27 @@ request_user_defined_values() {
    # Collect user-configured fields
    # TODO: Sanitize all inputs
 
-   echo "Enter your Chain ID from the Dragonchain console: "
-   read USER_CHAIN_ID
+   echo -e "\e[33mEnter your Chain ID from the Dragonchain console:\e[0m"
+   read DRAGONCHAIN_UVN_INTERNAL_ID
    echo
 
-   echo "Enter your Matchmaking Token from the Dragonchain console: "
-   read USER_MATCHMAKING_TOKEN
+   echo -e "\e[33mEnter your Matchmaking Token from the Dragonchain console:\e[0m"
+   read DRAGONCHAIN_UVN_REGISTRATION_TOKEN
    echo
 
-   echo "Enter a name for your Dragonchain node (lowercase letters, numbers, or dashes): "
-   read USER_CHAIN_NAME
+   echo -e "\e[33mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
+   read DRAGONCHAIN_UVN_NODE_NAME
+   echo
 
-   echo "Enter the endpoint URL for your Dragonchain node: "
-   echo "Example with domain name: http://yourdomainname.com:30000"
-   echo "Example with IP address: http://12.34.56.78:30000"
-   read USER_ENDPOINT
+   echo -e "\e[33mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
+   echo -e "\e[31mDON'T forget the http:// or https://\e[0m"
+   echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
+   echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
+   read DRAGONCHAIN_UVN_ENDPOINT_URL
+   echo
+
+   echo -e "\e[33mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
+   read DRAGONCHAIN_UVN_NODE_PORT
    echo
 }
 
@@ -183,26 +189,17 @@ generate_chainsecrets(){
     # need \ before $"" and $() ; compare to template in 'code' to verify accuracy of cmds
     # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_04
     # # This will be a problem if $DRAGONCHAIN_UVN_NODE_NAME has a space in it!!
-    cat <<EOF >setup_chainsecrets.sh
-    #!/bin/bash
-    # First create the dragonchain namespace
+
+    #duck note: running it outright; TODO: write HMAC_ID and HMAC_KEY to secure log file
+
     echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | kubectl create -f -
     export LC_CTYPE=C  # Needed on MacOS when using tr with /dev/urandom
-    BASE_64_PRIVATE_KEY=\$(openssl ecparam -genkey -name secp256k1 | openssl ec -outform DER | tail -c +8 | head -c 32 | xxd -p -c 32 | xxd -r -p | base64)
-    HMAC_ID=\$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
-    HMAC_KEY=\$(tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 43 | head -n 1)
-    echo "Root HMAC key details: ID: \$HMAC_ID | KEY: \$HMAC_KEY"
-    SECRETS_AS_JSON="{\"private-key\":\"\$BASE_64_PRIVATE_KEY\",\"hmac-id\":\"\$HMAC_ID\",\"hmac-key\":\"\$HMAC_KEY\",\"registry-password\":\"\"}"
-    kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_NODE_NAME-secrets" --from-literal=SecretString="\$SECRETS_AS_JSON"
+    BASE_64_PRIVATE_KEY=$(openssl ecparam -genkey -name secp256k1 | openssl ec -outform DER | tail -c +8 | head -c 32 | xxd -p -c 32 | xxd -r -p | base64)
+    HMAC_ID=$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
+    HMAC_KEY=$(tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 43 | head -n 1)
+    SECRETS_AS_JSON="{\"private-key\":\"$BASE_64_PRIVATE_KEY\",\"hmac-id\":\"$HMAC_ID\",\"hmac-key\":\"$HMAC_KEY\",\"registry-password\":\"\"}"
+    kubectl create secret generic -n dragonchain "d-INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON"
     # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
-EOF
-
-    # Make executable
-    chmod u+x setup_chainsecrets.sh
-    ./setup_chainsecrets.sh >> $SECURE_LOG_FILE 2>&1
-
-    # harvest keys for later use
-    #TODO
 
     # output from generated script above ; we need to capture ROOT HMAC KEY for later!
     ## ./setup_chainsecrets.sh
@@ -223,8 +220,8 @@ download_dragonchain(){
     # https://dragonchain-core-docs.dragonchain.com/latest/deployment/links.html
     #duck this probably isn't always going to be the latest
     #duck note: switched to variable values with hard versioning
-    wget $DRAGONCHAIN_HELM_CHART_URL
-    wget $DRAGONCHAIN_HELM_VALUES_URL
+    wget -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL
+    wget -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL
 }
 
 ##########################################################################
@@ -241,29 +238,33 @@ customize_dragonchain_uvm_yaml(){
     # 7. CHANGE 1 LINE FROM "storageClass: standard" TO "storageClass: microk8s-hostpath"
 
     # 1. ArbitraryName with nodename for sanity sake
-    sed -i "s/ArbitraryName/$DRAGONCHAIN_UVN_NODE_NAME/g" opensource-config.yaml
+    sed -i "s/ArbitraryName/$DRAGONCHAIN_UVN_NODE_NAME/g" ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #1"
 
     # 2. REGISTRATION_TOKEN = "MATCHMAKING_TOKEN_FROM_CONSOLE"
-    sed -i "s/REGISTRATION\_TOKEN\:\ \"\"/REGISTRATION\_TOKEN\:\ \""$DRAGONCHAIN_UVN_REGISTRATION_TOKEN"\"/g" opensource-config.yaml
+    sed -i "s/REGISTRATION\_TOKEN\:\ \"\"/REGISTRATION\_TOKEN\:\ \""$DRAGONCHAIN_UVN_REGISTRATION_TOKEN"\"/g" ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #2"
 
     # 3. REPLACE INTERNAL_ID WITH CHAIN_ID FROM CONSOLE
-    sed -i "s/INTERNAL\_ID\:\ \"\"/INTERNAL\_ID\:\ \""$DRAGONCHAIN_UVN_INTERNAL_ID"\"/g" opensource-config.yaml
+    sed -i "s/INTERNAL\_ID\:\ \"\"/INTERNAL\_ID\:\ \""$DRAGONCHAIN_UVN_INTERNAL_ID"\"/g" ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #3"
 
     # 4. REPLACE DRAGONCHAIN_ENDPOINT with user address
-    
+    # modify sed to use # as separator
+    # https://backreference.org/2010/02/20/using-different-delimiters-in-sed/ ; Thanks Bill
+    sed -i "s#https://my-chain.api.company.org:443#$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT#" ./dragonchain-setup/opensource-config.yaml
+    errchk $? "sed #4"
+
     # 5. CHANGE LEVEL TO 2
-    sed -i 's/LEVEL\:\ \"1/LEVEL\:\ \"2/g' opensource-config.yaml
+    sed -i 's/LEVEL\:\ \"1/LEVEL\:\ \"2/g' ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #5"
 
     # 6. CHANGE 2 LINES FROM "storageClassName: standard" TO "storageClassName: microk8s-hostpath"
-    sed -i 's/storageClassName\:\ standard/storageClassName\:\ microk8s\-hostpath/g' opensource-config.yaml
+    sed -i 's/storageClassName\:\ standard/storageClassName\:\ microk8s\-hostpath/g' ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #6"
 
     # 7. CHANGE 1 LINE FROM "storageClass: standard" TO "storageClass: microk8s-hostpath"
-    sed -i 's/storageClass\:\ standard/storageClass\:\ microk8s\-hostpath/g' opensource-config.yaml
+    sed -i 's/storageClass\:\ standard/storageClass\:\ microk8s\-hostpath/g' ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #7"
 }
 
@@ -277,10 +278,10 @@ preflight_check
 request_user_defined_values
 
 #patch system current
-#patch_server_current
+patch_server_current
 
 #install necessary software, set tunables
-#bootstrap_environment
+bootstrap_environment
 
 # Check for argument for user to enter node details on command line or read unmanaged_verification_node.config
 # Source our umanaged_verification_node.config
@@ -293,7 +294,7 @@ download_dragonchain
 customize_dragonchain_uvm_yaml
 
 # Deploy Helm Chart
-#sudo helm upgrade --install SOMETHING_HERE dragonchain-k8s-0.9.0.tgz --values opensource-config.yaml dragonchain
+sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml dragonchain
 
 exit 0
 
