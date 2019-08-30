@@ -87,26 +87,26 @@ request_user_defined_values() {
    # Collect user-configured fields
    # TODO: Sanitize all inputs
 
-   echo -e "\e[33mEnter your Chain ID from the Dragonchain console:\e[0m"
+   echo -e "\e[94mEnter your Chain ID from the Dragonchain console:\e[0m"
    read DRAGONCHAIN_UVN_INTERNAL_ID
    echo
 
-   echo -e "\e[33mEnter your Matchmaking Token from the Dragonchain console:\e[0m"
+   echo -e "\e[94mEnter your Matchmaking Token from the Dragonchain console:\e[0m"
    read DRAGONCHAIN_UVN_REGISTRATION_TOKEN
    echo
 
-   echo -e "\e[33mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
+   echo -e "\e[94mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
    read DRAGONCHAIN_UVN_NODE_NAME
    echo
 
-   echo -e "\e[33mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
+   echo -e "\e[94mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
    echo -e "\e[31mDON'T forget the http:// or https://\e[0m"
    echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
    echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
    read DRAGONCHAIN_UVN_ENDPOINT_URL
    echo
 
-   echo -e "\e[33mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
+   echo -e "\e[94mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
    read DRAGONCHAIN_UVN_NODE_PORT
    echo
 }
@@ -205,7 +205,7 @@ generate_chainsecrets(){
     HMAC_ID=$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
     HMAC_KEY=$(tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 43 | head -n 1)
     SECRETS_AS_JSON="{\"private-key\":\"$BASE_64_PRIVATE_KEY\",\"hmac-id\":\"$HMAC_ID\",\"hmac-key\":\"$HMAC_KEY\",\"registry-password\":\"\"}"
-    kubectl create secret generic -n dragonchain "d-INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON"
+    kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON"
     # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
 
     # output from generated script above ; we need to capture ROOT HMAC KEY for later!
@@ -275,6 +275,99 @@ customize_dragonchain_uvm_yaml(){
     errchk $? "sed #7"
 }
 
+##########################################################################
+## Function install_dragonchain
+install_dragonchain() {
+
+    # Upgrade Helm and sleep because EFF HELM
+    sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
+    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
+
+    sleep 20
+
+    # Deploy Helm Chart
+    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
+    errchk $? "sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1"
+}
+
+
+##########################################################################
+## Function check_kube_status
+check_kube_status() {
+    DRAGONCHAIN_UVN_INSTALLED=0
+
+    #Pull the current kube status and check until all pods are "1/1" and "running"
+    local STATUS_CHECK_COUNT=1
+    while :
+    do
+        local STATUS=$(sudo kubectl get pods -n dragonchain)
+
+        READYCOUNT=$(echo "$STATUS" | grep -c "1/1")
+        RUNNINGCOUNT=$(echo "$STATUS" | grep -c "Running")
+
+        echo "[$STATUS_CHECK_COUNT] Ready: $READYCOUNT Running: $RUNNINGCOUNT"
+
+        if [ $READYCOUNT -eq 5 ] && [ $RUNNINGCOUNT -eq 5 ]
+        then
+             DRAGONCHAIN_UVN_INSTALLED=1
+             break
+        fi
+
+        if [ $STATUS_CHECK_COUNT -gt 60 ] #Don't loop forever (60 loops should be about 30 minutes, the longest it SHOULD take for kube to finish its business)
+        then
+             break
+        fi
+
+        let STATUS_CHECK_COUNT=$STATUS_CHECK_COUNT+1
+
+        sleep 30
+    done
+
+    if [ $DRAGONCHAIN_UVN_INSTALLED -eq 0 ] #Unsuccessful install: direct user to ask for help and exit
+    then
+        echo -e "\e[31mPOST-INSTALL STATUS CHECKS FAILED. PLEASE ASK ON THE DRAGONCHAIN TELEGRAM FOR TECHNICAL SUPPORT.\e[0m"
+        #duck Need to add to error log here as well...
+        exit
+    fi
+
+    echo -e "\e[32mSTATUS CHECKS GOOD. DRAGONCHAIN IS RUNNING.\e[0m"
+    #duck Maybe add logging here, too?
+}
+
+##########################################################################
+## Function set_dragonchain_public_id
+set_dragonchain_public_id() {
+    #Parse the full name of the webserver pod
+    local PODLIST=$(sudo kubectl get pods -n dragonchain)
+
+    #duck global variables make me itch...
+    DRAGONCHAIN_WEBSERVER_POD_NAME=$(echo "$PODLIST" | grep -Po "\K$DRAGONCHAIN_UVN_NODE_NAME-webserver-[^-]+-[^\s]+")
+
+    DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n dragonchain $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
+
+    echo "Public ID: $DRAGONCHAIN_UVN_PUBLIC_ID"
+    #duck Let's log this in the secrets file with hmac stuff
+}
+
+##########################################################################
+## Function check_matchmaking_status
+check_matchmaking_status() {
+    local MATCHMAKING_API_CHECK=$(curl -s https://matchmaking.api.dragonchain.com/registration/verify/$DRAGONCHAIN_UVN_PUBLIC_ID)
+
+    local SUCCESS_CHECK=$(echo "$MATCHMAKING_API_CHECK" | grep -c "configuration is valid and chain is reachable")
+
+    if [ $SUCCESS_CHECK -eq 1 ]
+    then
+        #SUCCESS!
+        echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+    else
+        #Boo!
+        echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo "$MATCHMAKING_API_CHECK"
+    fi
+}
+
+
 
 ## Main()
 
@@ -300,8 +393,13 @@ generate_chainsecrets
 download_dragonchain
 customize_dragonchain_uvm_yaml
 
-# Deploy Helm Chart
-sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml dragonchain
+install_dragonchain
+
+check_kube_status
+
+set_dragonchain_public_id
+
+check_matchmaking_status
 
 exit 0
 
