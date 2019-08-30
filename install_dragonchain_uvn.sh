@@ -304,7 +304,7 @@ check_kube_status() {
 
         let STATUS_CHECK_COUNT=$STATUS_CHECK_COUNT+1
 
-        sleep 2
+        sleep 30
     done
 
     if [ $DRAGONCHAIN_UVN_INSTALLED -eq 0 ] #Unsuccessful install: direct user to ask for help and exit
