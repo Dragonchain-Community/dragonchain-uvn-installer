@@ -4,10 +4,15 @@
 ## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
 
 # Variables
+DRAGONCHAIN_VERSION="3.5.0"
+DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
+DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
+
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd"
 LOG_FILE=/home/ubuntu/drgn.log
 SECURE_LOG_FILE=/home/ubuntu/secure.drgn.log
 
+#duck note: don't think we need this (can hardcode); not a value that should change or is configurable
 SYSCTL_CONF_MOD="vm.max_map_count=262144"
 
 #Variables may be in .config or from user input
@@ -64,6 +69,31 @@ preflight_check() {
 }
 
 ##########################################################################
+## Function request_user_defined_values
+request_user_defined_values() {
+   # Collect user-configured fields
+   # TODO: Sanitize all inputs
+
+   echo "Enter your Chain ID from the Dragonchain console: "
+   read USER_CHAIN_ID
+   echo
+
+   echo "Enter your Matchmaking Token from the Dragonchain console: "
+   read USER_MATCHMAKING_TOKEN
+   echo
+
+   echo "Enter a name for your Dragonchain node (lowercase letters, numbers, or dashes): "
+   read USER_CHAIN_NAME
+
+   echo "Enter the endpoint URL for your Dragonchain node: "
+   echo "Example with domain name: http://yourdomainname.com:30000"
+   echo "Example with IP address: http://12.34.56.78:30000"
+   read USER_ENDPOINT
+   echo
+}
+
+
+##########################################################################
 ## Function patch_server_current
 patch_server_current() {
     #Patch our system current [stable]
@@ -80,6 +110,9 @@ bootstrap_environment(){
     #duck
     # Make vm.max_map change current and for next reboot
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
+
+    #duck note: might want to check the .conf file for this line to already exist before adding again
+
     echo $SYSCTL_CONF_MOD| sudo tee -a /etc/sysctl.conf > /dev/null
     sudo sysctl -w vm.max_map=262144 >> $LOG_FILE 2>&1
     errchk $? "sudo sysctl -w vm.max_map=262144 >> $LOG_FILE 2>&1"
@@ -184,13 +217,14 @@ EOF
 ## Function download_dragonchain
 download_dragonchain(){
     #duck what is pwd?
-    cd /home/ubuntu/setup
-    errchk $? "cd /home/ubuntu/setup"
+    #duck note: just assume keep downloads and script files in the same directory (wherever the user runs the script)
+
     # Download latest Helm chart and values
     # https://dragonchain-core-docs.dragonchain.com/latest/deployment/links.html
     #duck this probably isn't always going to be the latest
-    wget https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz
-    wget https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml
+    #duck note: switched to variable values with hard versioning
+    wget $DRAGONCHAIN_HELM_CHART_URL
+    wget $DRAGONCHAIN_HELM_VALUES_URL
 }
 
 ##########################################################################
@@ -219,8 +253,7 @@ customize_dragonchain_uvm_yaml(){
     errchk $? "sed #3"
 
     # 4. REPLACE DRAGONCHAIN_ENDPOINT with user address
-    # this scenario is difficult with sed because the variable will contain // and potentially more characters
-
+    
     # 5. CHANGE LEVEL TO 2
     sed -i 's/LEVEL\:\ \"1/LEVEL\:\ \"2/g' opensource-config.yaml
     errchk $? "sed #5"
@@ -240,11 +273,14 @@ customize_dragonchain_uvm_yaml(){
 #check for required commands, setup logging
 preflight_check
 
+#gather user defined values
+request_user_defined_values
+
 #patch system current
-patch_server_current
+#patch_server_current
 
 #install necessary software, set tunables
-bootstrap_environment
+#bootstrap_environment
 
 # Check for argument for user to enter node details on command line or read unmanaged_verification_node.config
 # Source our umanaged_verification_node.config
@@ -257,7 +293,7 @@ download_dragonchain
 customize_dragonchain_uvm_yaml
 
 # Deploy Helm Chart
-sudo helm upgrade --install SOMETHING_HERE dragonchain-k8s-0.9.0.tgz --values opensource-config.yaml dragonchain
+#sudo helm upgrade --install SOMETHING_HERE dragonchain-k8s-0.9.0.tgz --values opensource-config.yaml dragonchain
 
 exit 0
 
