@@ -48,13 +48,18 @@ preflight_check() {
     #duck
 
     # assume user executing is ubuntu with sudo privs
-    rm -r ./dragonchain-setup
-    mkdir ./dragonchain-setup
-    errchk $? "mkdir ./dragonchain-setup"
+    if [ -e ./dragonchain-setup ]; then
+        rm -r ./dragonchain-setup >/dev/null 2>&1
+        mkdir ./dragonchain-setup
+        errchk $? "mkdir ./dragonchain-setup"
+    else
+        mkdir ./dragonchain-setup
+        errchk $? "mkdir ./dragonchain-setup"
+    fi
 
     # Generate logfiles
     touch $LOG_FILE >/dev/null 2>&1
-    errchk $? "touch $LOG_FILE"
+    errchk $? "touch $LOG_FILE >/dev/null 2>&1"
     touch $SECURE_LOG_FILE >/dev/null 2>&1
     errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
 
