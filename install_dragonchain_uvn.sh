@@ -180,6 +180,9 @@ bootstrap_environment(){
     sudo helm init --history-max 200 >> $LOG_FILE 2>&1
     errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
+    # Wait for system to stabilize and avoid race conditions
+    sleep 10
+
     # Install more Microk8s modules
     sudo microk8s.enable registry >> $LOG_FILE 2>&1
     errchk $? "sudo microk8s.enable registry >> $LOG_FILE 2>&1"
