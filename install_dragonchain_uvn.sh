@@ -184,14 +184,8 @@ bootstrap_environment(){
     sleep 10
 
     # Install more Microk8s modules
-    sudo microk8s.enable registry >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable registry >> $LOG_FILE 2>&1"
-
-    sudo microk8s.enable ingress >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable ingress >> $LOG_FILE 2>&1"
-
-    sudo microk8s.enable fluentd >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable fluentd >> $LOG_FILE 2>&1"
+    sudo microk8s.enable registry ingress fluentd >> $LOG_FILE 2>&1
+    errchk $? "sudo microk8s.enable registry ingress fluentd >> $LOG_FILE 2>&1"
 }
 
 ##########################################################################
