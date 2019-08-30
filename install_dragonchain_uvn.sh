@@ -165,6 +165,9 @@ bootstrap_environment(){
     sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1
     errchk $? "sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1"
 
+    # Wait for system to stabilize and avoid race conditions
+    sleep 10
+
     # Enable Microk8s modules
     sudo microk8s.enable dns >> $LOG_FILE 2>&1
     errchk $? "sudo microk8s.enable dns >> $LOG_FILE 2>&1"
