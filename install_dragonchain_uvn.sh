@@ -138,7 +138,7 @@ bootstrap_environment(){
 
     # Install jq, openssl, xxd
     sudo apt-get install -y jq openssl xxd >> $LOG_FILE 2>&1
-    errchk $? "sudo apt-get install -y jq openssl xxd >> $LOG_FILE 2>&1"
+    errchk $? "sudo apt-get install -y curl jq openssl xxd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
     sudo snap install microk8s --classic >> $LOG_FILE 2>&1
