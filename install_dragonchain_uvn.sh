@@ -8,13 +8,10 @@ DRAGONCHAIN_VERSION="3.5.0"
 DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
 
-REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd"
+REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw"
 #duck note: would just assume keep any files generated in a subfolder of the executing directory
 LOG_FILE=./dragonchain-setup/drgn.log
 SECURE_LOG_FILE=./dragonchain-setup/secure.drgn.log
-
-#duck note: don't think we need this (can hardcode); not a value that should change or is configurable
-SYSCTL_CONF_MOD="vm.max_map_count=262144"
 
 #Variables may be in .config or from user input
 
@@ -48,13 +45,29 @@ preflight_check() {
     #duck
 
     # assume user executing is ubuntu with sudo privs
-    rm -r ./dragonchain-setup
-    mkdir ./dragonchain-setup
-    errchk $? "mkdir ./dragonchain-setup"
+    if [ -e ./dragonchain-setup ]; then
+        rm -r ./dragonchain-setup >/dev/null 2>&1
+        mkdir ./dragonchain-setup
+        errchk $? "mkdir ./dragonchain-setup"
+    else
+        mkdir ./dragonchain-setup
+        errchk $? "mkdir ./dragonchain-setup"
+    fi
+
+    # Test for sudo without password prompts. This is by no means exhaustive.
+    # Sudo can be configured many different ways and extensive sudo testing is beyond the scope of this effort
+    # There are may ways sudo could be configured in this simple example we expect:
+    # ubuntu ALL=(ALL) NOPASSWD:ALL #where 'ubuntu' could be any user
+    if timeout -s SIGKILL 2 sudo ls -l /tmp >/dev/null 2>&1 ; then
+        printf "PASS: Sudo configuration in place\n"
+    else
+        printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n"
+        exit 1
+    fi
 
     # Generate logfiles
     touch $LOG_FILE >/dev/null 2>&1
-    errchk $? "touch $LOG_FILE"
+    errchk $? "touch $LOG_FILE >/dev/null 2>&1"
     touch $SECURE_LOG_FILE >/dev/null 2>&1
     errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
 
@@ -119,9 +132,9 @@ bootstrap_environment(){
 
     #duck note: might want to check the .conf file for this line to already exist before adding again
 
-    echo $SYSCTL_CONF_MOD| sudo tee -a /etc/sysctl.conf > /dev/null
-    sudo sysctl -w vm.max_map=262144 >> $LOG_FILE 2>&1
-    errchk $? "sudo sysctl -w vm.max_map=262144 >> $LOG_FILE 2>&1"
+    echo "vm.max_map_count=262144"| sudo tee -a /etc/sysctl.conf > /dev/null
+    sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1
+    errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
     sudo apt-get install -y jq openssl xxd >> $LOG_FILE 2>&1
@@ -152,15 +165,12 @@ bootstrap_environment(){
     sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1
     errchk $? "sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1"
 
+    # Wait for system to stabilize and avoid race conditions
+    sleep 10
+
     # Enable Microk8s modules
-    sudo microk8s.enable dns >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable dns >> $LOG_FILE 2>&1"
-
-    sudo microk8s.enable storage >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable storage >> $LOG_FILE 2>&1"
-
-    sudo microk8s.enable helm  >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable helm  >> $LOG_FILE 2>&1"
+    # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
+    sudo microk8s.enable dns storage helm >> $LOG_FILE 2>&1
 
     # Install helm classic via snap package
     sudo snap install helm --classic >> $LOG_FILE 2>&1
@@ -170,15 +180,12 @@ bootstrap_environment(){
     sudo helm init --history-max 200 >> $LOG_FILE 2>&1
     errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
+    # Wait for system to stabilize and avoid race conditions
+    sleep 10
+
     # Install more Microk8s modules
-    sudo microk8s.enable registry >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable registry >> $LOG_FILE 2>&1"
-
-    sudo microk8s.enable ingress >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable ingress >> $LOG_FILE 2>&1"
-
-    sudo microk8s.enable fluentd >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable fluentd >> $LOG_FILE 2>&1"
+    sudo microk8s.enable registry ingress fluentd >> $LOG_FILE 2>&1
+    errchk $? "sudo microk8s.enable registry ingress fluentd >> $LOG_FILE 2>&1"
 }
 
 ##########################################################################
