@@ -8,7 +8,7 @@ DRAGONCHAIN_VERSION="3.5.0"
 DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
 
-REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd"
+REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw"
 #duck note: would just assume keep any files generated in a subfolder of the executing directory
 LOG_FILE=./dragonchain-setup/drgn.log
 SECURE_LOG_FILE=./dragonchain-setup/secure.drgn.log
@@ -55,6 +55,17 @@ preflight_check() {
     else
         mkdir ./dragonchain-setup
         errchk $? "mkdir ./dragonchain-setup"
+    fi
+
+    # Test for sudo without password prompts. This is by no means exhaustive.
+    # Sudo can be configured many different ways and extensive sudo testing is beyond the scope of this effort
+    # There are may ways sudo could be configured in this simple example we expect:
+    # ubuntu ALL=(ALL) NOPASSWD:ALL #where 'ubuntu' could be any user
+    if timeout -s SIGKILL 2 sudo ls -l /tmp >/dev/null 2>&1 ; then
+        printf "PASS: Sudo configuration in place\n"
+    else
+        printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n"
+        exit 1
     fi
 
     # Generate logfiles
