@@ -223,7 +223,6 @@ customize_dragonchain_uvm_yaml(){
     # https://backreference.org/2010/02/20/using-different-delimiters-in-sed/ ; Thanks Bill
     sed -i "s#https://my-chain.api.company.org:443#$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT#"
 
-
     # 5. CHANGE LEVEL TO 2
     sed -i 's/LEVEL\:\ \"1/LEVEL\:\ \"2/g' opensource-config.yaml
     errchk $? "sed #5"
