@@ -74,26 +74,26 @@ request_user_defined_values() {
    # Collect user-configured fields
    # TODO: Sanitize all inputs
 
-   echo -e "\e[33mEnter your Chain ID from the Dragonchain console:\e[0m"
+   echo -e "\e[94mEnter your Chain ID from the Dragonchain console:\e[0m"
    read DRAGONCHAIN_UVN_INTERNAL_ID
    echo
 
-   echo -e "\e[33mEnter your Matchmaking Token from the Dragonchain console:\e[0m"
+   echo -e "\e[94mEnter your Matchmaking Token from the Dragonchain console:\e[0m"
    read DRAGONCHAIN_UVN_REGISTRATION_TOKEN
    echo
 
-   echo -e "\e[33mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
+   echo -e "\e[94mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
    read DRAGONCHAIN_UVN_NODE_NAME
    echo
 
-   echo -e "\e[33mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
+   echo -e "\e[94mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
    echo -e "\e[31mDON'T forget the http:// or https://\e[0m"
    echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
    echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
    read DRAGONCHAIN_UVN_ENDPOINT_URL
    echo
 
-   echo -e "\e[33mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
+   echo -e "\e[94mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
    read DRAGONCHAIN_UVN_NODE_PORT
    echo
 }
@@ -278,10 +278,10 @@ preflight_check
 request_user_defined_values
 
 #patch system current
-patch_server_current
+#patch_server_current
 
 #install necessary software, set tunables
-bootstrap_environment
+#bootstrap_environment
 
 # Check for argument for user to enter node details on command line or read unmanaged_verification_node.config
 # Source our umanaged_verification_node.config
@@ -294,7 +294,7 @@ download_dragonchain
 customize_dragonchain_uvm_yaml
 
 # Deploy Helm Chart
-sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml dragonchain
+#sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml dragonchain
 
 exit 0
 
