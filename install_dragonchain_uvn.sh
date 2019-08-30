@@ -278,10 +278,10 @@ preflight_check
 request_user_defined_values
 
 #patch system current
-#patch_server_current
+patch_server_current
 
 #install necessary software, set tunables
-#bootstrap_environment
+bootstrap_environment
 
 # Check for argument for user to enter node details on command line or read unmanaged_verification_node.config
 # Source our umanaged_verification_node.config
@@ -294,7 +294,7 @@ download_dragonchain
 customize_dragonchain_uvm_yaml
 
 # Deploy Helm Chart
-#sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml dragonchain
+sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml dragonchain
 
 exit 0
 
