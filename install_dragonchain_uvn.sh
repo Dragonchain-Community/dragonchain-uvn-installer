@@ -173,7 +173,8 @@ bootstrap_environment(){
     errchk $? "sudo microk8s.enable storage >> $LOG_FILE 2>&1"
 
     sudo microk8s.enable helm  >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable helm  >> $LOG_FILE 2>&1"
+    #duck - there is nothing for helm to do so it exits RC=2. Is this necessary?
+    #errchk $? "sudo microk8s.enable helm  >> $LOG_FILE 2>&1"
 
     # Install helm classic via snap package
     sudo snap install helm --classic >> $LOG_FILE 2>&1
