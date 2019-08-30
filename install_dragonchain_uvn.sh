@@ -276,6 +276,22 @@ customize_dragonchain_uvm_yaml(){
 }
 
 ##########################################################################
+## Function install_dragonchain
+install_dragonchain() {
+
+    # Upgrade Helm and sleep because EFF HELM
+    sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
+    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
+
+    sleep 20
+
+    # Deploy Helm Chart
+    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
+    errchk $? "sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1"
+}
+
+
+##########################################################################
 ## Function check_kube_status
 check_kube_status() {
     DRAGONCHAIN_UVN_INSTALLED=0
@@ -377,8 +393,7 @@ generate_chainsecrets
 download_dragonchain
 customize_dragonchain_uvm_yaml
 
-# Deploy Helm Chart
-sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml dragonchain
+install_dragonchain
 
 check_kube_status
 
