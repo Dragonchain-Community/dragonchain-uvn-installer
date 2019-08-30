@@ -13,9 +13,6 @@ REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw"
 LOG_FILE=./dragonchain-setup/drgn.log
 SECURE_LOG_FILE=./dragonchain-setup/secure.drgn.log
 
-#duck note: don't think we need this (can hardcode); not a value that should change or is configurable
-SYSCTL_CONF_MOD="vm.max_map_count=262144"
-
 #Variables may be in .config or from user input
 
 ##########################################################################
@@ -135,9 +132,9 @@ bootstrap_environment(){
 
     #duck note: might want to check the .conf file for this line to already exist before adding again
 
-    echo $SYSCTL_CONF_MOD| sudo tee -a /etc/sysctl.conf > /dev/null
-    sudo sysctl -w vm.max_map=262144 >> $LOG_FILE 2>&1
-    errchk $? "sudo sysctl -w vm.max_map=262144 >> $LOG_FILE 2>&1"
+    echo "vm.max_map_count=262144"| sudo tee -a /etc/sysctl.conf > /dev/null
+    sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1
+    errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
     sudo apt-get install -y jq openssl xxd >> $LOG_FILE 2>&1
