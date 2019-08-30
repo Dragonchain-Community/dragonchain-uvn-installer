@@ -313,7 +313,7 @@ check_kube_status() {
              break
         fi
 
-        if [ $STATUS_CHECK_COUNT -gt 4 ] #Don't loop forever
+        if [ $STATUS_CHECK_COUNT -gt 60 ] #Don't loop forever (60 loops should be about 30 minutes, the longest it SHOULD take for kube to finish its business)
         then
              break
         fi
