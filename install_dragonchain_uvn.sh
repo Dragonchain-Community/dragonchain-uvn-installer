@@ -103,7 +103,7 @@ function set_config_values() {
         echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
         echo
 
-        # Prompt user about whether to use saved values 
+        # Prompt user about whether to use saved values
         #duck Maybe just add a flag to bypass this for automated installation?
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
