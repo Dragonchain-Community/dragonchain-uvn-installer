@@ -22,3 +22,5 @@ Currently, the following limitations are in place for this script to function:
 ### Coming features:
 - Support for pre-built config files for easy automatic deployment
 - Sanity checks for user input to prevent downstream problems
+
+*Dragonchain-Community and this project are not affiliated with Dragonchain, Inc. or the Dragonchain Foundation*
