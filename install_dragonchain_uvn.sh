@@ -435,22 +435,29 @@ check_matchmaking_status() {
 ## Main()
 
 #check for required commands, setup logging
+printf "\nChecking host OS for necessary components...\n"
 preflight_check
 
 #load config values or gather from user
 set_config_values
 
 #patch system current
+printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
 
 #install necessary software, set tunables
+printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
 bootstrap_environment
 
 # must gather node details from user or .config before generating chainsecrets
+printf "\nGenerating chain secrets...\n"
 generate_chainsecrets
+printf "\nDownloading Dragonchain...\n"
 download_dragonchain
+printf "\nCustomizing UVN configuration (yaml)...\n"
 customize_dragonchain_uvm_yaml
 
+printf "\nInstalling UVN Dragonchain...\n"
 install_dragonchain
 
 check_kube_status
