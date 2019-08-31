@@ -54,6 +54,10 @@ preflight_check() {
         errchk $? "mkdir ./dragonchain-setup"
     fi
 
+    # create the installer settings directory (for storing config'ed values, logs?)
+    mkdir -p ~/.dragonchain-installer
+    errchk $? "mkdir -p ~/.dragonchain-installer"
+
     # Test for sudo without password prompts. This is by no means exhaustive.
     # Sudo can be configured many different ways and extensive sudo testing is beyond the scope of this effort
     # There are may ways sudo could be configured in this simple example we expect:
@@ -82,8 +86,47 @@ preflight_check() {
 }
 
 ##########################################################################
+## Function set_config_values
+function set_config_values() {
+    if [ -f ~/.dragonchain-installer/.config ]
+    then
+        # Execute config file
+        . ~/.dragonchain-installer/.config
+
+        echo -e "\e[93mSaved configuration values found:\e[0m"
+        echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
+        echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
+        echo "Node Name = $DRAGONCHAIN_UVN_NODE_NAME"
+        echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
+        echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
+        echo
+
+        # Prompt user about whether to use saved values 
+        #duck Maybe just add a flag to bypass this for automated installation?
+        local ANSWER=""
+        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
+        do
+            echo -e "\e[93mUse saved configuration? [yes or no]\e[0m"
+            read ANSWER
+            echo
+        done
+
+        if [[ "$ANSWER" == "n" || "$ANSWER" == "no" ]]
+        then
+            # User wants fresh values
+            request_user_defined_values
+        fi
+    else
+        # No saved config, request values
+        request_user_defined_values
+    fi
+}
+
+
+##########################################################################
 ## Function request_user_defined_values
 request_user_defined_values() {
+
    # Collect user-configured fields
    # TODO: Sanitize all inputs
 
@@ -109,6 +152,17 @@ request_user_defined_values() {
    echo -e "\e[94mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
    read DRAGONCHAIN_UVN_NODE_PORT
    echo
+
+   # Write a fresh config file with user-defined values
+   rm -f ~/.dragonchain-installer/.config
+   touch ~/.dragonchain-installer/.config
+
+   echo "DRAGONCHAIN_UVN_INTERNAL_ID=$DRAGONCHAIN_UVN_INTERNAL_ID" >> ~/.dragonchain-installer/.config
+   echo "DRAGONCHAIN_UVN_REGISTRATION_TOKEN=$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" >> ~/.dragonchain-installer/.config
+   echo "DRAGONCHAIN_UVN_NODE_NAME=$DRAGONCHAIN_UVN_NODE_NAME" >> ~/.dragonchain-installer/.config
+   echo "DRAGONCHAIN_UVN_ENDPOINT_URL=$DRAGONCHAIN_UVN_ENDPOINT_URL" >> ~/.dragonchain-installer/.config
+   echo "DRAGONCHAIN_UVN_NODE_PORT=$DRAGONCHAIN_UVN_NODE_PORT" >> ~/.dragonchain-installer/.config
+
 }
 
 
@@ -137,8 +191,8 @@ bootstrap_environment(){
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
-    sudo apt-get install -y jq openssl xxd >> $LOG_FILE 2>&1
-    errchk $? "sudo apt-get install -y jq openssl xxd >> $LOG_FILE 2>&1"
+    sudo apt-get install -y curl jq openssl xxd >> $LOG_FILE 2>&1
+    errchk $? "sudo apt-get install -y curl jq openssl xxd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
     sudo snap install microk8s --classic >> $LOG_FILE 2>&1
@@ -374,8 +428,8 @@ check_matchmaking_status() {
 #check for required commands, setup logging
 preflight_check
 
-#gather user defined values
-request_user_defined_values
+#load config values or gather from user
+set_config_values
 
 #patch system current
 patch_server_current
