@@ -412,11 +412,12 @@ check_matchmaking_status() {
     if [ $SUCCESS_CHECK -eq 1 ]
     then
         #SUCCESS!
-        echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
-
         echo "Your HMAC (aka Access) Key Details are as follows (please save for future use):"
         echo "ID: $HMAC_ID"
         echo "Key: $HMAC_KEY"
+
+        echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+
     else
         #Boo!
         echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
