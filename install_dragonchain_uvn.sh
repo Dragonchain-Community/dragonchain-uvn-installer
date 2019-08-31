@@ -395,10 +395,10 @@ set_dragonchain_public_id() {
     local PODLIST=$(sudo kubectl get pods -n dragonchain)
 
     DRAGONCHAIN_WEBSERVER_POD_NAME=$(echo "$PODLIST" | grep -Po "\K$DRAGONCHAIN_UVN_NODE_NAME-webserver-[^-]+-[^\s]+")
-    #duck errchk here - I'm too dumb
+    errchk $? "Pod name extraction"
 
     DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n dragonchain $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
-    #duck errchk here - I'm too dumb
+    errchk $? "Public ID lookup"
 
     #duck Let's log this in the secrets file with hmac stuff
     echo "Your Chain's Public ID is: $DRAGONCHAIN_UVN_PUBLIC_ID"
