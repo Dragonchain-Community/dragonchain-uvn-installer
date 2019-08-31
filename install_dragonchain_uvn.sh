@@ -283,8 +283,10 @@ download_dragonchain(){
     # https://dragonchain-core-docs.dragonchain.com/latest/deployment/links.html
     #duck this probably isn't always going to be the latest
     #duck note: switched to variable values with hard versioning
-    wget -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL
-    wget -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL
+    wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL
+    errchk $? "wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL"
+    wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL
+    errchk $? "wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL"
 }
 
 ##########################################################################
