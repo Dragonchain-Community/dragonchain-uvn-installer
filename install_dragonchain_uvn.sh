@@ -22,10 +22,11 @@ SECURE_LOG_FILE=./dragonchain-setup/secure.drgn.log
 ## When passing $2, do not forget to escape any ""
 errchk() {
     if [ "$1" -ne 0 ] ; then
+        printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2" >> $LOG_FILE
         printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2"
         exit $1
     fi
-    printf "\nPASS: %s\n" "$2"
+    printf "\nPASS: %s\n" "$2" >> $LOG_FILE
 }
 
 ##########################################################################
