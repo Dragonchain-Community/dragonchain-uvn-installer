@@ -11,7 +11,7 @@ Currently, the following limitations are in place for this script to function:
 
 ### Usage:
 
-- Clone the repo or download the **install_dragonchain_uvn.sh** raw file
+- Clone the repo or download the [install_dragonchain_uvn.sh](https://dragonchain-community.github.io/dragonchain-uvn-installer/install_dragonchain_uvn.sh) file
 
 - Make the script executable:
 ```chmod u+x install_dragonchain_uvn.sh```
