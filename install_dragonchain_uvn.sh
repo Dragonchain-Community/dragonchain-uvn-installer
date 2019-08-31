@@ -64,8 +64,9 @@ preflight_check() {
     # There are may ways sudo could be configured in this simple example we expect:
     # ubuntu ALL=(ALL) NOPASSWD:ALL #where 'ubuntu' could be any user
     if timeout -s SIGKILL 2 sudo ls -l /tmp >/dev/null 2>&1 ; then
-        printf "PASS: Sudo configuration in place\n"
+        printf "PASS: Sudo configuration in place\n" >> $LOG_FILE
     else
+        printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n" >> $LOG_FILE
         printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n"
         exit 1
     fi
