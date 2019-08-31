@@ -398,9 +398,8 @@ set_dragonchain_public_id() {
     DRAGONCHAIN_WEBSERVER_POD_NAME=$(echo "$PODLIST" | grep -Po "\K$DRAGONCHAIN_UVN_NODE_NAME-webserver-[^-]+-[^\s]+")
 
     DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n dragonchain $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
-
-    echo "Public ID: $DRAGONCHAIN_UVN_PUBLIC_ID"
     #duck Let's log this in the secrets file with hmac stuff
+    echo "Your Chain's Public ID is: $DRAGONCHAIN_UVN_PUBLIC_ID"
 }
 
 ##########################################################################
@@ -414,13 +413,16 @@ check_matchmaking_status() {
     then
         #SUCCESS!
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+
+        echo "Your HMAC (aka Access) Key Details are as follows (please save for future use):"
+        echo "ID: $HMAC_ID"
+        echo "Key: $HMAC_KEY"
     else
         #Boo!
-        echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
     fi
 }
-
 
 
 ## Main()
