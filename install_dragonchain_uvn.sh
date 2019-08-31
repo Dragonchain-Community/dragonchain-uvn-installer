@@ -446,11 +446,6 @@ patch_server_current
 #install necessary software, set tunables
 bootstrap_environment
 
-# Check for argument for user to enter node details on command line or read unmanaged_verification_node.config
-# Source our umanaged_verification_node.config
-#chmod u+x unmanaged_verification_node.config
-#. ./unmanaged_verification_node.config
-
 # must gather node details from user or .config before generating chainsecrets
 generate_chainsecrets
 download_dragonchain
