@@ -1,6 +1,6 @@
 # dragonchain-uvn-installer 
 
-This project enables "easy mode" setup and installation of an Dragonchain Level 2 Unmanaged Verification Node
+This project enables "easy mode" setup and installation of a Dragonchain Level 2 Unmanaged Verification Node
 
 ### Limitations:
 
