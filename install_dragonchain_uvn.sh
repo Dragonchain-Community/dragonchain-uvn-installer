@@ -290,8 +290,8 @@ download_dragonchain(){
 }
 
 ##########################################################################
-## Function customize_dragonchain_uvm_yaml
-customize_dragonchain_uvm_yaml(){
+## Function customize_dragonchain_uvn_yaml
+customize_dragonchain_uvn_yaml(){
     #duck
     # Modify opensource-config.yaml to our nodes specifications
     # 1. ArbitraryName with nodename for sanity sake
@@ -455,7 +455,7 @@ generate_chainsecrets
 printf "\nDownloading Dragonchain...\n"
 download_dragonchain
 printf "\nCustomizing UVN configuration (yaml)...\n"
-customize_dragonchain_uvm_yaml
+customize_dragonchain_uvn_yaml
 
 printf "\nInstalling UVN Dragonchain...\n"
 install_dragonchain
