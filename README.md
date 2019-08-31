@@ -1,11 +1,24 @@
-# drgn_nodes
-# UVN = Unmanaged Verification Node
-Usage:
+# dragonchain-uvn-installer 
 
-wget unmanaged_verification_node.config ; edit this file with node specific information
+This project enables "easy mode" setup and installation of a Dragonchain Level 2 Unmanaged Verification Node
 
-# bootstrap AWS Ubuntu 18.04 LTS image with necessary software & create microk8s single node cluster
-wget bootstrap_server_software.sh ; chmod u+x bootstrap_server_software.sh ; ./bootstrap_server_software.sh
+### Limitations:
 
-# Create custom .yaml file and spin up DRGN L2 node!
-wget create_drgn_node.sh ; chmod u+x create_drgn_node.sh ; ./create_drgn_node.sh
+Currently, the following limitations are in place for this script to function:
+- Must be run on a Ubuntu linux installation (standard or server version)
+    - Recommended server specs for the current Dragonchain release (3.5.0): 2 CPUs, 8GB RAM
+- Only supports unmanaged level 2 nodes at this time (level 3+ support will come soon)
+
+### Usage:
+
+- Clone the repo or download the **install_dragonchain_uvn.sh** raw file
+
+- Make the script executable:
+```chmod u+x install_dragonchain_uvn.sh```
+
+- Run the script with sudo:
+```sudo ./install_dragonchain_uvn.sh```
+
+### Coming features:
+- Support for pre-built config files for easy automatic deployment
+- Sanity checks for user input to prevent downstream problems
