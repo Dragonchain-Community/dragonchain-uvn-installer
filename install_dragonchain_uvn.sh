@@ -259,7 +259,7 @@ generate_chainsecrets(){
     HMAC_ID=$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
     HMAC_KEY=$(tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 43 | head -n 1)
     SECRETS_AS_JSON="{\"private-key\":\"$BASE_64_PRIVATE_KEY\",\"hmac-id\":\"$HMAC_ID\",\"hmac-key\":\"$HMAC_KEY\",\"registry-password\":\"\"}"
-    kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON"
+    sudo kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON"
     # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
 
     # output from generated script above ; we need to capture ROOT HMAC KEY for later!
@@ -394,13 +394,14 @@ set_dragonchain_public_id() {
     #Parse the full name of the webserver pod
     local PODLIST=$(sudo kubectl get pods -n dragonchain)
 
-    #duck global variables make me itch...
     DRAGONCHAIN_WEBSERVER_POD_NAME=$(echo "$PODLIST" | grep -Po "\K$DRAGONCHAIN_UVN_NODE_NAME-webserver-[^-]+-[^\s]+")
+    errchk $? "Pod name extraction"
 
     DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n dragonchain $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
+    errchk $? "Public ID lookup"
 
-    echo "Public ID: $DRAGONCHAIN_UVN_PUBLIC_ID"
     #duck Let's log this in the secrets file with hmac stuff
+    echo "Your Chain's Public ID is: $DRAGONCHAIN_UVN_PUBLIC_ID"
 }
 
 ##########################################################################
@@ -413,14 +414,18 @@ check_matchmaking_status() {
     if [ $SUCCESS_CHECK -eq 1 ]
     then
         #SUCCESS!
+        echo "Your HMAC (aka Access) Key Details are as follows (please save for future use):"
+        echo "ID: $HMAC_ID"
+        echo "Key: $HMAC_KEY"
+
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+
     else
         #Boo!
-        echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
     fi
 }
-
 
 
 ## Main()
