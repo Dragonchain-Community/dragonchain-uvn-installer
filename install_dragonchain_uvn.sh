@@ -191,7 +191,7 @@ bootstrap_environment(){
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
-    sudo apt-get install -y curl jq openssl xxd >> $LOG_FILE 2>&1
+    sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1
     errchk $? "sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
