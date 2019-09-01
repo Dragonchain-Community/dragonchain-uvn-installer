@@ -10,8 +10,8 @@ DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/lates
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw"
 #duck note: would just assume keep any files generated in a subfolder of the executing directory
-LOG_FILE=./dragonchain-setup/drgn.log
-SECURE_LOG_FILE=./dragonchain-setup/secure.drgn.log
+LOG_FILE=./dragonchain-setup/dragonchain_uvn_installer.log
+SECURE_LOG_FILE=./dragonchain-setup/dragonchain_uvn_installer.secure.log
 
 #Variables may be in .config or from user input
 
@@ -22,10 +22,11 @@ SECURE_LOG_FILE=./dragonchain-setup/secure.drgn.log
 ## When passing $2, do not forget to escape any ""
 errchk() {
     if [ "$1" -ne 0 ] ; then
+        printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2" >> $LOG_FILE
         printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2"
         exit $1
     fi
-    printf "\nPASS: %s\n" "$2"
+    printf "\nPASS: %s\n" "$2" >> $LOG_FILE
 }
 
 ##########################################################################
@@ -63,8 +64,9 @@ preflight_check() {
     # There are may ways sudo could be configured in this simple example we expect:
     # ubuntu ALL=(ALL) NOPASSWD:ALL #where 'ubuntu' could be any user
     if timeout -s SIGKILL 2 sudo ls -l /tmp >/dev/null 2>&1 ; then
-        printf "PASS: Sudo configuration in place\n"
+        printf "PASS: Sudo configuration in place\n" >> $LOG_FILE
     else
+        printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n" >> $LOG_FILE
         printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n"
         exit 1
     fi
@@ -101,7 +103,7 @@ function set_config_values() {
         echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
         echo
 
-        # Prompt user about whether to use saved values 
+        # Prompt user about whether to use saved values
         #duck Maybe just add a flag to bypass this for automated installation?
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
@@ -253,13 +255,13 @@ generate_chainsecrets(){
 
     #duck note: running it outright; TODO: write HMAC_ID and HMAC_KEY to secure log file
 
-    echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | kubectl create -f -
+    echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | kubectl create -f - >> $LOG_FILE
     export LC_CTYPE=C  # Needed on MacOS when using tr with /dev/urandom
-    BASE_64_PRIVATE_KEY=$(openssl ecparam -genkey -name secp256k1 | openssl ec -outform DER | tail -c +8 | head -c 32 | xxd -p -c 32 | xxd -r -p | base64)
+    BASE_64_PRIVATE_KEY=$(openssl ecparam -genkey -name secp256k1 | openssl ec -outform DER 2>/dev/null| tail -c +8 | head -c 32 | xxd -p -c 32 | xxd -r -p | base64)
     HMAC_ID=$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
     HMAC_KEY=$(tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 43 | head -n 1)
     SECRETS_AS_JSON="{\"private-key\":\"$BASE_64_PRIVATE_KEY\",\"hmac-id\":\"$HMAC_ID\",\"hmac-key\":\"$HMAC_KEY\",\"registry-password\":\"\"}"
-    sudo kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON"
+    sudo kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON" >> $LOG_FILE
     # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
 
     # output from generated script above ; we need to capture ROOT HMAC KEY for later!
@@ -281,13 +283,15 @@ download_dragonchain(){
     # https://dragonchain-core-docs.dragonchain.com/latest/deployment/links.html
     #duck this probably isn't always going to be the latest
     #duck note: switched to variable values with hard versioning
-    wget -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL
-    wget -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL
+    wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL
+    errchk $? "wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL"
+    wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL
+    errchk $? "wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL"
 }
 
 ##########################################################################
-## Function customize_dragonchain_uvm_yaml
-customize_dragonchain_uvm_yaml(){
+## Function customize_dragonchain_uvn_yaml
+customize_dragonchain_uvn_yaml(){
     #duck
     # Modify opensource-config.yaml to our nodes specifications
     # 1. ArbitraryName with nodename for sanity sake
@@ -431,27 +435,29 @@ check_matchmaking_status() {
 ## Main()
 
 #check for required commands, setup logging
+printf "\nChecking host OS for necessary components...\n"
 preflight_check
 
 #load config values or gather from user
 set_config_values
 
 #patch system current
+printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
 
 #install necessary software, set tunables
+printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
 bootstrap_environment
 
-# Check for argument for user to enter node details on command line or read unmanaged_verification_node.config
-# Source our umanaged_verification_node.config
-#chmod u+x unmanaged_verification_node.config
-#. ./unmanaged_verification_node.config
-
 # must gather node details from user or .config before generating chainsecrets
+printf "\nGenerating chain secrets...\n"
 generate_chainsecrets
+printf "\nDownloading Dragonchain...\n"
 download_dragonchain
-customize_dragonchain_uvm_yaml
+printf "\nCustomizing UVN configuration (yaml)...\n"
+customize_dragonchain_uvn_yaml
 
+printf "\nInstalling UVN Dragonchain...\n"
 install_dragonchain
 
 check_kube_status
