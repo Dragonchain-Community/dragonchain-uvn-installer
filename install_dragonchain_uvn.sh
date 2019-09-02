@@ -10,8 +10,9 @@ DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/lates
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw"
 #duck note: would just assume keep any files generated in a subfolder of the executing directory
-LOG_FILE=./dragonchain-setup/dragonchain_uvn_installer.log
-SECURE_LOG_FILE=./dragonchain-setup/dragonchain_uvn_installer.secure.log
+DRAGONCHAIN_INSTALLER_BASE=~/.dragonchain_installer
+LOG_FILE=$DRAGONCHAIN_INSTALLER_BASE/dragonchain_uvn_installer.log
+SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_BASE/dragonchain_uvn_installer.secure.log
 
 #Variables may be in .config or from user input
 
