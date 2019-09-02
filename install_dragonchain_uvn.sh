@@ -176,8 +176,8 @@ patch_server_current() {
     sudo apt-get update >> $LOG_FILE 2>&1
     errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
 
-    sudo apt-get upgrade -y >> $LOG_FILE 2>&1
-    errchk $? "sudo apt-get upgrade -y >> $LOG_FILE 2>&1"
+#    sudo apt-get upgrade -y >> $LOG_FILE 2>&1
+#    errchk $? "sudo apt-get upgrade -y >> $LOG_FILE 2>&1"
 }
 
 ##########################################################################
@@ -194,8 +194,8 @@ bootstrap_environment(){
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
-    sudo apt-get install -y curl jq openssl xxd >> $LOG_FILE 2>&1
-    errchk $? "sudo apt-get install -y curl jq openssl xxd >> $LOG_FILE 2>&1"
+    sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1
+    errchk $? "sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
     sudo snap install microk8s --classic >> $LOG_FILE 2>&1
@@ -342,7 +342,7 @@ install_dragonchain() {
     sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
     errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
 
-    sleep 20
+    sleep 30
 
     # Deploy Helm Chart
     sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
@@ -425,6 +425,8 @@ check_matchmaking_status() {
 
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
 
+        offer_apt_upgrade
+
     else
         #Boo!
         echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
@@ -432,6 +434,25 @@ check_matchmaking_status() {
     fi
 }
 
+offer_apt_upgrade() {
+
+    echo -e "\e[93mIt is HIGHLY recommended that you run 'sudo apt-get upgrade -y' at this time to update your operating system.\e[0m"
+
+    local ANSWER=""
+    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
+    do
+        echo -e "Run the upgrade command now? [yes or no]"
+        read ANSWER
+        echo
+    done
+
+    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
+    then
+        # User wants fresh values
+        sudo apt-get upgrade -y
+        errchk $? "sudo apt-get upgrade -y"
+    fi
+}
 
 ## Main()
 
@@ -468,4 +489,3 @@ set_dragonchain_public_id
 check_matchmaking_status
 
 exit 0
-
