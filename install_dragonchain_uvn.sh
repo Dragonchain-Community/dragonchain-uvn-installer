@@ -450,7 +450,7 @@ offer_apt_upgrade() {
 ## Main()
 
 #check for required commands, setup logging
-printf "\nChecking host OS for necessary components...\n"
+printf "\n\nChecking host OS for necessary components...\n\n"
 preflight_check
 
 #load config values or gather from user
