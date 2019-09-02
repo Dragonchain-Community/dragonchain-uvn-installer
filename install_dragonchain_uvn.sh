@@ -284,6 +284,8 @@ check_existing_install(){
             sudo microk8s.reset >> $LOG_FILE 2>&1
             errchk $? "sudo microk8s.reset"
 
+            sleep 20
+
             initialize_microk8s
         fi
     fi
