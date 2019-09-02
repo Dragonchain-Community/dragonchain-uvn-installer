@@ -25,7 +25,7 @@ errchk() {
     if [ "$1" -ne 0 ] ; then
         printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2" >> $LOG_FILE
         printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2"
-        exit $1
+        exit "$1"
     fi
     printf "\nPASS: %s\n" "$2" >> $LOG_FILE
 }
@@ -81,8 +81,8 @@ preflight_check() {
     # Check for existance of necessary commands
     for CMD in $REQUIRED_COMMANDS ; do
         if ! cmd_exists "$CMD" ; then
-            printf "ERROR: Command '%s' was not found and is required. Cannot proceed further.\n"
-            printf "Please install with apt-get install '%s'\n"
+            printf "ERROR: Command '%s' was not found and is required. Cannot proceed further.\n" "$CMD"
+            printf "Please install with apt-get install '%s'\n" "$CMD"
             exit 1
         fi
     done
