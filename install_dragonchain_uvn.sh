@@ -4,15 +4,15 @@
 ## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
 
 # Variables
-DRAGONCHAIN_VERSION="3.5.0"
+DRAGONCHAIN_VERSION="3.5.0" #duck Unused
 DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw"
 #duck note: would just assume keep any files generated in a subfolder of the executing directory
-DRAGONCHAIN_INSTALLER_BASE=~/.dragonchain_installer
-LOG_FILE=$DRAGONCHAIN_INSTALLER_BASE/dragonchain_uvn_installer.log
-SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_BASE/dragonchain_uvn_installer.secure.log
+DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
+LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
+SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 
 #Variables may be in .config or from user input
 
@@ -57,8 +57,9 @@ preflight_check() {
     fi
 
     # create the installer settings directory (for storing config'ed values, logs?)
-    mkdir -p ~/.dragonchain-installer
-    errchk $? "mkdir -p ~/.dragonchain-installer"
+    #mkdir -p ~/.dragonchain-installer #duck delete this line
+    mkdir -p $DRAGONCHAIN_INSTALLER_DIR
+    errchk $? "mkdir -p $DRAGONCHAIN_INSTALLER_DIR"
 
     # Test for sudo without password prompts. This is by no means exhaustive.
     # Sudo can be configured many different ways and extensive sudo testing is beyond the scope of this effort
@@ -91,10 +92,10 @@ preflight_check() {
 ##########################################################################
 ## Function set_config_values
 function set_config_values() {
-    if [ -f ~/.dragonchain-installer/.config ]
+    if [ -f $DRAGONCHAIN_INSTALLER_DIR/.config ]
     then
         # Execute config file
-        . ~/.dragonchain-installer/.config
+        . $DRAGONCHAIN_INSTALLER_DIR/.config
 
         echo -e "\e[93mSaved configuration values found:\e[0m"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
@@ -157,14 +158,14 @@ request_user_defined_values() {
    echo
 
    # Write a fresh config file with user-defined values
-   rm -f ~/.dragonchain-installer/.config
-   touch ~/.dragonchain-installer/.config
+   rm -f $DRAGONCHAIN_INSTALLER_DIR/.config
+   touch $DRAGONCHAIN_INSTALLER_DIR/.config
 
-   echo "DRAGONCHAIN_UVN_INTERNAL_ID=$DRAGONCHAIN_UVN_INTERNAL_ID" >> ~/.dragonchain-installer/.config
-   echo "DRAGONCHAIN_UVN_REGISTRATION_TOKEN=$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" >> ~/.dragonchain-installer/.config
-   echo "DRAGONCHAIN_UVN_NODE_NAME=$DRAGONCHAIN_UVN_NODE_NAME" >> ~/.dragonchain-installer/.config
-   echo "DRAGONCHAIN_UVN_ENDPOINT_URL=$DRAGONCHAIN_UVN_ENDPOINT_URL" >> ~/.dragonchain-installer/.config
-   echo "DRAGONCHAIN_UVN_NODE_PORT=$DRAGONCHAIN_UVN_NODE_PORT" >> ~/.dragonchain-installer/.config
+   echo "DRAGONCHAIN_UVN_INTERNAL_ID=$DRAGONCHAIN_UVN_INTERNAL_ID" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_REGISTRATION_TOKEN=$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_NODE_NAME=$DRAGONCHAIN_UVN_NODE_NAME" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_ENDPOINT_URL=$DRAGONCHAIN_UVN_ENDPOINT_URL" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_NODE_PORT=$DRAGONCHAIN_UVN_NODE_PORT" >> $DRAGONCHAIN_INSTALLER_DIR/.config
 
 }
 
