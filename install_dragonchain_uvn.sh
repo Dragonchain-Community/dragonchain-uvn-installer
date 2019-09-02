@@ -249,12 +249,6 @@ bootstrap_environment(){
 ##########################################################################
 ## Function generate_chainsecrets
 generate_chainsecrets(){
-    #duck - rewrite this piece, no need to generate a file and execute
-    # generate setup_chainsecrets.sh script to be executed
-    # need \ before $"" and $() ; compare to template in 'code' to verify accuracy of cmds
-    # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_04
-    # # This will be a problem if $DRAGONCHAIN_UVN_NODE_NAME has a space in it!!
-
     #duck note: running it outright; TODO: write HMAC_ID and HMAC_KEY to secure log file
 
     echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | kubectl create -f - >> $LOG_FILE
@@ -267,12 +261,6 @@ generate_chainsecrets(){
     # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
 
     # output from generated script above ; we need to capture ROOT HMAC KEY for later!
-    ## ./setup_chainsecrets.sh
-    ## The connection to the server localhost:8080 was refused - did you specify the right host or port?
-    ## read EC key
-    ## writing EC key
-    ## Root HMAC key details: ID: XXFRZZOJWAAJ | KEY: AjEHkGntNVxvMTgFMiolSJXwKgkiUzg2lJ9dMCjIdUp
-    ## The connection to the server localhost:8080 was refused - did you specify the right host or port?
 }
 
 ##########################################################################
