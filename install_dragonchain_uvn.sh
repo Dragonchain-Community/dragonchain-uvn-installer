@@ -230,8 +230,15 @@ bootstrap_environment(){
     errchk $? "sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 10
+    sleep 20
 
+    initialize_microk8s
+
+}
+
+##########################################################################
+## Function initialize_microk8s
+initialize_microk8s(){
     # Enable Microk8s modules
     # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
     sudo microk8s.enable dns storage helm >> $LOG_FILE 2>&1
@@ -245,12 +252,13 @@ bootstrap_environment(){
     errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 10
+    sleep 20
 
     # Install more Microk8s modules
     sudo microk8s.enable registry ingress fluentd >> $LOG_FILE 2>&1
     errchk $? "sudo microk8s.enable registry ingress fluentd >> $LOG_FILE 2>&1"
 }
+
 
 ##########################################################################
 ## Function check_existing_install
@@ -275,6 +283,12 @@ check_existing_install(){
             echo "Reseting microk8s (may take several minutes)..."
             sudo microk8s.reset >> $LOG_FILE 2>&1
             errchk $? "sudo microk8s.reset"
+
+            # Enable Microk8s modules
+            # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
+            sudo microk8s.enable dns storage helm >> $LOG_FILE 2>&1
+
+            initialize_microk8s
         fi
     fi
 
