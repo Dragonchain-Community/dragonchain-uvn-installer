@@ -60,15 +60,19 @@ preflight_check() {
     mkdir -p $DRAGONCHAIN_INSTALLER_DIR
     errchk $? "mkdir -p $DRAGONCHAIN_INSTALLER_DIR"
 
-    # Generate logfiles
-    touch $LOG_FILE >/dev/null 2>&1
-    errchk $? "touch $LOG_FILE >/dev/null 2>&1"
-    touch $SECURE_LOG_FILE >/dev/null 2>&1
-    errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
-
-    # Rotate logfiles if size is greater than 0
-    savelog -t -c 5 -l -p -n -q $LOG_FILE
-    savelog -t -c 5 -l -p -n -q $SECURE_LOG_FILE
+    # Generate logfiles & rotate as appropriate
+    if [ ! -e $LOG_FILE ]; then
+        touch $LOG_FILE >/dev/null 2>&1
+        errchk $? "touch $LOG_FILE >/dev/null 2>&1"
+    else
+        savelog -t -c 5 -l -p -n -q $LOG_FILE
+    fi
+    if [ ! -e $SECURE_LOG_FILE ]; then
+        touch $SECURE_LOG_FILE >/dev/null 2>&1
+        errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
+    else
+        savelog -t -c 5 -l -p -n -q $SECURE_LOG_FILE
+    fi
 
     # Test for sudo without password prompts. This is by no means exhaustive.
     # Sudo can be configured many different ways and extensive sudo testing is beyond the scope of this effort
