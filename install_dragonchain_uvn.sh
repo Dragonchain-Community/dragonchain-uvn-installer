@@ -245,6 +245,35 @@ bootstrap_environment(){
 }
 
 ##########################################################################
+## Function check_existing_install
+check_existing_install(){
+    NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c "dragonchain")
+
+    if [ $NAMESPACE_EXISTS -ge 1 ]
+    then
+        echo -e "\e[93mA previous installation of Dragonchain (failed or complete) was found.\e[0m"
+
+        local ANSWER=""
+        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
+        do
+            echo -e "Reset your installation (\e[91mAll data will be deleted\e[0m)? [yes or no]"
+            read ANSWER
+            echo
+        done
+
+        if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
+        then
+            # User wants fresh install
+            echo "Reseting microk8s (may take several minutes)..."
+            sudo microk8s.reset
+            errchk $? "sudo microk8s.reset"
+        fi
+    fi
+
+}
+
+
+##########################################################################
 ## Function generate_chainsecrets
 generate_chainsecrets(){
     #duck - rewrite this piece, no need to generate a file and execute
@@ -469,6 +498,10 @@ patch_server_current
 #install necessary software, set tunables
 printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
 bootstrap_environment
+
+# check for previous installation (failed or successful) and offer reset if found
+printf "\nChecking for previous installation...\n"
+check_existing_install
 
 # must gather node details from user or .config before generating chainsecrets
 printf "\nGenerating chain secrets...\n"
