@@ -284,10 +284,6 @@ check_existing_install(){
             sudo microk8s.reset >> $LOG_FILE 2>&1
             errchk $? "sudo microk8s.reset"
 
-            # Enable Microk8s modules
-            # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
-            sudo microk8s.enable dns storage helm >> $LOG_FILE 2>&1
-
             initialize_microk8s
         fi
     fi
