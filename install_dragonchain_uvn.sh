@@ -273,7 +273,7 @@ check_existing_install(){
         then
             # User wants fresh install
             echo "Reseting microk8s (may take several minutes)..."
-            sudo microk8s.reset
+            sudo microk8s.reset >> $LOG_FILE 2>&1
             errchk $? "sudo microk8s.reset"
         fi
     fi
