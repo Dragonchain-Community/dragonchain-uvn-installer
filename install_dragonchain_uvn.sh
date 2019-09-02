@@ -46,20 +46,25 @@ cmd_exists() {
 preflight_check() {
     #duck
 
-    # assume user executing is ubuntu with sudo privs
-    if [ -e ./dragonchain-setup ]; then
-        rm -r ./dragonchain-setup >/dev/null 2>&1
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
-    else
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
-    fi
+    # Check for existance of necessary commands
+    for CMD in $REQUIRED_COMMANDS ; do
+        if ! cmd_exists "$CMD" ; then
+            printf "ERROR: Command '%s' was not found and is required. Cannot proceed further.\n" "$CMD"
+            printf "Please install with apt-get install '%s'\n" "$CMD"
+            exit 1
+        fi
+    done
 
-    # create the installer settings directory (for storing config'ed values, logs?)
+    # Create the installer directory
     #mkdir -p ~/.dragonchain-installer #duck delete this line
     mkdir -p $DRAGONCHAIN_INSTALLER_DIR
     errchk $? "mkdir -p $DRAGONCHAIN_INSTALLER_DIR"
+
+    # Generate logfiles
+    touch $LOG_FILE >/dev/null 2>&1
+    errchk $? "touch $LOG_FILE >/dev/null 2>&1"
+    touch $SECURE_LOG_FILE >/dev/null 2>&1
+    errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
 
     # Test for sudo without password prompts. This is by no means exhaustive.
     # Sudo can be configured many different ways and extensive sudo testing is beyond the scope of this effort
@@ -73,20 +78,15 @@ preflight_check() {
         exit 1
     fi
 
-    # Generate logfiles
-    touch $LOG_FILE >/dev/null 2>&1
-    errchk $? "touch $LOG_FILE >/dev/null 2>&1"
-    touch $SECURE_LOG_FILE >/dev/null 2>&1
-    errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
-
-    # Check for existance of necessary commands
-    for CMD in $REQUIRED_COMMANDS ; do
-        if ! cmd_exists "$CMD" ; then
-            printf "ERROR: Command '%s' was not found and is required. Cannot proceed further.\n" "$CMD"
-            printf "Please install with apt-get install '%s'\n" "$CMD"
-            exit 1
-        fi
-    done
+    # assume user executing is ubuntu with sudo privs
+    if [ -e ./dragonchain-setup ]; then
+        rm -r ./dragonchain-setup >/dev/null 2>&1
+        mkdir ./dragonchain-setup
+        errchk $? "mkdir ./dragonchain-setup"
+    else
+        mkdir ./dragonchain-setup
+        errchk $? "mkdir ./dragonchain-setup"
+    fi
 }
 
 ##########################################################################
