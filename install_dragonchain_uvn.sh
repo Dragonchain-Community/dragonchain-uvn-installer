@@ -4,14 +4,14 @@
 ## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
 
 # Variables
-DRAGONCHAIN_VERSION="3.5.0"
+DRAGONCHAIN_VERSION="3.5.0" #duck Unused
 DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
 
-REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw"
-#duck note: would just assume keep any files generated in a subfolder of the executing directory
-LOG_FILE=./dragonchain-setup/dragonchain_uvn_installer.log
-SECURE_LOG_FILE=./dragonchain-setup/dragonchain_uvn_installer.secure.log
+REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
+DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
+LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
+SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 
 #Variables may be in .config or from user input
 
@@ -24,7 +24,7 @@ errchk() {
     if [ "$1" -ne 0 ] ; then
         printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2" >> $LOG_FILE
         printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2"
-        exit $1
+        exit "$1"
     fi
     printf "\nPASS: %s\n" "$2" >> $LOG_FILE
 }
@@ -43,21 +43,34 @@ cmd_exists() {
 ##########################################################################
 ## Function preflight_check
 preflight_check() {
-    #duck
+    # Check for existance of necessary commands
+    for CMD in $REQUIRED_COMMANDS ; do
+        if ! cmd_exists "$CMD" ; then
+            printf "ERROR: Command '%s' was not found and is required. Cannot proceed further.\n" "$CMD"
+            printf "Please install with apt-get install '%s'\n" "$CMD"
+            exit 1
+        fi
+    done
 
-    # assume user executing is ubuntu with sudo privs
-    if [ -e ./dragonchain-setup ]; then
-        rm -r ./dragonchain-setup >/dev/null 2>&1
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
-    else
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
+    # Create the installer directory
+    if [ ! -e $DRAGONCHAIN_INSTALLER_DIR ]; then
+        mkdir -p $DRAGONCHAIN_INSTALLER_DIR
+        errchk $? "mkdir -p $DRAGONCHAIN_INSTALLER_DIR"
     fi
 
-    # create the installer settings directory (for storing config'ed values, logs?)
-    mkdir -p ~/.dragonchain-installer
-    errchk $? "mkdir -p ~/.dragonchain-installer"
+    # Generate logfiles & rotate as appropriate
+    if [ ! -e $LOG_FILE ]; then
+        touch $LOG_FILE >/dev/null 2>&1
+        errchk $? "touch $LOG_FILE >/dev/null 2>&1"
+    else
+        savelog -t -c 5 -l -p -n -q $LOG_FILE
+    fi
+    if [ ! -e $SECURE_LOG_FILE ]; then
+        touch $SECURE_LOG_FILE >/dev/null 2>&1
+        errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
+    else
+        savelog -t -c 5 -l -p -n -q $SECURE_LOG_FILE
+    fi
 
     # Test for sudo without password prompts. This is by no means exhaustive.
     # Sudo can be configured many different ways and extensive sudo testing is beyond the scope of this effort
@@ -71,29 +84,24 @@ preflight_check() {
         exit 1
     fi
 
-    # Generate logfiles
-    touch $LOG_FILE >/dev/null 2>&1
-    errchk $? "touch $LOG_FILE >/dev/null 2>&1"
-    touch $SECURE_LOG_FILE >/dev/null 2>&1
-    errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
-
-    # Check for existance of necessary commands
-    for CMD in $REQUIRED_COMMANDS ; do
-        if ! cmd_exists "$CMD" ; then
-            printf "ERROR: Command '%s' was not found and is required. Cannot proceed further.\n"
-            printf "Please install with apt-get install '%s'\n"
-            exit 1
-        fi
-    done
+    # assume user executing is ubuntu with sudo privs
+    if [ -e ./dragonchain-setup ]; then
+        rm -r ./dragonchain-setup >/dev/null 2>&1
+        mkdir ./dragonchain-setup
+        errchk $? "mkdir ./dragonchain-setup"
+    else
+        mkdir ./dragonchain-setup
+        errchk $? "mkdir ./dragonchain-setup"
+    fi
 }
 
 ##########################################################################
 ## Function set_config_values
 function set_config_values() {
-    if [ -f ~/.dragonchain-installer/.config ]
+    if [ -f $DRAGONCHAIN_INSTALLER_DIR/.config ]
     then
         # Execute config file
-        . ~/.dragonchain-installer/.config
+        . $DRAGONCHAIN_INSTALLER_DIR/.config
 
         echo -e "\e[93mSaved configuration values found:\e[0m"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
@@ -156,14 +164,14 @@ request_user_defined_values() {
    echo
 
    # Write a fresh config file with user-defined values
-   rm -f ~/.dragonchain-installer/.config
-   touch ~/.dragonchain-installer/.config
+   rm -f $DRAGONCHAIN_INSTALLER_DIR/.config
+   touch $DRAGONCHAIN_INSTALLER_DIR/.config
 
-   echo "DRAGONCHAIN_UVN_INTERNAL_ID=$DRAGONCHAIN_UVN_INTERNAL_ID" >> ~/.dragonchain-installer/.config
-   echo "DRAGONCHAIN_UVN_REGISTRATION_TOKEN=$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" >> ~/.dragonchain-installer/.config
-   echo "DRAGONCHAIN_UVN_NODE_NAME=$DRAGONCHAIN_UVN_NODE_NAME" >> ~/.dragonchain-installer/.config
-   echo "DRAGONCHAIN_UVN_ENDPOINT_URL=$DRAGONCHAIN_UVN_ENDPOINT_URL" >> ~/.dragonchain-installer/.config
-   echo "DRAGONCHAIN_UVN_NODE_PORT=$DRAGONCHAIN_UVN_NODE_PORT" >> ~/.dragonchain-installer/.config
+   echo "DRAGONCHAIN_UVN_INTERNAL_ID=$DRAGONCHAIN_UVN_INTERNAL_ID" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_REGISTRATION_TOKEN=$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_NODE_NAME=$DRAGONCHAIN_UVN_NODE_NAME" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_ENDPOINT_URL=$DRAGONCHAIN_UVN_ENDPOINT_URL" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_NODE_PORT=$DRAGONCHAIN_UVN_NODE_PORT" >> $DRAGONCHAIN_INSTALLER_DIR/.config
 
 }
 
@@ -247,12 +255,6 @@ bootstrap_environment(){
 ##########################################################################
 ## Function generate_chainsecrets
 generate_chainsecrets(){
-    #duck - rewrite this piece, no need to generate a file and execute
-    # generate setup_chainsecrets.sh script to be executed
-    # need \ before $"" and $() ; compare to template in 'code' to verify accuracy of cmds
-    # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_04
-    # # This will be a problem if $DRAGONCHAIN_UVN_NODE_NAME has a space in it!!
-
     #duck note: running it outright; TODO: write HMAC_ID and HMAC_KEY to secure log file
 
     echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | kubectl create -f - >> $LOG_FILE
@@ -265,12 +267,6 @@ generate_chainsecrets(){
     # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
 
     # output from generated script above ; we need to capture ROOT HMAC KEY for later!
-    ## ./setup_chainsecrets.sh
-    ## The connection to the server localhost:8080 was refused - did you specify the right host or port?
-    ## read EC key
-    ## writing EC key
-    ## Root HMAC key details: ID: XXFRZZOJWAAJ | KEY: AjEHkGntNVxvMTgFMiolSJXwKgkiUzg2lJ9dMCjIdUp
-    ## The connection to the server localhost:8080 was refused - did you specify the right host or port?
 }
 
 ##########################################################################
@@ -281,7 +277,6 @@ download_dragonchain(){
 
     # Download latest Helm chart and values
     # https://dragonchain-core-docs.dragonchain.com/latest/deployment/links.html
-    #duck this probably isn't always going to be the latest
     #duck note: switched to variable values with hard versioning
     wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL
     errchk $? "wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL"
@@ -456,7 +451,7 @@ offer_apt_upgrade() {
 ## Main()
 
 #check for required commands, setup logging
-printf "\nChecking host OS for necessary components...\n"
+printf "\n\nChecking host OS for necessary components...\n\n"
 preflight_check
 
 #load config values or gather from user
@@ -473,8 +468,10 @@ bootstrap_environment
 # must gather node details from user or .config before generating chainsecrets
 printf "\nGenerating chain secrets...\n"
 generate_chainsecrets
+
 printf "\nDownloading Dragonchain...\n"
 download_dragonchain
+
 printf "\nCustomizing UVN configuration (yaml)...\n"
 customize_dragonchain_uvn_yaml
 
