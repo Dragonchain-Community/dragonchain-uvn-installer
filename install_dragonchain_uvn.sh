@@ -57,8 +57,10 @@ preflight_check() {
 
     # Create the installer directory
     #mkdir -p ~/.dragonchain-installer #duck delete this line
-    mkdir -p $DRAGONCHAIN_INSTALLER_DIR
-    errchk $? "mkdir -p $DRAGONCHAIN_INSTALLER_DIR"
+    if [ ! -e $DRAGONCHAIN_INSTALLER_DIR ]; then
+        mkdir -p $DRAGONCHAIN_INSTALLER_DIR
+        errchk $? "mkdir -p $DRAGONCHAIN_INSTALLER_DIR"
+    fi
 
     # Generate logfiles & rotate as appropriate
     if [ ! -e $LOG_FILE ]; then
