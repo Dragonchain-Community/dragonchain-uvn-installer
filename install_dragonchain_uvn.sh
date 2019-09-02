@@ -8,7 +8,7 @@ DRAGONCHAIN_VERSION="3.5.0" #duck Unused
 DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
 
-REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw"
+REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
 #duck note: would just assume keep any files generated in a subfolder of the executing directory
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
 LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
@@ -65,6 +65,10 @@ preflight_check() {
     errchk $? "touch $LOG_FILE >/dev/null 2>&1"
     touch $SECURE_LOG_FILE >/dev/null 2>&1
     errchk $? "touch $SECURE_LOG_FILE >/dev/null 2>&1"
+
+    # Rotate logfiles if size is greater than 0
+    savelog -t -c 5 -l -p -n -q $DRAGONCHAIN_INSTALLER_DIR/$LOG_FILE
+    savelog -t -c 5 -l -p -n -q $DRAGONCHAIN_INSTALLER_DIR/$SECURE_LOG_FILE
 
     # Test for sudo without password prompts. This is by no means exhaustive.
     # Sudo can be configured many different ways and extensive sudo testing is beyond the scope of this effort
