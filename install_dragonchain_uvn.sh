@@ -9,7 +9,6 @@ DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
-#duck note: would just assume keep any files generated in a subfolder of the executing directory
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
 LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
 SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
@@ -44,8 +43,6 @@ cmd_exists() {
 ##########################################################################
 ## Function preflight_check
 preflight_check() {
-    #duck
-
     # Check for existance of necessary commands
     for CMD in $REQUIRED_COMMANDS ; do
         if ! cmd_exists "$CMD" ; then
@@ -56,7 +53,6 @@ preflight_check() {
     done
 
     # Create the installer directory
-    #mkdir -p ~/.dragonchain-installer #duck delete this line
     if [ ! -e $DRAGONCHAIN_INSTALLER_DIR ]; then
         mkdir -p $DRAGONCHAIN_INSTALLER_DIR
         errchk $? "mkdir -p $DRAGONCHAIN_INSTALLER_DIR"
@@ -281,7 +277,6 @@ download_dragonchain(){
 
     # Download latest Helm chart and values
     # https://dragonchain-core-docs.dragonchain.com/latest/deployment/links.html
-    #duck this probably isn't always going to be the latest
     #duck note: switched to variable values with hard versioning
     wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL
     errchk $? "wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL"
@@ -473,8 +468,10 @@ bootstrap_environment
 # must gather node details from user or .config before generating chainsecrets
 printf "\nGenerating chain secrets...\n"
 generate_chainsecrets
+
 printf "\nDownloading Dragonchain...\n"
 download_dragonchain
+
 printf "\nCustomizing UVN configuration (yaml)...\n"
 customize_dragonchain_uvn_yaml
 
