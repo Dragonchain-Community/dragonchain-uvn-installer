@@ -230,8 +230,15 @@ bootstrap_environment(){
     errchk $? "sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 10
+    sleep 20
 
+    initialize_microk8s
+
+}
+
+##########################################################################
+## Function initialize_microk8s
+initialize_microk8s(){
     # Enable Microk8s modules
     # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
     sudo microk8s.enable dns storage helm >> $LOG_FILE 2>&1
@@ -245,12 +252,46 @@ bootstrap_environment(){
     errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 10
+    sleep 20
 
     # Install more Microk8s modules
-    sudo microk8s.enable registry ingress fluentd >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable registry ingress fluentd >> $LOG_FILE 2>&1"
+    sudo microk8s.enable registry fluentd >> $LOG_FILE 2>&1
+    errchk $? "sudo microk8s.enable registry fluentd >> $LOG_FILE 2>&1"
 }
+
+
+##########################################################################
+## Function check_existing_install
+check_existing_install(){
+    NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c "dragonchain")
+
+    if [ $NAMESPACE_EXISTS -ge 1 ]
+    then
+        echo -e "\e[93mA previous installation of Dragonchain (failed or complete) was found.\e[0m"
+
+        local ANSWER=""
+        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
+        do
+            echo -e "Reset your installation (\e[91mAll data will be deleted\e[0m)? [yes or no]"
+            read ANSWER
+            echo
+        done
+
+        if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
+        then
+            # User wants fresh install
+            echo "Reseting microk8s (may take several minutes)..."
+            sudo microk8s.reset >> $LOG_FILE 2>&1
+            errchk $? "sudo microk8s.reset"
+
+            sleep 20
+
+            initialize_microk8s
+        fi
+    fi
+
+}
+
 
 ##########################################################################
 ## Function generate_chainsecrets
@@ -464,6 +505,10 @@ patch_server_current
 #install necessary software, set tunables
 printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
 bootstrap_environment
+
+# check for previous installation (failed or successful) and offer reset if found
+printf "\nChecking for previous installation...\n"
+check_existing_install
 
 # must gather node details from user or .config before generating chainsecrets
 printf "\nGenerating chain secrets...\n"
