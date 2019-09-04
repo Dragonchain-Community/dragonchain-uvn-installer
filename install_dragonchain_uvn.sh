@@ -175,7 +175,7 @@ request_user_defined_values() {
       fi
 
       echo -e "\e[94mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
-      echo -e "\e[31mDON'T forget the http:// or https://\e[0m"
+      echo -e "\e[93mStart with http:// (or https:// if you know you've configured SSL)\e[0m"
       echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
       echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
       read DRAGONCHAIN_UVN_ENDPOINT_URL
@@ -455,7 +455,7 @@ check_kube_status() {
         exit
     fi
 
-    echo -e "\e[32mSTATUS CHECKS GOOD. DRAGONCHAIN IS RUNNING.\e[0m"
+    echo -e "\e[93mSTATUS CHECKS GOOD. DRAGONCHAIN IS RUNNING. CONTACTING MATCHMAKING API...\e[0m"
     #duck Maybe add logging here, too?
 }
 
