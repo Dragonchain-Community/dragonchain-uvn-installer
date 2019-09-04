@@ -12,13 +12,16 @@ Currently, the following limitations are in place for this script to function:
 ### Usage:
 
 - Clone the repo or download the [install_dragonchain_uvn.sh](https://dragonchain-community.github.io/dragonchain-uvn-installer/install_dragonchain_uvn.sh) file
-```wget https://dragonchain-community.github.io/dragonchain-uvn-installer/install_dragonchain_uvn.sh```
+
+    ```wget https://dragonchain-community.github.io/dragonchain-uvn-installer/install_dragonchain_uvn.sh```
 
 - Make the script executable:
-```chmod u+x install_dragonchain_uvn.sh```
+
+    ```chmod u+x install_dragonchain_uvn.sh```
 
 - Run the script with sudo:
-```sudo ./install_dragonchain_uvn.sh```
+
+    ```sudo ./install_dragonchain_uvn.sh```
 
 ### Coming features:
 - Support for pre-built config files for easy automatic deployment
