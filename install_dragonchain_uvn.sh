@@ -137,6 +137,13 @@ function set_config_values() {
 ## Function request_user_defined_values
 request_user_defined_values() {
 
+   # Reset all values in case they were set in config check
+   DRAGONCHAIN_UVN_INTERNAL_ID=""
+   DRAGONCHAIN_UVN_REGISTRATION_TOKEN=""
+   DRAGONCHAIN_UVN_NODE_NAME=""
+   DRAGONCHAIN_UVN_ENDPOINT_URL=""
+   DRAGONCHAIN_UVN_NODE_PORT=""
+
    # Collect user-configured fields
    # TODO: Sanitize all inputs
 
@@ -148,20 +155,44 @@ request_user_defined_values() {
    read DRAGONCHAIN_UVN_REGISTRATION_TOKEN
    echo
 
-   echo -e "\e[94mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
-   read DRAGONCHAIN_UVN_NODE_NAME
-   echo
+   while [[ ! $DRAGONCHAIN_UVN_NODE_NAME =~ ^[a-z0-9-]+[a-z0-9]+$ ]]
+   do
+      if [[ ! -z "$DRAGONCHAIN_UVN_NODE_NAME" ]]
+      then
+         echo -e "\e[91mInvalid node name entered!\e[0m"
+      fi
 
-   echo -e "\e[94mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
-   echo -e "\e[31mDON'T forget the http:// or https://\e[0m"
-   echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
-   echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
-   read DRAGONCHAIN_UVN_ENDPOINT_URL
-   echo
+      echo -e "\e[94mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
+      read DRAGONCHAIN_UVN_NODE_NAME
+      echo
+   done
 
-   echo -e "\e[94mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
-   read DRAGONCHAIN_UVN_NODE_PORT
-   echo
+   while [[ ! $DRAGONCHAIN_UVN_ENDPOINT_URL =~ ^(https?)://[A-Za-z0-9.-]+$ ]]
+   do
+      if [[ ! -z "$DRAGONCHAIN_UVN_ENDPOINT_URL" ]]
+      then
+         echo -e "\e[91mInvalid endpoint URL entered!\e[0m"
+      fi
+
+      echo -e "\e[94mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
+      echo -e "\e[31mDON'T forget the http:// or https://\e[0m"
+      echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
+      echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
+      read DRAGONCHAIN_UVN_ENDPOINT_URL
+      echo
+   done
+
+   while [[ ! "$DRAGONCHAIN_UVN_NODE_PORT" =~ ^[0-9]+$ ]] || (( DRAGONCHAIN_UVN_NODE_PORT < 30000 || DRAGONCHAIN_UVN_NODE_PORT > 32767 ))
+   do
+      if [[ ! -z "$DRAGONCHAIN_UVN_NODE_PORT" ]]
+      then
+         echo -e "\e[91mInvalid port number entered!\e[0m"
+      fi
+
+      echo -e "\e[94mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
+      read DRAGONCHAIN_UVN_NODE_PORT
+      echo
+   done
 
    # Write a fresh config file with user-defined values
    rm -f $DRAGONCHAIN_INSTALLER_DIR/.config
