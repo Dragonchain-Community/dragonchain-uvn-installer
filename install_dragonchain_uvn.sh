@@ -422,10 +422,10 @@ customize_dragonchain_uvn_yaml(){
 install_dragonchain() {
 
     # Upgrade Helm and sleep because EFF HELM
-    sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
-    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
+#    sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
+#    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
 
-    sleep 30
+    sleep 45
 
     # Deploy Helm Chart
     sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
@@ -480,9 +480,7 @@ check_kube_status() {
 ## Function set_dragonchain_public_id
 set_dragonchain_public_id() {
     #Parse the full name of the webserver pod
-    local PODLIST=$(sudo kubectl get pods -n dragonchain)
-
-    DRAGONCHAIN_WEBSERVER_POD_NAME=$(echo "$PODLIST" | grep -Po "\K$DRAGONCHAIN_UVN_NODE_NAME-webserver-[^-]+-[^\s]+")
+    DRAGONCHAIN_WEBSERVER_POD_NAME=$(kubectl get pod -n dragonchain -l app.kubernetes.io/component=webserver | tail -1 | awk '{print $1}')
     errchk $? "Pod name extraction"
 
     DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n dragonchain $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
