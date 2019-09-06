@@ -118,7 +118,6 @@ function set_config_values() {
         echo -e "\e[93mSaved configuration values found:\e[0m"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
         echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
-        echo "Node Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
         echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
         echo
@@ -169,18 +168,10 @@ request_user_defined_values() {
    DRAGONCHAIN_UVN_REGISTRATION_TOKEN=$(echo $DRAGONCHAIN_UVN_REGISTRATION_TOKEN | tr -d '\r')
    echo
 
-   while [[ ! $DRAGONCHAIN_UVN_NODE_NAME =~ ^[a-z0-9-]+[a-z0-9]+$ ]]
-   do
-      if [[ ! -z "$DRAGONCHAIN_UVN_NODE_NAME" ]]
-      then
-         echo -e "\e[91mInvalid node name entered!\e[0m"
-      fi
+   # Create a new node name
+   DRAGONCHAIN_UVN_NODE_NAME=$(date +"%s")
+   DRAGONCHAIN_UVN_NODE_NAME="dc-$DRAGONCHAIN_UVN_NODE_NAME"
 
-      echo -e "\e[94mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
-      read DRAGONCHAIN_UVN_NODE_NAME
-      DRAGONCHAIN_UVN_NODE_NAME=$(echo $DRAGONCHAIN_UVN_NODE_NAME | tr -d '\r')
-      echo
-   done
 
    while [[ ! $DRAGONCHAIN_UVN_ENDPOINT_URL =~ ^(https?)://[A-Za-z0-9.-]+$ ]]
    do
