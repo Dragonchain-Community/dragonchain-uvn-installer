@@ -278,7 +278,7 @@ bootstrap_environment(){
     errchk $? "sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 20
+    sleep 30
 
     initialize_microk8s
 
@@ -300,7 +300,7 @@ initialize_microk8s(){
     errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 20
+    sleep 30
 
     # Install more Microk8s modules
     sudo microk8s.enable registry fluentd >> $LOG_FILE 2>&1
