@@ -295,9 +295,6 @@ initialize_microk8s(){
     sudo snap install helm --classic >> $LOG_FILE 2>&1
     errchk $? "sudo snap install helm --classic >> $LOG_FILE 2>&1"
 
-    # Initialize helm
-    sudo helm init --history-max 200 >> $LOG_FILE 2>&1
-    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
     sleep 30
@@ -425,7 +422,12 @@ install_dragonchain() {
 #    sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
 #    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
 
-    sleep 45
+#    sleep 45
+
+    # Initialize helm (and wait until Tiller is ready before continuing)
+    sudo helm init --history-max 200 --wait >> $LOG_FILE 2>&1
+    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
+
 
     # Deploy Helm Chart
     sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
