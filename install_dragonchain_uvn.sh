@@ -262,7 +262,7 @@ bootstrap_environment(){
 
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
-    sudo ufw enable >> $LOG_FILE 2>&1
+    sudo ufw --force enable >> $LOG_FILE 2>&1
     errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
 
     sudo ufw default allow routed >> $LOG_FILE 2>&1
