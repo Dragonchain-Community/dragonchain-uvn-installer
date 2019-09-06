@@ -41,6 +41,18 @@ cmd_exists() {
 }
 
 ##########################################################################
+## Function trim
+trim() {
+   local var="$*"
+    # remove leading whitespace characters
+    var="${var#"${var%%[![:space:]]*}"}"
+    # remove trailing whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"   
+    echo -n "$var"
+}
+
+
+##########################################################################
 ## Function preflight_check
 preflight_check() {
     # Check for existance of necessary commands
@@ -149,10 +161,12 @@ request_user_defined_values() {
 
    echo -e "\e[94mEnter your Chain ID from the Dragonchain console:\e[0m"
    read DRAGONCHAIN_UVN_INTERNAL_ID
+   DRAGONCHAIN_UVN_INTERNAL_ID=$(echo $DRAGONCHAIN_UVN_INTERNAL_ID | tr -d '\r')
    echo
 
    echo -e "\e[94mEnter your Matchmaking Token from the Dragonchain console:\e[0m"
    read DRAGONCHAIN_UVN_REGISTRATION_TOKEN
+   DRAGONCHAIN_UVN_REGISTRATION_TOKEN=$(echo $DRAGONCHAIN_UVN_REGISTRATION_TOKEN | tr -d '\r')
    echo
 
    while [[ ! $DRAGONCHAIN_UVN_NODE_NAME =~ ^[a-z0-9-]+[a-z0-9]+$ ]]
@@ -164,6 +178,7 @@ request_user_defined_values() {
 
       echo -e "\e[94mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
       read DRAGONCHAIN_UVN_NODE_NAME
+      DRAGONCHAIN_UVN_NODE_NAME=$(echo $DRAGONCHAIN_UVN_NODE_NAME | tr -d '\r')
       echo
    done
 
@@ -179,6 +194,7 @@ request_user_defined_values() {
       echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
       echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
       read DRAGONCHAIN_UVN_ENDPOINT_URL
+      DRAGONCHAIN_UVN_ENDPOINT_URL=$(echo $DRAGONCHAIN_UVN_ENDPOINT_URL | tr -d '\r')
       echo
    done
 
@@ -191,6 +207,7 @@ request_user_defined_values() {
 
       echo -e "\e[94mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
       read DRAGONCHAIN_UVN_NODE_PORT
+      DRAGONCHAIN_UVN_NODE_PORT=$(echo $DRAGONCHAIN_UVN_NODE_PORT | tr -d '\r')
       echo
    done
 
