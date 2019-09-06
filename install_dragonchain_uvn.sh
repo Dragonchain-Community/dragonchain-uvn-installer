@@ -265,6 +265,9 @@ bootstrap_environment(){
     sudo ufw --force enable >> $LOG_FILE 2>&1
     errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
 
+    sudo ufw allow 22/tcp >> $LOG_FILE 2>&1
+    errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
+
     sudo ufw default allow routed >> $LOG_FILE 2>&1
     errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
 
@@ -298,6 +301,8 @@ initialize_microk8s(){
     sudo snap install helm --classic >> $LOG_FILE 2>&1
     errchk $? "sudo snap install helm --classic >> $LOG_FILE 2>&1"
 
+    sudo helm init --history-max 200 >> $LOG_FILE 2>&1
+    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
     sleep 30
@@ -422,14 +427,14 @@ customize_dragonchain_uvn_yaml(){
 install_dragonchain() {
 
     # Upgrade Helm and sleep because EFF HELM
-#    sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
-#    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
+    sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
+    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
 
-#    sleep 45
+    sleep 45
 
     # Initialize helm (and wait until Tiller is ready before continuing)
-    sudo helm init --history-max 200 --wait >> $LOG_FILE 2>&1
-    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
+#    sudo helm init --history-max 200 --wait >> $LOG_FILE 2>&1
+#    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
 
     # Deploy Helm Chart
