@@ -118,7 +118,6 @@ function set_config_values() {
         echo -e "\e[93mSaved configuration values found:\e[0m"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
         echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
-        echo "Node Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
         echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
         echo
@@ -169,18 +168,10 @@ request_user_defined_values() {
    DRAGONCHAIN_UVN_REGISTRATION_TOKEN=$(echo $DRAGONCHAIN_UVN_REGISTRATION_TOKEN | tr -d '\r')
    echo
 
-   while [[ ! $DRAGONCHAIN_UVN_NODE_NAME =~ ^[a-z0-9-]+[a-z0-9]+$ ]]
-   do
-      if [[ ! -z "$DRAGONCHAIN_UVN_NODE_NAME" ]]
-      then
-         echo -e "\e[91mInvalid node name entered!\e[0m"
-      fi
+   # Create a new node name
+   DRAGONCHAIN_UVN_NODE_NAME=$(date +"%s")
+   DRAGONCHAIN_UVN_NODE_NAME="dc-$DRAGONCHAIN_UVN_NODE_NAME"
 
-      echo -e "\e[94mEnter a name for your Dragonchain node (lowercase letters, numbers, or dashes):\e[0m"
-      read DRAGONCHAIN_UVN_NODE_NAME
-      DRAGONCHAIN_UVN_NODE_NAME=$(echo $DRAGONCHAIN_UVN_NODE_NAME | tr -d '\r')
-      echo
-   done
 
    while [[ ! $DRAGONCHAIN_UVN_ENDPOINT_URL =~ ^(https?)://[A-Za-z0-9.-]+$ ]]
    do
@@ -262,6 +253,12 @@ bootstrap_environment(){
 
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
+    sudo ufw --force enable >> $LOG_FILE 2>&1
+    errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
+
+    sudo ufw allow 22/tcp >> $LOG_FILE 2>&1
+    errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
+
     sudo ufw default allow routed >> $LOG_FILE 2>&1
     errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
 
@@ -278,7 +275,7 @@ bootstrap_environment(){
     errchk $? "sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 20
+    sleep 30
 
     initialize_microk8s
 
@@ -295,12 +292,11 @@ initialize_microk8s(){
     sudo snap install helm --classic >> $LOG_FILE 2>&1
     errchk $? "sudo snap install helm --classic >> $LOG_FILE 2>&1"
 
-    # Initialize helm
     sudo helm init --history-max 200 >> $LOG_FILE 2>&1
     errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 20
+    sleep 30
 
     # Install more Microk8s modules
     sudo microk8s.enable registry fluentd >> $LOG_FILE 2>&1
@@ -425,7 +421,12 @@ install_dragonchain() {
     sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
     errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
 
-    sleep 30
+    sleep 45
+
+    # Initialize helm (and wait until Tiller is ready before continuing)
+#    sudo helm init --history-max 200 --wait >> $LOG_FILE 2>&1
+#    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
+
 
     # Deploy Helm Chart
     sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
@@ -480,9 +481,7 @@ check_kube_status() {
 ## Function set_dragonchain_public_id
 set_dragonchain_public_id() {
     #Parse the full name of the webserver pod
-    local PODLIST=$(sudo kubectl get pods -n dragonchain)
-
-    DRAGONCHAIN_WEBSERVER_POD_NAME=$(echo "$PODLIST" | grep -Po "\K$DRAGONCHAIN_UVN_NODE_NAME-webserver-[^-]+-[^\s]+")
+    DRAGONCHAIN_WEBSERVER_POD_NAME=$(kubectl get pod -n dragonchain -l app.kubernetes.io/component=webserver | tail -1 | awk '{print $1}')
     errchk $? "Pod name extraction"
 
     DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n dragonchain $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
