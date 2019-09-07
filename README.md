@@ -11,7 +11,7 @@ Currently, the following limitations are in place for this script to function:
 
 ### Usage:
 
-- Clone the repo or download the [install_dragonchain_uvn.sh](https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v1.2-dragon-3.5.0/install_dragonchain_uvn.sh) file
+- Clone the repo or download the **install_dragonchain_uvn.sh** file
 
     ```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v1.2-dragon-3.5.0/install_dragonchain_uvn.sh```
 
