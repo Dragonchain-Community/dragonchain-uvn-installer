@@ -481,7 +481,7 @@ check_kube_status() {
 ## Function set_dragonchain_public_id
 set_dragonchain_public_id() {
     #Parse the full name of the webserver pod
-    DRAGONCHAIN_WEBSERVER_POD_NAME=$(kubectl get pod -n dragonchain -l app.kubernetes.io/component=webserver | tail -1 | awk '{print $1}')
+    DRAGONCHAIN_WEBSERVER_POD_NAME=$(sudo kubectl get pod -n dragonchain -l app.kubernetes.io/component=webserver | tail -1 | awk '{print $1}')
     errchk $? "Pod name extraction"
 
     DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n dragonchain $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
