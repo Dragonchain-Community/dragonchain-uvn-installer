@@ -5,7 +5,8 @@
 
 # Variables
 DRAGONCHAIN_VERSION="4.0.0" 
-DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/36f9cc0584bac8b0a06f434d60e4c811/dragonchain-k8s-1.0.0.tgz"
+DRAGONCHAIN_HELM_CHART_FILENAME="dragonchain-k8s-1.0.0.tgz"
+DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/36f9cc0584bac8b0a06f434d60e4c811/$DRAGONCHAIN_HELM_CHART_FILENAME"
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/f55b95b91076947c217a57e6b413c9c5/opensource-config.yaml"
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
@@ -433,8 +434,8 @@ install_dragonchain() {
 
 
     # Deploy Helm Chart
-    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
-    errchk $? "sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/dragonchain-k8s-0.9.0.tgz --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1"
+    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/$DRAGONCHAIN_HELM_CHART_FILENAME --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
+    errchk $? "sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/$DRAGONCHAIN_HELM_CHART_FILENAME --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1"
 }
 
 
