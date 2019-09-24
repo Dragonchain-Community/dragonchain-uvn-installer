@@ -4,14 +4,14 @@
 ## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
 
 # Variables
-DRAGONCHAIN_VERSION="4.0.0" 
+DRAGONCHAIN_VERSION="4.0.0"
 DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
 DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
-LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
-SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
+LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_upgrader.log
+SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_upgrader.secure.log
 
 #Variables may be in .config or from user input
 
@@ -336,23 +336,6 @@ check_existing_install(){
 
 }
 
-
-##########################################################################
-## Function generate_chainsecrets
-generate_chainsecrets(){
-    #duck note: running it outright; TODO: write HMAC_ID and HMAC_KEY to secure log file
-
-    echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | kubectl create -f - >> $LOG_FILE
-    export LC_CTYPE=C  # Needed on MacOS when using tr with /dev/urandom
-    BASE_64_PRIVATE_KEY=$(openssl ecparam -genkey -name secp256k1 | openssl ec -outform DER 2>/dev/null| tail -c +8 | head -c 32 | xxd -p -c 32 | xxd -r -p | base64)
-    HMAC_ID=$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
-    HMAC_KEY=$(tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 43 | head -n 1)
-    SECRETS_AS_JSON="{\"private-key\":\"$BASE_64_PRIVATE_KEY\",\"hmac-id\":\"$HMAC_ID\",\"hmac-key\":\"$HMAC_KEY\",\"registry-password\":\"\"}"
-    sudo kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON" >> $LOG_FILE
-    # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
-
-    # output from generated script above ; we need to capture ROOT HMAC KEY for later!
-}
 
 ##########################################################################
 ## Function download_dragonchain
