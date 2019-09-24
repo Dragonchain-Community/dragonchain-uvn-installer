@@ -9,11 +9,11 @@ Currently, the following limitations are in place for this script to function:
     - Recommended server specs for the current Dragonchain release (3.5.0): 2 CPUs, 8GB RAM
 - Only supports unmanaged level 2 nodes at this time (level 3+ support will come soon)
 
-### Usage:
+### To INSTALL a New Dragonchain Unmanaged Node:
 
 - Clone the repo or download the **install_dragonchain_uvn.sh** file
 
-    ```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v1.2-dragon-3.5.0/install_dragonchain_uvn.sh```
+    ```wget STUB```
 
 - Make the script executable:
 
@@ -23,8 +23,21 @@ Currently, the following limitations are in place for this script to function:
 
     ```sudo ./install_dragonchain_uvn.sh```
 
+### To UPGRADE a Running Dragonchain Unmanaged Node:
+
+- Clone the repo or download the **upgrade_dragonchain_uvn.sh** file
+
+    ```wget STUB```
+
+- Make the script executable:
+
+    ```chmod u+x upgrade_dragonchain_uvn.sh```
+
+- Run the script with sudo:
+
+    ```sudo ./upgrade_dragonchain_uvn.sh```
+
 ### Coming features:
 - Support for pre-built config files for easy automatic deployment
-- Sanity checks for user input to prevent downstream problems
 
 *Dragonchain-Community and this project are not affiliated with Dragonchain, Inc. or the Dragonchain Foundation*
