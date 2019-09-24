@@ -5,8 +5,8 @@
 
 # Variables
 DRAGONCHAIN_VERSION="4.0.0" 
-DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
-DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
+DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/36f9cc0584bac8b0a06f434d60e4c811/dragonchain-k8s-1.0.0.tgz"
+DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/f55b95b91076947c217a57e6b413c9c5/opensource-config.yaml"
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer

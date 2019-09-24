@@ -5,8 +5,8 @@
 
 # Variables
 DRAGONCHAIN_VERSION="4.0.0"
-DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/d4c3d7cc2b271faa6e8e75167e6a54af/dragonchain-k8s-0.9.0.tgz"
-DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/latest/_downloads/604d88c35bc090d29fe98a9e8e4b024e/opensource-config.yaml"
+DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/36f9cc0584bac8b0a06f434d60e4c811/dragonchain-k8s-1.0.0.tgz"
+DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/f55b95b91076947c217a57e6b413c9c5/opensource-config.yaml"
 
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
@@ -387,17 +387,13 @@ customize_dragonchain_uvn_yaml(){
     sed -i 's/LEVEL\:\ \"1/LEVEL\:\ \"2/g' ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #5"
 
-    # 6. CHANGE 2 LINES FROM "storageClassName: standard" TO "storageClassName: microk8s-hostpath"
+    # 6. CHANGE 3 LINES FROM "storageClassName: standard" TO "storageClassName: microk8s-hostpath"
     sed -i 's/storageClassName\:\ standard/storageClassName\:\ microk8s\-hostpath/g' ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #6"
 
-    # 7. CHANGE 1 LINE FROM "storageClass: standard" TO "storageClass: microk8s-hostpath"
-    sed -i 's/storageClass\:\ standard/storageClass\:\ microk8s\-hostpath/g' ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #7"
-
-    # 8. CHANGE 1 LINE FROM "version: latest" TO "version: DRAGONCHAIN_VERSION"
+    # 7. CHANGE 1 LINE FROM "version: latest" TO "version: DRAGONCHAIN_VERSION"
     sed -i "s/version\:\ latest/version\:\ $DRAGONCHAIN_VERSION/g" ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #8"
+    errchk $? "sed #7"
 }
 
 ##########################################################################
@@ -443,7 +439,7 @@ check_kube_status() {
              break
         fi
 
-        if [ $STATUS_CHECK_COUNT -gt 60 ] #Don't loop forever (60 loops should be about 30 minutes, the longest it SHOULD take for kube to finish its business)
+        if [ $STATUS_CHECK_COUNT -gt 120 ] #Don't loop forever (120 loops should be about 60 minutes, the longest it SHOULD take for kube to finish its business)
         then
              break
         fi
@@ -488,11 +484,7 @@ check_matchmaking_status() {
     if [ $SUCCESS_CHECK -eq 1 ]
     then
         #SUCCESS!
-        echo "Your HMAC (aka Access) Key Details are as follows (please save for future use):"
-        echo "ID: $HMAC_ID"
-        echo "Key: $HMAC_KEY"
-
-        echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+        echo -e "\e[92mYOUR DRAGONCHAIN NODE IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
 
         offer_apt_upgrade
 
@@ -536,17 +528,10 @@ set_config_values
 printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
 
-#install necessary software, set tunables
-printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
-bootstrap_environment
-
+# duck Clean this up: check for successfully running DC and prevent continuing if NOT found
 # check for previous installation (failed or successful) and offer reset if found
-printf "\nChecking for previous installation...\n"
-check_existing_install
-
-# must gather node details from user or .config before generating chainsecrets
-printf "\nGenerating chain secrets...\n"
-generate_chainsecrets
+# printf "\nChecking for previous installation...\n"
+# check_existing_install
 
 printf "\nDownloading Dragonchain...\n"
 download_dragonchain
