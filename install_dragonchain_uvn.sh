@@ -405,17 +405,13 @@ customize_dragonchain_uvn_yaml(){
     sed -i 's/LEVEL\:\ \"1/LEVEL\:\ \"2/g' ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #5"
 
-    # 6. CHANGE 2 LINES FROM "storageClassName: standard" TO "storageClassName: microk8s-hostpath"
+    # 6. CHANGE 3 LINES FROM "storageClassName: standard" TO "storageClassName: microk8s-hostpath"
     sed -i 's/storageClassName\:\ standard/storageClassName\:\ microk8s\-hostpath/g' ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #6"
 
-    # 7. CHANGE 1 LINE FROM "storageClass: standard" TO "storageClass: microk8s-hostpath"
-    sed -i 's/storageClass\:\ standard/storageClass\:\ microk8s\-hostpath/g' ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #7"
-
-    # 8. CHANGE 1 LINE FROM "version: latest" TO "version: DRAGONCHAIN_VERSION"
+    # 7. CHANGE 1 LINE FROM "version: latest" TO "version: DRAGONCHAIN_VERSION"
     sed -i "s/version\:\ latest/version\:\ $DRAGONCHAIN_VERSION/g" ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #8"
+    errchk $? "sed #7"
 }
 
 ##########################################################################
