@@ -230,78 +230,15 @@ patch_server_current() {
 ##########################################################################
 ## Function bootstrap_environment
 bootstrap_environment(){
-    #duck
-    # Make vm.max_map change current and for next reboot
-    # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
-
-    #duck note: might want to check the .conf file for this line to already exist before adding again
-
-    echo "vm.max_map_count=262144"| sudo tee -a /etc/sysctl.conf > /dev/null
-    sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1
-    errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
-
-    # Install jq, openssl, xxd
-    sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1
-    errchk $? "sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1"
-
+   
     # Install microk8s classic via snap package
-    sudo snap install microk8s --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap install microk8s --classic >> $LOG_FILE 2>&1"
+    sudo snap refresh microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1
+    errchk $? "sudo snap refresh microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1"
 
-    # Because we have microk8s, we need to alias kubectl
-    sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1
-    errchk $? "sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1"
-
-    # Setup firewall rules
-    # This should be reviewed - confident we can restrict this further
-    sudo ufw --force enable >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
-
-    sudo ufw allow 22/tcp >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
-
-    sudo ufw default allow routed >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
-
-    sudo ufw default allow outgoing >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
-
-    sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1"
-
-    sudo ufw allow in on cbr0 >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw allow in on cbr0 >> $LOG_FILE 2>&1"
-
-    sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
     sleep 30
 
-    initialize_microk8s
-
-}
-
-##########################################################################
-## Function initialize_microk8s
-initialize_microk8s(){
-    # Enable Microk8s modules
-    # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
-    sudo microk8s.enable dns storage helm >> $LOG_FILE 2>&1
-
-    # Install helm classic via snap package
-    sudo snap install helm --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap install helm --classic >> $LOG_FILE 2>&1"
-
-    sudo helm init --history-max 200 >> $LOG_FILE 2>&1
-    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
-
-    # Wait for system to stabilize and avoid race conditions
-    sleep 30
-
-    # Install more Microk8s modules
-    sudo microk8s.enable registry fluentd >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable registry fluentd >> $LOG_FILE 2>&1"
 }
 
 
@@ -529,6 +466,10 @@ set_config_values
 #patch system current
 printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
+
+#install necessary software, set tunables
+printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
+bootstrap_environment
 
 # duck Clean this up: check for successfully running DC and prevent continuing if NOT found
 # check for previous installation (failed or successful) and offer reset if found
