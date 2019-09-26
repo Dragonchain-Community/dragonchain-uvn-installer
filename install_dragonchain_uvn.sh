@@ -245,8 +245,8 @@ bootstrap_environment(){
     errchk $? "sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
-    sudo snap install microk8s --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap install microk8s --classic >> $LOG_FILE 2>&1"
+    sudo snap install microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1
+    errchk $? "sudo snap install microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1"
 
     # Because we have microk8s, we need to alias kubectl
     sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1
@@ -508,7 +508,8 @@ check_matchmaking_status() {
 
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
 
-        offer_apt_upgrade
+        #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
+        #offer_apt_upgrade
 
     else
         #Boo!
