@@ -13,7 +13,7 @@ Currently, the following limitations are in place for this script to function:
 
 - Clone the repo or download the **install_dragonchain_uvn.sh** file
 
-    ```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/master/install_dragonchain_uvn.sh```
+    ```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/hotfix-v1.3.1-dragon-4.0.0/install_dragonchain_uvn.sh```
 
 - Make the script executable:
 
