@@ -467,6 +467,10 @@ set_config_values
 printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
 
+#install necessary software, set tunables
+printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
+bootstrap_environment
+
 # duck Clean this up: check for successfully running DC and prevent continuing if NOT found
 # check for previous installation (failed or successful) and offer reset if found
 # printf "\nChecking for previous installation...\n"
