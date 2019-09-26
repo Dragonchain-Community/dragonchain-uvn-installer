@@ -486,8 +486,9 @@ check_matchmaking_status() {
     then
         #SUCCESS!
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
-
-        offer_apt_upgrade
+        
+        #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
+        #offer_apt_upgrade
 
     else
         #Boo!
