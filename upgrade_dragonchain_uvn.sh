@@ -232,8 +232,8 @@ patch_server_current() {
 bootstrap_environment(){
    
     # Install microk8s classic via snap package
-    sudo snap install microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap install microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1"
+    sudo snap refresh microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1
+    errchk $? "sudo snap refresh microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1"
 
 
     # Wait for system to stabilize and avoid race conditions
