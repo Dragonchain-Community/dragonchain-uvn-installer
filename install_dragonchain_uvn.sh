@@ -246,7 +246,7 @@ bootstrap_environment(){
 
     # Install microk8s classic via snap package
     sudo snap install microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap install microk8s --classic >> $LOG_FILE 2>&1"
+    errchk $? "sudo snap install microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1"
 
     # Because we have microk8s, we need to alias kubectl
     sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1
