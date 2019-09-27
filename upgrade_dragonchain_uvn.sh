@@ -332,6 +332,10 @@ customize_dragonchain_uvn_yaml(){
     # 7. CHANGE 1 LINE FROM "version: latest" TO "version: DRAGONCHAIN_VERSION"
     sed -i "s/version\:\ latest/version\:\ $DRAGONCHAIN_VERSION/g" ./dragonchain-setup/opensource-config.yaml
     errchk $? "sed #7"
+
+    # 8. CHANGE PORT
+    sed -i "s/port\:\ 30000/port\:\ $DRAGONCHAIN_UVN_NODE_PORT/g" ./dragonchain-setup/opensource-config.yaml
+    errchk $? "sed #8"
 }
 
 ##########################################################################
