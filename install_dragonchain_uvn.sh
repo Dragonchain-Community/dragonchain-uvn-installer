@@ -300,8 +300,8 @@ initialize_microk8s(){
     sleep 30
 
     # Install more Microk8s modules
-    sudo microk8s.enable registry fluentd >> $LOG_FILE 2>&1
-    errchk $? "sudo microk8s.enable registry fluentd >> $LOG_FILE 2>&1"
+    sudo microk8s.enable registry >> $LOG_FILE 2>&1
+    errchk $? "sudo microk8s.enable registry >> $LOG_FILE 2>&1"
 }
 
 
@@ -343,7 +343,7 @@ check_existing_install(){
 generate_chainsecrets(){
     #duck note: running it outright; TODO: write HMAC_ID and HMAC_KEY to secure log file
 
-    echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | kubectl create -f - >> $LOG_FILE
+    echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | sudo kubectl create -f - >> $LOG_FILE
     export LC_CTYPE=C  # Needed on MacOS when using tr with /dev/urandom
     BASE_64_PRIVATE_KEY=$(openssl ecparam -genkey -name secp256k1 | openssl ec -outform DER 2>/dev/null| tail -c +8 | head -c 32 | xxd -p -c 32 | xxd -r -p | base64)
     HMAC_ID=$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
