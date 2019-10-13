@@ -6,14 +6,14 @@ This project enables "easy mode" setup and installation of a Dragonchain Level 2
 
 Currently, the following limitations are in place for this script to function:
 - Must be run on a Ubuntu linux installation (standard or server version)
-    - Recommended server specs for the current Dragonchain release (4.0.0): 2 CPUs, 4GB RAM
+    - Recommended server specs for the current Dragonchain release (4.0.0): 1 CPUs, 2GB RAM
 - Only supports unmanaged level 2 nodes at this time (level 3+ support will come soon)
 
 ### To INSTALL a New Dragonchain Unmanaged Node:
 
 - Clone the repo or download the **install_dragonchain_uvn.sh** file
 
-    ```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v1.4-dragon-4.0.0/install_dragonchain_uvn.sh```
+    ```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v1.5-dragon-4.0.0/install_dragonchain_uvn.sh```
 
 
 - Make the script executable:
@@ -28,7 +28,7 @@ Currently, the following limitations are in place for this script to function:
 
 - Clone the repo or download the **upgrade_dragonchain_uvn.sh** file
 
-    ```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v1.4-dragon-4.0.0/upgrade_dragonchain_uvn.sh```
+    ```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v1.5-dragon-4.0.0/upgrade_dragonchain_uvn.sh```
 
 
 - Make the script executable:
