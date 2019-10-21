@@ -290,8 +290,11 @@ initialize_microk8s(){
     sudo microk8s.enable dns storage helm >> $LOG_FILE 2>&1
 
     # Install helm classic via snap package
-    sudo snap install helm --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap install helm --classic >> $LOG_FILE 2>&1"
+    #sudo snap install helm --classic >> $LOG_FILE 2>&1
+    #errchk $? "sudo snap install helm --classic >> $LOG_FILE 2>&1"
+
+    sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1 && sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1 && sudo rm get_helm.sh >> $LOG_FILE 2>&1
+    errchk $? "sudo curl -LO https://git.io/get_helm.sh && sudo bash get_helm.sh --version v2.14.3 && sudo rm get_helm.sh"
 
     sudo helm init --history-max 200 >> $LOG_FILE 2>&1
     errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
