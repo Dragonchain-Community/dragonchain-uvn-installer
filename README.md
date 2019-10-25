@@ -6,7 +6,7 @@ This project enables "easy mode" setup and installation of a Dragonchain Level 2
 
 Currently, the following limitations are in place for this script to function:
 - Must be run on a Ubuntu linux installation (standard or server version)
-    - Recommended server specs for the current Dragonchain release (4.0.0): 1 CPUs, 2GB RAM
+    - Recommended server specs for the current Dragonchain release (4.1.0): 1 CPUs, 2GB RAM
 - Only supports unmanaged level 2 nodes at this time (level 3+ support will come soon)
 
 ### To INSTALL a New Dragonchain Unmanaged Node:
