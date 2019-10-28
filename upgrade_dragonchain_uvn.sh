@@ -233,6 +233,9 @@ bootstrap_environment(){
     sudo snap refresh microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1
     errchk $? "sudo snap refresh microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1"
 
+    # Remove the snap package for helm and install direct with the known working version (just in case)
+    sudo snap remove helm --purge
+    sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1 && sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1 && sudo rm get_helm.sh >> $LOG_FILE 2>&1
 
     # Wait for system to stabilize and avoid race conditions
     sleep 30
