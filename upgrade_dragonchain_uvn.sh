@@ -235,7 +235,9 @@ bootstrap_environment(){
 
     # Remove the snap package for helm and install direct with the known working version (just in case)
     sudo snap remove helm --purge >> $LOG_FILE 2>&1
+
     sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1 && sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1 && sudo rm get_helm.sh >> $LOG_FILE 2>&1
+    sudo helm init --history-max 200 --upgrade --force-upgrade >> $LOG_FILE 2>&1
 
     # Wait for system to stabilize and avoid race conditions
     sleep 30
