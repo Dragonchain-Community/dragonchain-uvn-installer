@@ -7,7 +7,7 @@
 DRAGONCHAIN_VERSION="4.1.0" 
 DRAGONCHAIN_HELM_CHART_VERSION="1.0.2"
 
-REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
+REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
 LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
 SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
@@ -291,8 +291,14 @@ initialize_microk8s(){
     #sudo snap install helm --classic >> $LOG_FILE 2>&1
     #errchk $? "sudo snap install helm --classic >> $LOG_FILE 2>&1"
 
-    sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1 && sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1 && sudo rm get_helm.sh >> $LOG_FILE 2>&1
-    errchk $? "sudo curl -LO https://git.io/get_helm.sh && sudo bash get_helm.sh --version v2.14.3 && sudo rm get_helm.sh"
+    sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1 
+    errchk $? "sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1"
+
+    sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1 
+    errchk $? "sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1"
+
+    sudo rm get_helm.sh >> $LOG_FILE 2>&1
+    errchk $? "sudo rm get_helm.sh >> $LOG_FILE 2>&1"
 
     sudo helm init --history-max 200 >> $LOG_FILE 2>&1
     errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
