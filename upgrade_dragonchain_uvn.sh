@@ -4,12 +4,10 @@
 ## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
 
 # Variables
-DRAGONCHAIN_VERSION="4.0.0"
-DRAGONCHAIN_HELM_CHART_FILENAME="dragonchain-k8s-1.0.0.tgz"
-DRAGONCHAIN_HELM_CHART_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/36f9cc0584bac8b0a06f434d60e4c811/$DRAGONCHAIN_HELM_CHART_FILENAME"
-DRAGONCHAIN_HELM_VALUES_URL="https://dragonchain-core-docs.dragonchain.com/4.0.0/_downloads/f55b95b91076947c217a57e6b413c9c5/opensource-config.yaml"
+DRAGONCHAIN_VERSION="4.1.0" 
+DRAGONCHAIN_HELM_CHART_VERSION="1.0.2"
 
-REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog"
+REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
 LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_upgrader.log
 SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_upgrader.secure.log
@@ -235,6 +233,20 @@ bootstrap_environment(){
     sudo snap refresh microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1
     errchk $? "sudo snap refresh microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1"
 
+    # Remove the snap package for helm and install direct with the known working version (just in case)
+    sudo snap remove helm --purge >> $LOG_FILE 2>&1
+
+    sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1 
+    errchk $? "sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1"
+
+    sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1 
+    errchk $? "sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1"
+
+    sudo rm get_helm.sh >> $LOG_FILE 2>&1
+    errchk $? "sudo rm get_helm.sh >> $LOG_FILE 2>&1"
+
+    sudo helm init --history-max 200 --upgrade --force-upgrade >> $LOG_FILE 2>&1
+    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
     sleep 30
@@ -274,70 +286,6 @@ check_existing_install(){
 
 }
 
-
-##########################################################################
-## Function download_dragonchain
-download_dragonchain(){
-    #duck what is pwd?
-    #duck note: just assume keep downloads and script files in the same directory (wherever the user runs the script)
-
-    # Download latest Helm chart and values
-    # https://dragonchain-core-docs.dragonchain.com/latest/deployment/links.html
-    #duck note: switched to variable values with hard versioning
-    wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL
-    errchk $? "wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_CHART_URL"
-    wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL
-    errchk $? "wget -q -P ./dragonchain-setup/ $DRAGONCHAIN_HELM_VALUES_URL"
-}
-
-##########################################################################
-## Function customize_dragonchain_uvn_yaml
-customize_dragonchain_uvn_yaml(){
-    #duck
-    # Modify opensource-config.yaml to our nodes specifications
-    # 1. ArbitraryName with nodename for sanity sake
-    # 2. REGISTRATION_TOKEN = "MATCHMAKING_TOKEN_FROM_CONSOLE"
-    # 3. REPLACE INTERNAL_ID WITH CHAIN_ID FROM CONSOLE
-    # 4. REPLACE DRAGONCHAIN_ENDPOINT with user address
-    # 5. CHANGE LEVEL TO 2
-    # 6. CHANGE 2 LINES FROM "storageClassName: standard" TO "storageClassName: microk8s-hostpath"
-    # 7. CHANGE 1 LINE FROM "storageClass: standard" TO "storageClass: microk8s-hostpath"
-
-    # 1. ArbitraryName with nodename for sanity sake
-    sed -i "s/ArbitraryName/$DRAGONCHAIN_UVN_NODE_NAME/g" ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #1"
-
-    # 2. REGISTRATION_TOKEN = "MATCHMAKING_TOKEN_FROM_CONSOLE"
-    sed -i "s/REGISTRATION\_TOKEN\:\ \"\"/REGISTRATION\_TOKEN\:\ \""$DRAGONCHAIN_UVN_REGISTRATION_TOKEN"\"/g" ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #2"
-
-    # 3. REPLACE INTERNAL_ID WITH CHAIN_ID FROM CONSOLE
-    sed -i "s/INTERNAL\_ID\:\ \"\"/INTERNAL\_ID\:\ \""$DRAGONCHAIN_UVN_INTERNAL_ID"\"/g" ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #3"
-
-    # 4. REPLACE DRAGONCHAIN_ENDPOINT with user address
-    # modify sed to use # as separator
-    # https://backreference.org/2010/02/20/using-different-delimiters-in-sed/ ; Thanks Bill
-    sed -i "s#https://my-chain.api.company.org:443#$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT#" ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #4"
-
-    # 5. CHANGE LEVEL TO 2
-    sed -i 's/LEVEL\:\ \"1/LEVEL\:\ \"2/g' ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #5"
-
-    # 6. CHANGE 3 LINES FROM "storageClassName: standard" TO "storageClassName: microk8s-hostpath"
-    sed -i 's/storageClassName\:\ standard/storageClassName\:\ microk8s\-hostpath/g' ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #6"
-
-    # 7. CHANGE 1 LINE FROM "version: latest" TO "version: DRAGONCHAIN_VERSION"
-    sed -i "s/version\:\ latest/version\:\ $DRAGONCHAIN_VERSION/g" ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #7"
-
-    # 8. CHANGE PORT
-    sed -i "s/port\:\ 30000/port\:\ $DRAGONCHAIN_UVN_NODE_PORT/g" ./dragonchain-setup/opensource-config.yaml
-    errchk $? "sed #8"
-}
-
 ##########################################################################
 ## Function install_dragonchain
 install_dragonchain() {
@@ -348,14 +296,26 @@ install_dragonchain() {
 
     sleep 45
 
-    # Initialize helm (and wait until Tiller is ready before continuing)
-#    sudo helm init --history-max 200 --wait >> $LOG_FILE 2>&1
-#    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
+    sudo helm repo add dragonchain https://dragonchain-charts.s3.amazonaws.com >> $LOG_FILE 2>&1
+    errchk $? "sudo helm repo add dragonchain https://dragonchain-charts.s3.amazonaws.com >> $LOG_FILE 2>&1"
 
+    sudo helm repo update >> $LOG_FILE 2>&1
+    errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
     # Deploy Helm Chart
-    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/$DRAGONCHAIN_HELM_CHART_FILENAME --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1
-    errchk $? "sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME ./dragonchain-setup/$DRAGONCHAIN_HELM_CHART_FILENAME --values ./dragonchain-setup/opensource-config.yaml --namespace dragonchain >> $LOG_FILE 2>&1"
+    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace dragonchain dragonchain/dragonchain-k8s \
+    --version $DRAGONCHAIN_HELM_CHART_VERSION \
+    --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
+    --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
+    --set global.environment.INTERNAL_ID="$DRAGONCHAIN_UVN_INTERNAL_ID" \
+    --set global.environment.DRAGONCHAIN_ENDPOINT="$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT" \
+    --set-string global.environment.LEVEL=2 \
+    --set service.port=$DRAGONCHAIN_UVN_NODE_PORT \
+    --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
+    --set redis.storage.spec.storageClassName="microk8s-hostpath" \
+    --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >> $LOG_FILE 2>&1
+
+    errchk $? "sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace dragonchain dragonchain/dragonchain-k8s --version $DRAGONCHAIN_HELM_CHART_VERSION --set global.environment.DRAGONCHAIN_NAME=\"$DRAGONCHAIN_UVN_NODE_NAME\" --set global.environment.REGISTRATION_TOKEN=\"$DRAGONCHAIN_UVN_REGISTRATION_TOKEN\" --set global.environment.INTERNAL_ID=\"$DRAGONCHAIN_UVN_INTERNAL_ID\" --set global.environment.DRAGONCHAIN_ENDPOINT=\"$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT\" --set-string global.environment.LEVEL=2 --set service.port=$DRAGONCHAIN_UVN_NODE_PORT --set dragonchain.storage.spec.storageClassName=\"microk8s-hostpath\" --set redis.storage.spec.storageClassName=\"microk8s-hostpath\" --set redisearch.storage.spec.storageClassName=\"microk8s-hostpath\" >> $LOG_FILE 2>&1"
 }
 
 
@@ -479,12 +439,6 @@ bootstrap_environment
 # check for previous installation (failed or successful) and offer reset if found
 # printf "\nChecking for previous installation...\n"
 # check_existing_install
-
-printf "\nDownloading Dragonchain...\n"
-download_dragonchain
-
-printf "\nCustomizing UVN configuration (yaml)...\n"
-customize_dragonchain_uvn_yaml
 
 printf "\nInstalling UVN Dragonchain...\n"
 install_dragonchain
