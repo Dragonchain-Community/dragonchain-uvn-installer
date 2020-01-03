@@ -356,12 +356,13 @@ generate_chainsecrets(){
     HMAC_ID=$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
     HMAC_KEY=$(tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 43 | head -n 1)
     SECRETS_AS_JSON="{\"private-key\":\"$BASE_64_PRIVATE_KEY\",\"hmac-id\":\"$HMAC_ID\",\"hmac-key\":\"$HMAC_KEY\",\"registry-password\":\"\"}"
-    #sudo kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON" >> $LOG_FILE
+    sudo kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON" >> $LOG_FILE
     # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
 
     # hard code for now
     # https://dragonchain-core-docs.dragonchain.com/latest/deployment/deploying.html#add-your-tls-certificate
-    sudo kubectl create secret tls -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-cert" --cert=/home/ubuntu/bigredtruck.ddns.net.fullchain.pem --key=/home/ubuntu/bigredtruck.ddns.net.privkey.pem
+    # both kubectl create commands are required with using TLS_SUPPORT
+    sudo kubectl create secret tls -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-cert" --cert=/home/ubuntu/bigredtruck.ddns.net.fullchain.pem --key=/home/ubuntu/bigredtruck.ddns.net.privkey.pem --from-literal=SecretString="$SECRETS_AS_JSON" >> $LOG_FILE
 
     # output from generated script above ; we need to capture ROOT HMAC KEY for later!
 }
