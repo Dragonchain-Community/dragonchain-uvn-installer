@@ -4,7 +4,7 @@
 ## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
 
 # Variables
-REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl snapd"
+REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
 LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_upgrader.log
 SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_upgrader.secure.log
