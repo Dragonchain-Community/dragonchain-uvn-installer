@@ -129,6 +129,21 @@ function set_config_values() {
             echo
         done
 
+        if [ -z $DRAGONCHAIN_UVN_NODE_LEVEL ]
+            while [[ ! "$DRAGONCHAIN_UVN_NODE_LEVEL" =~ ^[0-9]+$ ]] || (( DRAGONCHAIN_UVN_NODE_LEVEL < 2 || DRAGONCHAIN_UVN_NODE_LEVEL > 4 ))
+            do
+                if [[ ! -z "$DRAGONCHAIN_UVN_NODE_LEVEL" ]]
+                then
+                    echo -e "\e[91mInvalid node level entered!\e[0m"
+                fi
+
+                echo -e "\e[94mEnter the node level for your Dragonchain node (must be between 2 and 4):\e[0m"
+                read DRAGONCHAIN_UVN_NODE_LEVEL
+                DRAGONCHAIN_UVN_NODE_LEVEL=$(echo $DRAGONCHAIN_UVN_NODE_LEVEL | tr -d '\r')
+                echo
+            done
+        fi
+
         if [[ "$ANSWER" == "n" || "$ANSWER" == "no" ]]
         then
             # User wants fresh values
