@@ -130,6 +130,7 @@ function set_config_values() {
         done
 
         if [ -z $DRAGONCHAIN_UVN_NODE_LEVEL ]
+        then
             while [[ ! "$DRAGONCHAIN_UVN_NODE_LEVEL" =~ ^[0-9]+$ ]] || (( DRAGONCHAIN_UVN_NODE_LEVEL < 2 || DRAGONCHAIN_UVN_NODE_LEVEL > 4 ))
             do
                 if [[ ! -z "$DRAGONCHAIN_UVN_NODE_LEVEL" ]]
