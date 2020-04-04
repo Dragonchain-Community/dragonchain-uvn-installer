@@ -4,9 +4,6 @@
 ## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
 
 # Variables
-DRAGONCHAIN_VERSION="4.1.0" 
-DRAGONCHAIN_HELM_CHART_VERSION="1.0.2"
-
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
 DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
 LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
@@ -119,6 +116,7 @@ function set_config_values() {
         echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
         echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
         echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
+        echo "Node Level = $DRAGONCHAIN_UVN_NODE_LEVEL"
         echo
 
         # Prompt user about whether to use saved values
@@ -153,6 +151,7 @@ request_user_defined_values() {
    DRAGONCHAIN_UVN_NODE_NAME=""
    DRAGONCHAIN_UVN_ENDPOINT_URL=""
    DRAGONCHAIN_UVN_NODE_PORT=""
+   DRAGONCHAIN_UVN_NODE_LEVEL=""
 
    # Collect user-configured fields
    # TODO: Sanitize all inputs
@@ -201,6 +200,19 @@ request_user_defined_values() {
       echo
    done
 
+   while [[ ! "$DRAGONCHAIN_UVN_NODE_LEVEL" =~ ^[0-9]+$ ]] || (( DRAGONCHAIN_UVN_NODE_LEVEL < 2 || DRAGONCHAIN_UVN_NODE_LEVEL > 4 ))
+   do
+      if [[ ! -z "$DRAGONCHAIN_UVN_NODE_LEVEL" ]]
+      then
+         echo -e "\e[91mInvalid node level entered!\e[0m"
+      fi
+
+      echo -e "\e[94mEnter the node level for your Dragonchain node (must be between 2 and 4):\e[0m"
+      read DRAGONCHAIN_UVN_NODE_LEVEL
+      DRAGONCHAIN_UVN_NODE_LEVEL=$(echo $DRAGONCHAIN_UVN_NODE_LEVEL | tr -d '\r')
+      echo
+   done
+
    # Write a fresh config file with user-defined values
    rm -f $DRAGONCHAIN_INSTALLER_DIR/.config
    touch $DRAGONCHAIN_INSTALLER_DIR/.config
@@ -210,6 +222,7 @@ request_user_defined_values() {
    echo "DRAGONCHAIN_UVN_NODE_NAME=$DRAGONCHAIN_UVN_NODE_NAME" >> $DRAGONCHAIN_INSTALLER_DIR/.config
    echo "DRAGONCHAIN_UVN_ENDPOINT_URL=$DRAGONCHAIN_UVN_ENDPOINT_URL" >> $DRAGONCHAIN_INSTALLER_DIR/.config
    echo "DRAGONCHAIN_UVN_NODE_PORT=$DRAGONCHAIN_UVN_NODE_PORT" >> $DRAGONCHAIN_INSTALLER_DIR/.config
+   echo "DRAGONCHAIN_UVN_NODE_LEVEL=$DRAGONCHAIN_UVN_NODE_LEVEL" >> $DRAGONCHAIN_INSTALLER_DIR/.config
 
 }
 
@@ -239,12 +252,12 @@ bootstrap_environment(){
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
-    sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1
-    errchk $? "sudo apt-get install -y ufw curl jq openssl xxd >> $LOG_FILE 2>&1"
+    sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1
+    errchk $? "sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
-    sudo snap install microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap install microk8s --channel=1.15/stable --classic >> $LOG_FILE 2>&1"
+    sudo snap install microk8s --channel=1.18/stable --classic >> $LOG_FILE 2>&1
+    errchk $? "sudo snap install microk8s --channel=1.18/stable --classic >> $LOG_FILE 2>&1"
 
     # Because we have microk8s, we need to alias kubectl
     sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1
@@ -267,11 +280,11 @@ bootstrap_environment(){
     sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1
     errchk $? "sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1"
 
-    sudo ufw allow in on cbr0 >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw allow in on cbr0 >> $LOG_FILE 2>&1"
+    sudo ufw allow in on cni0 >> $LOG_FILE 2>&1
+    errchk $? "sudo ufw allow in on cni0 >> $LOG_FILE 2>&1"
 
-    sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1
-    errchk $? "sudo ufw allow out on cbr0 >> $LOG_FILE 2>&1"
+    sudo ufw allow out on cni0 >> $LOG_FILE 2>&1
+    errchk $? "sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
     sleep 30
@@ -285,23 +298,11 @@ bootstrap_environment(){
 initialize_microk8s(){
     # Enable Microk8s modules
     # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
-    sudo microk8s.enable dns storage helm >> $LOG_FILE 2>&1
+    sudo microk8s.enable dns storage helm3 >> $LOG_FILE 2>&1
 
-    # Install helm classic via snap package
-    #sudo snap install helm --classic >> $LOG_FILE 2>&1
-    #errchk $? "sudo snap install helm --classic >> $LOG_FILE 2>&1"
-
-    sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1 
-    errchk $? "sudo curl -LO https://git.io/get_helm.sh >> $LOG_FILE 2>&1"
-
-    sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1 
-    errchk $? "sudo bash get_helm.sh --version v2.14.3 >> $LOG_FILE 2>&1"
-
-    sudo rm get_helm.sh >> $LOG_FILE 2>&1
-    errchk $? "sudo rm get_helm.sh >> $LOG_FILE 2>&1"
-
-    sudo helm init --history-max 200 >> $LOG_FILE 2>&1
-    errchk $? "sudo helm init --history-max 200 >> $LOG_FILE 2>&1"
+    # Alias helm3
+    sudo snap alias microk8s.helm3 helm >> $LOG_FILE 2>&1
+    errchk $? "sudo snap alias microk8s.helm3 helm >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
     sleep 30
@@ -367,12 +368,6 @@ generate_chainsecrets(){
 ## Function install_dragonchain
 install_dragonchain() {
 
-    # Upgrade Helm and sleep because EFF HELM
-    sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1
-    errchk $? "sudo helm init --history-max 200 --upgrade >> $LOG_FILE 2>&1"
-
-    sleep 45
-
     sudo helm repo add dragonchain https://dragonchain-charts.s3.amazonaws.com >> $LOG_FILE 2>&1
     errchk $? "sudo helm repo add dragonchain https://dragonchain-charts.s3.amazonaws.com >> $LOG_FILE 2>&1"
 
@@ -381,18 +376,17 @@ install_dragonchain() {
 
     # Deploy Helm Chart
     sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace dragonchain dragonchain/dragonchain-k8s \
-    --version $DRAGONCHAIN_HELM_CHART_VERSION \
     --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
     --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
     --set global.environment.INTERNAL_ID="$DRAGONCHAIN_UVN_INTERNAL_ID" \
     --set global.environment.DRAGONCHAIN_ENDPOINT="$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT" \
-    --set-string global.environment.LEVEL=2 \
+    --set-string global.environment.LEVEL=$DRAGONCHAIN_UVN_NODE_LEVEL \
     --set service.port=$DRAGONCHAIN_UVN_NODE_PORT \
     --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
     --set redis.storage.spec.storageClassName="microk8s-hostpath" \
     --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >> $LOG_FILE 2>&1
 
-    errchk $? "sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace dragonchain dragonchain/dragonchain-k8s --version $DRAGONCHAIN_HELM_CHART_VERSION --set global.environment.DRAGONCHAIN_NAME=\"$DRAGONCHAIN_UVN_NODE_NAME\" --set global.environment.REGISTRATION_TOKEN=\"$DRAGONCHAIN_UVN_REGISTRATION_TOKEN\" --set global.environment.INTERNAL_ID=\"$DRAGONCHAIN_UVN_INTERNAL_ID\" --set global.environment.DRAGONCHAIN_ENDPOINT=\"$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT\" --set-string global.environment.LEVEL=2 --set service.port=$DRAGONCHAIN_UVN_NODE_PORT --set dragonchain.storage.spec.storageClassName=\"microk8s-hostpath\" --set redis.storage.spec.storageClassName=\"microk8s-hostpath\" --set redisearch.storage.spec.storageClassName=\"microk8s-hostpath\" >> $LOG_FILE 2>&1"
+    errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
 }
 
 
@@ -412,13 +406,13 @@ check_kube_status() {
 
         echo "[$STATUS_CHECK_COUNT] Ready: $READYCOUNT Running: $RUNNINGCOUNT"
 
-        if [ $READYCOUNT -eq 5 ] && [ $RUNNINGCOUNT -eq 5 ]
+        if [ $READYCOUNT -eq 4 ] && [ $RUNNINGCOUNT -eq 4 ]
         then
              DRAGONCHAIN_UVN_INSTALLED=1
              break
         fi
 
-        if [ $STATUS_CHECK_COUNT -gt 60 ] #Don't loop forever (60 loops should be about 30 minutes, the longest it SHOULD take for kube to finish its business)
+        if [ $STATUS_CHECK_COUNT -gt 30 ] #Don't loop forever (30 loops should be about 15 minutes, the longest it SHOULD take for kube to finish its business)
         then
              break
         fi
