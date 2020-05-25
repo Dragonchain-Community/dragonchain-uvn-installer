@@ -27,6 +27,6 @@ errchk $? "Microk8s update"
 sudo microk8s.refresh-certs -i >> $LOG_FILE 2>&1
 errchk $? "Certificate refresh"
 
-printf "\nIf you see no errors above, you should be up-to-date. Check in Telegram if you still have trouble!\n"
+printf "\n\e[92mIf you see no errors above, you should be up-to-date. Check in Telegram if you still have trouble!\e[0m\n"
 
 exit 0
