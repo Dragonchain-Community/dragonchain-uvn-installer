@@ -14,7 +14,7 @@ An issue with microk8s (not Dragonchain or our software) has been discovered tha
 
 If you run into this problem, SSH into your node and run the following command:
 
-```sudo wget -O - https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/hotfix-certificates/update_certificates.sh | bash```
+```wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/hotfix-certificates/update_certificates.sh && chmod u+x update_certificates.sh && sudo ./update_certificates.sh```
     
 If, after running, you don't see all "1/1" and "Running" for the status of your pods, please try running the following command to check the status again:
 
