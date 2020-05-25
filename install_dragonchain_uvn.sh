@@ -256,8 +256,9 @@ bootstrap_environment(){
     errchk $? "sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
-    sudo snap install microk8s --channel=1.18/stable --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap install microk8s --channel=1.18/stable --classic >> $LOG_FILE 2>&1"
+    # TODO - Revert to stable when refresh-certs is merged
+    sudo snap install microk8s --channel=1.18/beta --classic >> $LOG_FILE 2>&1
+    errchk $? "sudo snap install microk8s --channel=1.18/beta --classic >> $LOG_FILE 2>&1"
 
     # Because we have microk8s, we need to alias kubectl
     sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1
