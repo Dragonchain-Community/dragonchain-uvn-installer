@@ -44,14 +44,14 @@ printf "\nRefreshing certificates...\n"
 sudo microk8s.refresh-certs -i >> $LOG_FILE 2>&1
 errchk $? "Certificate refresh"
 
-sleep 5
+sleep 15
 
 # Restart microk8s for some damned reason
 printf "\nRestarting microk8s...\n"
 sudo microk8s.stop >> $LOG_FILE 2>&1
 errchk $? "Stopping microk8s"
 
-sleep 5
+sleep 15
 
 sudo microk8s.start >> $LOG_FILE 2>&1
 errchk $? "Starting microk8s"
