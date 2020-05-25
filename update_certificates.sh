@@ -35,16 +35,19 @@ fi
 
 # Install microk8s classic via snap package
 # TODO - Replace with stable after microk8s.refresh-certs is stabilized
+printf "\nUpdating microk8s...\n"
 sudo snap refresh microk8s --channel=1.18/beta --classic >> $LOG_FILE 2>&1
 errchk $? "Microk8s update"
 
 # Refresh certificates just in case
+printf "\nRefreshing certificates...\n"
 sudo microk8s.refresh-certs -i >> $LOG_FILE 2>&1
 errchk $? "Certificate refresh"
 
 sleep 15
 
 # Restart microk8s for some damned reason
+printf "\nRestarting microk8s...\n"
 sudo microk8s.stop >> $LOG_FILE 2>&1
 errchk $? "Stopping microk8s"
 
@@ -55,6 +58,7 @@ errchk $? "Starting microk8s"
 
 sleep 30
 
+printf "\nGetting pod status:\n"
 sudo kubectl get pods -n dragonchain
 
 printf "\n\e[92mIf you see no errors and all pods show status of '1/1' above, you should be up-to-date. Check in Telegram if you still have trouble!\e[0m\n"
