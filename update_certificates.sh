@@ -19,6 +19,20 @@ errchk() {
 
 printf "\nUpdating microk8s and refreshing certificates...\n"
 
+# Create the installer directory
+if [ ! -e $DRAGONCHAIN_INSTALLER_DIR ]; then
+    mkdir -p $DRAGONCHAIN_INSTALLER_DIR
+    errchk $? "mkdir -p $DRAGONCHAIN_INSTALLER_DIR"
+fi
+
+# Generate logfiles & rotate as appropriate
+if [ ! -e $LOG_FILE ]; then
+    touch $LOG_FILE >/dev/null 2>&1
+    errchk $? "touch $LOG_FILE >/dev/null 2>&1"
+else
+    savelog -t -c 5 -l -p -n -q $LOG_FILE
+fi
+
 # Install microk8s classic via snap package
 # TODO - Replace with stable after microk8s.refresh-certs is stabilized
 sudo snap refresh microk8s --channel=1.18/beta --classic >> $LOG_FILE 2>&1
