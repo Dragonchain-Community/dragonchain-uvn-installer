@@ -44,19 +44,19 @@ printf "\nRefreshing certificates...\n"
 sudo microk8s.refresh-certs -i >> $LOG_FILE 2>&1
 errchk $? "Certificate refresh"
 
-sleep 15
+sleep 5
 
 # Restart microk8s for some damned reason
 printf "\nRestarting microk8s...\n"
 sudo microk8s.stop >> $LOG_FILE 2>&1
 errchk $? "Stopping microk8s"
 
-sleep 15
+sleep 5
 
 sudo microk8s.start >> $LOG_FILE 2>&1
 errchk $? "Starting microk8s"
 
-sleep 30
+sleep 60
 
 printf "\nGetting pod status:\n"
 sudo kubectl get pods -n dragonchain
