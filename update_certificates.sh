@@ -61,6 +61,6 @@ sleep 30
 printf "\nGetting pod status:\n"
 sudo kubectl get pods -n dragonchain
 
-printf "\n\e[92mIf you see no errors and all pods show status of '1/1' above, you should be up-to-date. Check in Telegram if you still have trouble!\e[0m\n"
+printf "\n\e[92mIf you see no errors and all pods show '1/1' and 'Running' above, you should be up-to-date. Check in Telegram if you still have trouble!\e[0m\n"
 
 exit 0
