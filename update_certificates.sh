@@ -1,6 +1,7 @@
 #!/bin/bash
 
-LOG_FILE=dragonchain_certificate_update.log
+DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
+LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_certificate_update.log
 
 ##########################################################################
 ## Function errchk
