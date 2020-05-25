@@ -14,11 +14,11 @@ An issue with microk8s (not Dragonchain or our software) has been discovered tha
 
 If you run into this problem, SSH into your node and run the following command:
 
-    ```sudo wget -O - https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/hotfix-certificates/update_certificates.sh | bash```
+```sudo wget -O - https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/hotfix-certificates/update_certificates.sh | bash```
     
 If, after running, you don't see all "1/1" and "Running" for the status of your pods, please try running the following command to check the status again:
 
-    ```sudo kubectl get pods -n dragonchain```
+```sudo kubectl get pods -n dragonchain```
 
 If you still don't see all "1/1" and "Running," check in Telegram for support.
 
