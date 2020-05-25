@@ -42,6 +42,21 @@ errchk $? "Microk8s update"
 sudo microk8s.refresh-certs -i >> $LOG_FILE 2>&1
 errchk $? "Certificate refresh"
 
-printf "\n\e[92mIf you see no errors above, you should be up-to-date. Check in Telegram if you still have trouble!\e[0m\n"
+sleep 15
+
+# Restart microk8s for some damned reason
+sudo microk8s.stop >> $LOG_FILE 2>&1
+errchk $? "Stopping microk8s"
+
+sleep 15
+
+sudo microk8s.start >> $LOG_FILE 2>&1
+errchk $? "Starting microk8s"
+
+sleep 30
+
+sudo kubectl get pods -n dragonchain
+
+printf "\n\e[92mIf you see no errors and all pods show status of '1/1' above, you should be up-to-date. Check in Telegram if you still have trouble!\e[0m\n"
 
 exit 0
