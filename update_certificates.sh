@@ -36,7 +36,7 @@ fi
 # Install microk8s classic via snap package
 # TODO - Replace with stable after microk8s.refresh-certs is stabilized
 printf "\nUpdating microk8s...\n"
-sudo snap refresh microk8s --channel=1.18/beta --classic >> $LOG_FILE 2>&1
+sudo snap refresh microk8s --channel=1.18/stable --classic >> $LOG_FILE 2>&1
 errchk $? "Microk8s update"
 
 # Refresh certificates just in case

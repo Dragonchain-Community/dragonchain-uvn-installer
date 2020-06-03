@@ -260,8 +260,8 @@ bootstrap_environment(){
    
     # Install microk8s classic via snap package
     # TODO - Replace with stable after microk8s.refresh-certs is stabilized
-    sudo snap refresh microk8s --channel=1.18/beta --classic >> $LOG_FILE 2>&1
-    errchk $? "sudo snap refresh microk8s --channel=1.18/beta --classic >> $LOG_FILE 2>&1"
+    sudo snap refresh microk8s --channel=1.18/stable --classic >> $LOG_FILE 2>&1
+    errchk $? "sudo snap refresh microk8s --channel=1.18/stable --classic >> $LOG_FILE 2>&1"
 
     # Refresh certificates just in case
     sudo microk8s.refresh-certs -i >> $LOG_FILE 2>&1
