@@ -26,7 +26,7 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 
 - Clone the repo or download the **install_dragonchain_uvn.sh** file
 
-    ```rm -f ./install_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v3.0/install_dragonchain_uvn.sh```
+    ```rm -f ./install_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v3.2/install_dragonchain_uvn.sh```
 
 
 - Make the script executable:
@@ -41,7 +41,7 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 
 - Clone the repo or download the **upgrade_dragonchain_uvn.sh** file
 
-    ```rm -f ./upgrade_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v3.0/upgrade_dragonchain_uvn.sh```
+    ```rm -f ./upgrade_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v3.2/upgrade_dragonchain_uvn.sh```
 
 
 - Make the script executable:
