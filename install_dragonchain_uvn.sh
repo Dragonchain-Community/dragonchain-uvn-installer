@@ -452,26 +452,6 @@ check_matchmaking_status() {
     fi
 }
 
-offer_apt_upgrade() {
-
-    echo -e "\e[93mIt is HIGHLY recommended that you run 'sudo apt-get upgrade -y' at this time to update your operating system.\e[0m"
-
-    local ANSWER=""
-    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
-    do
-        echo -e "Run the upgrade command now? [yes or no]"
-        read ANSWER
-        echo
-    done
-
-    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
-    then
-        # User wants fresh values
-        sudo apt-get upgrade -y
-        errchk $? "sudo apt-get upgrade -y"
-    fi
-}
-
 ## Main()
 
 #check for required commands, setup logging
