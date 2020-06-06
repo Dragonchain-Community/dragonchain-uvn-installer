@@ -91,16 +91,6 @@ preflight_check() {
         printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n"
         exit 1
     fi
-
-    # assume user executing is ubuntu with sudo privs
-    if [ -e ./dragonchain-setup ]; then
-        rm -r ./dragonchain-setup >/dev/null 2>&1
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
-    else
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
-    fi
 }
 
 ##########################################################################
