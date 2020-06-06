@@ -229,12 +229,11 @@ bootstrap_environment(){
     sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
-    # Install jq, openssl, xxd
-
     # Refresh available packages or install below may fail
     sudo apt-get update >> $LOG_FILE 2>&1
     errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
 
+    # Install jq, openssl, xxd
     sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1
     errchk $? "sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1"
 
