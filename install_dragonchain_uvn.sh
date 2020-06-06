@@ -436,6 +436,11 @@ check_matchmaking_status() {
     if [ $SUCCESS_CHECK -eq 1 ]
     then
         #SUCCESS!
+
+        echo "Your HMAC (aka Access) Key Details are as follows (please save for future use):" >> $SECURE_LOG_FILE
+        echo "ID: $HMAC_ID" >> $SECURE_LOG_FILE
+        echo "Key: $HMAC_KEY" >> $SECURE_LOG_FILE
+
         echo "Your HMAC (aka Access) Key Details are as follows (please save for future use):"
         echo "ID: $HMAC_ID"
         echo "Key: $HMAC_KEY"
