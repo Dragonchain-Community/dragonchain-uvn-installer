@@ -226,18 +226,6 @@ request_user_defined_values() {
 
 }
 
-
-##########################################################################
-## Function patch_server_current
-patch_server_current() {
-    #Patch our system current [stable]
-    sudo apt-get update >> $LOG_FILE 2>&1
-    errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
-
-#    sudo apt-get upgrade -y >> $LOG_FILE 2>&1
-#    errchk $? "sudo apt-get upgrade -y >> $LOG_FILE 2>&1"
-}
-
 ##########################################################################
 ## Function bootstrap_environment
 bootstrap_environment(){
@@ -502,10 +490,6 @@ preflight_check
 
 #load config values or gather from user
 set_config_values
-
-#patch system current
-printf "\nUpdating (patching) host OS current...\n"
-patch_server_current
 
 #install necessary software, set tunables
 printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
