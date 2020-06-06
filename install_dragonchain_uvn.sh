@@ -43,7 +43,7 @@ trim() {
     # remove leading whitespace characters
     var="${var#"${var%%[![:space:]]*}"}"
     # remove trailing whitespace characters
-    var="${var%"${var##*[![:space:]]}"}"   
+    var="${var%"${var##*[![:space:]]}"}"
     echo -n "$var"
 }
 
@@ -90,16 +90,6 @@ preflight_check() {
         printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n" >> $LOG_FILE
         printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n"
         exit 1
-    fi
-
-    # assume user executing is ubuntu with sudo privs
-    if [ -e ./dragonchain-setup ]; then
-        rm -r ./dragonchain-setup >/dev/null 2>&1
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
-    else
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
     fi
 }
 
@@ -226,18 +216,6 @@ request_user_defined_values() {
 
 }
 
-
-##########################################################################
-## Function patch_server_current
-patch_server_current() {
-    #Patch our system current [stable]
-    sudo apt-get update >> $LOG_FILE 2>&1
-    errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
-
-#    sudo apt-get upgrade -y >> $LOG_FILE 2>&1
-#    errchk $? "sudo apt-get upgrade -y >> $LOG_FILE 2>&1"
-}
-
 ##########################################################################
 ## Function bootstrap_environment
 bootstrap_environment(){
@@ -250,6 +228,10 @@ bootstrap_environment(){
     echo "vm.max_map_count=262144"| sudo tee -a /etc/sysctl.conf > /dev/null
     sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
+
+    # Refresh available packages or install below may fail
+    sudo apt-get update >> $LOG_FILE 2>&1
+    errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
     sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1
@@ -458,39 +440,21 @@ check_matchmaking_status() {
     if [ $SUCCESS_CHECK -eq 1 ]
     then
         #SUCCESS!
+
+        echo "Your HMAC (aka Access) Key Details are as follows (please save for future use):" >> $SECURE_LOG_FILE
+        echo "ID: $HMAC_ID" >> $SECURE_LOG_FILE
+        echo "Key: $HMAC_KEY" >> $SECURE_LOG_FILE
+
         echo "Your HMAC (aka Access) Key Details are as follows (please save for future use):"
         echo "ID: $HMAC_ID"
         echo "Key: $HMAC_KEY"
 
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
 
-        #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
-        #offer_apt_upgrade
-
     else
         #Boo!
         echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
-    fi
-}
-
-offer_apt_upgrade() {
-
-    echo -e "\e[93mIt is HIGHLY recommended that you run 'sudo apt-get upgrade -y' at this time to update your operating system.\e[0m"
-
-    local ANSWER=""
-    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
-    do
-        echo -e "Run the upgrade command now? [yes or no]"
-        read ANSWER
-        echo
-    done
-
-    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
-    then
-        # User wants fresh values
-        sudo apt-get upgrade -y
-        errchk $? "sudo apt-get upgrade -y"
     fi
 }
 
@@ -502,10 +466,6 @@ preflight_check
 
 #load config values or gather from user
 set_config_values
-
-#patch system current
-printf "\nUpdating (patching) host OS current...\n"
-patch_server_current
 
 #install necessary software, set tunables
 printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
