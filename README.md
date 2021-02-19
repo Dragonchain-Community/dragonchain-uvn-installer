@@ -3,19 +3,19 @@
 https://github.com/Dragonchain-Community/dragonchain-uvn-installer
 
 
+### To INSTALL a New Dragonchain Unmanaged Node from this version (multiple node install):
+
+- Clone the repo or download the **install_dragonchain_uvn.sh** file
+
+    ```rm -f ./install_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/l0wd0ct0r/dragonchain-uvn-installer/master/install_dragonchain_uvn.sh```
 
 
-To install this version:
+- Make the script executable:
 
-INSTALL a New Dragonchain Unmanaged Node:
-Clone the repo or download the install_dragonchain_uvn.sh file
+    ```chmod u+x install_dragonchain_uvn.sh```
 
-rm -f ./install_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/l0wd0ct0r/dragonchain-uvn-installer/master/install_dragonchain_uvn.sh
+- Run the script with sudo:
 
-Make the script executable:
+    ```sudo ./install_dragonchain_uvn.sh```
 
-chmod u+x install_dragonchain_uvn.sh
 
-Run the script with sudo:
-
-sudo ./install_dragonchain_uvn.sh
