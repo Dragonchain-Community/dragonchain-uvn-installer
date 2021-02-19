@@ -5,7 +5,14 @@
 
 # Variables
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
-DRAGONCHAIN_INSTALLER_DIR=~/.dragonchain-installer
+
+## Prompt for Dragonchain node name
+echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
+echo -e "\e[2mThis name must be unique if you intend to run multiple nodes\e[0m"
+echo -e "\e[2mTo repair a previous installation, type the node name of that installation\e[0m"
+
+read -e DRAGONCHAIN_INSTALLER_DIR
+
 LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
 SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 
@@ -93,13 +100,13 @@ preflight_check() {
     fi
 
     # assume user executing is ubuntu with sudo privs
-    if [ -e ./dragonchain-setup ]; then
-        rm -r ./dragonchain-setup >/dev/null 2>&1
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
+    if [ -e $DRAGONCHAIN_INSTALLER_DIR/dragonchain-setup ]; then
+        rm -r $DRAGONCHAIN_INSTALLER_DIR/dragonchain-setup >/dev/null 2>&1
+        mkdir $DRAGONCHAIN_INSTALLER_DIR/dragonchain-setup
+        errchk $? "mkdir $DRAGONCHAIN_INSTALLER_DIR/dragonchain-setup"
     else
-        mkdir ./dragonchain-setup
-        errchk $? "mkdir ./dragonchain-setup"
+        mkdir $DRAGONCHAIN_INSTALLER_DIR/dragonchain-setup
+        errchk $? "mkdir $DRAGONCHAIN_INSTALLER_DIR/dragonchain-setup"
     fi
 }
 
@@ -317,7 +324,7 @@ initialize_microk8s(){
 ##########################################################################
 ## Function check_existing_install
 check_existing_install(){
-    NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c "dragonchain")
+    NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c $DRAGONCHAIN_INSTALLER_DIR)
 
     if [ $NAMESPACE_EXISTS -ge 1 ]
     then
@@ -352,13 +359,13 @@ check_existing_install(){
 generate_chainsecrets(){
     #duck note: running it outright; TODO: write HMAC_ID and HMAC_KEY to secure log file
 
-    echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"dragonchain","labels":{"name":"dragonchain"}}}' | sudo kubectl create -f - >> $LOG_FILE
+    echo '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"'"$DRAGONCHAIN_INSTALLER_DIR"'","labels":{"name":"'"$DRAGONCHAIN_INSTALLER_DIR"'"}}}' | sudo kubectl create -f - >> $LOG_FILE
     export LC_CTYPE=C  # Needed on MacOS when using tr with /dev/urandom
     BASE_64_PRIVATE_KEY=$(openssl ecparam -genkey -name secp256k1 | openssl ec -outform DER 2>/dev/null| tail -c +8 | head -c 32 | xxd -p -c 32 | xxd -r -p | base64)
     HMAC_ID=$(tr -dc 'A-Z' < /dev/urandom | fold -w 12 | head -n 1)
     HMAC_KEY=$(tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 43 | head -n 1)
     SECRETS_AS_JSON="{\"private-key\":\"$BASE_64_PRIVATE_KEY\",\"hmac-id\":\"$HMAC_ID\",\"hmac-key\":\"$HMAC_KEY\",\"registry-password\":\"\"}"
-    sudo kubectl create secret generic -n dragonchain "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON" >> $LOG_FILE
+    sudo kubectl create secret generic -n $DRAGONCHAIN_INSTALLER_DIR "d-$DRAGONCHAIN_UVN_INTERNAL_ID-secrets" --from-literal=SecretString="$SECRETS_AS_JSON" >> $LOG_FILE
     # Note INTERNAL_ID from the secret name should be replaced with the value of .global.environment.INTERNAL_ID from the helm chart values (opensource-config.yaml)
 
     # output from generated script above ; we need to capture ROOT HMAC KEY for later!
@@ -376,7 +383,7 @@ install_dragonchain() {
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
     # Deploy Helm Chart
-    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace dragonchain dragonchain/dragonchain-k8s \
+    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
     --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
     --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
     --set global.environment.INTERNAL_ID="$DRAGONCHAIN_UVN_INTERNAL_ID" \
@@ -385,7 +392,8 @@ install_dragonchain() {
     --set service.port=$DRAGONCHAIN_UVN_NODE_PORT \
     --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
     --set redis.storage.spec.storageClassName="microk8s-hostpath" \
-    --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >> $LOG_FILE 2>&1
+    --set redisearch.storage.spec.storageClassName="microk8s-hostpath" \
+	--set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
 
     errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
 }
@@ -400,7 +408,7 @@ check_kube_status() {
     local STATUS_CHECK_COUNT=1
     while :
     do
-        local STATUS=$(sudo kubectl get pods -n dragonchain)
+        local STATUS=$(sudo kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR)
 
         READYCOUNT=$(echo "$STATUS" | grep -c "1/1")
         RUNNINGCOUNT=$(echo "$STATUS" | grep -c "Running")
@@ -438,10 +446,10 @@ check_kube_status() {
 ## Function set_dragonchain_public_id
 set_dragonchain_public_id() {
     #Parse the full name of the webserver pod
-    DRAGONCHAIN_WEBSERVER_POD_NAME=$(sudo kubectl get pod -n dragonchain -l app.kubernetes.io/component=webserver | tail -1 | awk '{print $1}')
+    DRAGONCHAIN_WEBSERVER_POD_NAME=$(sudo kubectl get pod -n $DRAGONCHAIN_INSTALLER_DIR -l app.kubernetes.io/component=webserver | tail -1 | awk '{print $1}')
     errchk $? "Pod name extraction"
 
-    DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n dragonchain $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
+    DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n $DRAGONCHAIN_INSTALLER_DIR $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
     errchk $? "Public ID lookup"
 
     #duck Let's log this in the secrets file with hmac stuff
@@ -463,8 +471,9 @@ check_matchmaking_status() {
         echo "Key: $HMAC_KEY"
 
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+        echo -e "\e[2mTo watch the status of this node, type 'sudo watch kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR'\e[0m"
 
-        #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
+      #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
         #offer_apt_upgrade
 
     else
@@ -519,7 +528,7 @@ check_existing_install
 printf "\nGenerating chain secrets...\n"
 generate_chainsecrets
 
-printf "\nInstalling UVN Dragonchain...\n"
+printf "\nInstalling UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
 install_dragonchain
 
 check_kube_status
