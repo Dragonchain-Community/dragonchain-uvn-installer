@@ -394,7 +394,8 @@ install_dragonchain() {
     --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
     --set redis.storage.spec.storageClassName="microk8s-hostpath" \
     --set redisearch.storage.spec.storageClassName="microk8s-hostpath" \
-    --set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
+    # Uncomment the below line for Raspberry Pi installations
+	#--set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
 
     errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
 }
