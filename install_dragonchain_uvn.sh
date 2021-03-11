@@ -384,6 +384,9 @@ install_dragonchain() {
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
     # Deploy Helm Chart
+    #
+    # For Raspberry Pi installations, uncomment the last --set line and
+    # on the --set redis.storage.spec.storageClassName line above it, replace >> $LOG_FILE 2>&1 with \
     sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
     --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
     --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
@@ -394,7 +397,6 @@ install_dragonchain() {
     --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
     --set redis.storage.spec.storageClassName="microk8s-hostpath" \
     --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >> $LOG_FILE 2>&1
-    # Uncomment the line below for Raspberry Pi installations and replace >> $LOG_FILE 2>&1 in the line above with \
     #--set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
 
     errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
