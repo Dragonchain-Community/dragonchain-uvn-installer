@@ -56,5 +56,3 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 - Support for pre-built config files for easy automatic deployment
 
 *Dragonchain-Community and this project are not affiliated with Dragonchain, Inc. or the Dragonchain Foundation*
-
-
