@@ -1,6 +1,8 @@
 # dragonchain-uvn-installer 
 
-This project enables "easy mode" setup and installation of a Dragonchain Level 2 Unmanaged Verification Node
+This project enables "easy mode" setup and installation of a Dragonchain Level 2-4 Unmanaged Verification Node
+
+**Now supports multiple node installations thanks to community member @l0wd0ct0r!**
 
 ### Limitations:
 
@@ -26,7 +28,7 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 
 - Clone the repo or download the **install_dragonchain_uvn.sh** file
 
-    ```rm -f ./install_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v3.2/install_dragonchain_uvn.sh```
+    ```rm -f ./install_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v4/install_dragonchain_uvn.sh```
 
 
 - Make the script executable:
@@ -51,8 +53,5 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 - Run the script with sudo:
 
     ```sudo ./upgrade_dragonchain_uvn.sh```
-
-### Coming features:
-- Support for pre-built config files for easy automatic deployment
 
 *Dragonchain-Community and this project are not affiliated with Dragonchain, Inc. or the Dragonchain Foundation*
