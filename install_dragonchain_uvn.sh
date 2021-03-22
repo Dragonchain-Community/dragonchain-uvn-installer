@@ -527,7 +527,7 @@ offer_apt_upgrade() {
 
 ##########################################################################
 ## Function check_matchmaking_status_upgrade
-check_matchmaking_status() {
+check_matchmaking_status_upgrade() {
     local MATCHMAKING_API_CHECK=$(curl -s https://matchmaking.api.dragonchain.com/registration/verify/$DRAGONCHAIN_UVN_PUBLIC_ID)
 
     local SUCCESS_CHECK=$(echo "$MATCHMAKING_API_CHECK" | grep -c "configuration is valid and chain is reachable")
