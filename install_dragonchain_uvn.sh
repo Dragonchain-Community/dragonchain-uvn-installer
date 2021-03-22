@@ -356,7 +356,16 @@ check_existing_install(){
 	    exit 0
         fi
 	
-	echo "oof"
+	printf "\nUpgrading UVN Dragonchain...\n"
+        
+	install_dragonchain
+
+        check_kube_status
+
+        set_dragonchain_public_id
+
+        check_matchmaking_status_upgrade
+	
 	exit 0
     fi
 
@@ -516,6 +525,47 @@ offer_apt_upgrade() {
     fi
 }
 
+##########################################################################
+## Function check_matchmaking_status_upgrade
+check_matchmaking_status() {
+    local MATCHMAKING_API_CHECK=$(curl -s https://matchmaking.api.dragonchain.com/registration/verify/$DRAGONCHAIN_UVN_PUBLIC_ID)
+
+    local SUCCESS_CHECK=$(echo "$MATCHMAKING_API_CHECK" | grep -c "configuration is valid and chain is reachable")
+
+    if [ $SUCCESS_CHECK -eq 1 ]
+    then
+        #SUCCESS!
+        echo -e "\e[92mYOUR DRAGONCHAIN NODE IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+        
+        #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
+        #offer_apt_upgrade
+
+    else
+        #Boo!
+        echo -e "\e[31mYOUR DRAGONCHAIN NODE IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo "$MATCHMAKING_API_CHECK"
+    fi
+}
+
+offer_apt_upgrade() {
+
+    echo -e "\e[93mIt is HIGHLY recommended that you run 'sudo apt-get upgrade -y' at this time to update your operating system.\e[0m"
+
+    local ANSWER=""
+    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
+    do
+        echo -e "Run the upgrade command now? [yes or no]"
+        read ANSWER
+        echo
+    done
+
+    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
+    then
+        # User wants fresh values
+        sudo apt-get upgrade -y
+        errchk $? "sudo apt-get upgrade -y"
+    fi
+} 
 ## Main()
 
 #check for required commands, setup logging
