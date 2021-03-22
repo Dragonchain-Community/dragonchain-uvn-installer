@@ -334,8 +334,10 @@ check_existing_install(){
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
         do
-            echo -e "Delete this node (\e[91mAll configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted\e[0m)[yes (delete) or no (to attempt upgrade)]"
-            read ANSWER
+            echo -e "/nIf incorrect values were supplied during install or if the node is not functioning, you can Delete it now (\e[91mAll configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted\e[0m)"
+            echo -e "/nIf you would like to Upgrade an existing working node, you can also attempt that now"
+	    echo -e "/n/n[Answer yes to Delete, or no to Upgrade]"
+	    read ANSWER
             echo
         done
 
@@ -356,6 +358,7 @@ check_existing_install(){
 	    exit 0
         fi
 	
+	# User wants to attempt upgrade
 	printf "\nUpgrading UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
         
 	install_dragonchain
