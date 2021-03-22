@@ -351,7 +351,7 @@ check_existing_install(){
             	    
 	    sleep 10
 	    
-	    echo -e "\n\nNode and configuration for $DRAGONCHAIN_INSTALLER_DIR has been deleted. Please rerun installer to reconfigure this node."
+	    echo -e "\nNode and configuration data for $DRAGONCHAIN_INSTALLER_DIR has been deleted. Please rerun installer to reconfigure this node."
 	    
 	    exit 0
         fi
