@@ -329,26 +329,32 @@ check_existing_install(){
 
     if [ $NAMESPACE_EXISTS -ge 1 ]
     then
-        echo -e "\e[93mA previous installation of Dragonchain (failed or complete) was found.\e[0m"
+        echo -e "\e[93mA previous installation of Dragonchain $DRAGONCHAIN_INSTALLER_DIR (failed or complete) was found.\e[0m"
 
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
         do
-            echo -e "Reset your installation (\e[91mAll data will be deleted\e[0m)? [yes or no]"
+            echo -e "Delete this node (\e[91mAll configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted\e[0m)? [yes or no]"
             read ANSWER
             echo
         done
 
         if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
         then
-            # User wants fresh install
-            echo "Reseting microk8s (may take several minutes)..."
-            sudo microk8s.reset >> $LOG_FILE 2>&1
-            errchk $? "sudo microk8s.reset"
-
-            sleep 20
-
-            initialize_microk8s
+            # User wants to delete namespace
+            echo "Deleting namespace $DRAGONCHAIN_INSTALLER_DIR (may take several minutes)..."
+            sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >> $LOG_FILE 2>&1
+            errchk $? "sudo kubectl delete namespaces"
+	    
+	    echo "Deleting configuration for $DRAGONCHAIN_INSTALLER_DIR..."
+            sudo rm $DRAGONCHAIN_INSTALLER_DIR -R >> $LOG_FILE 2>&1
+            errchk $? "sudo rm"
+	    
+	    sleep 10
+	    
+	    echo "Node and configuration for $DRAGONCHAIN_INSTALLER_DIR has been deleted. Please rerun installer to reconfigure this node."
+	    
+	    exit 0
         fi
     fi
 
