@@ -334,8 +334,9 @@ check_existing_install(){
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
         do
-            echo -e "\nIf incorrect values were supplied during install or if the node is not functioning, you can Delete it now (\e[91mAll configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted\e[0m)"
-            echo -e "\nIf you would like to Upgrade an existing working node, you can also attempt that now"
+            echo -e "If incorrect values were supplied during install or if the node is not functioning, you can Delete it now"
+	    echo -e "(\e[91mAll configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted\e[0m)"
+            echo -e "If you would like to instead Upgrade an existing working node, you can also attempt that now"
 	    echo -e "\e[93m\n\n[Answer yes to Delete, or no to Upgrade]\e[0m"
 	    read ANSWER
             echo
