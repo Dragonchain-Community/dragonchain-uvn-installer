@@ -342,16 +342,16 @@ check_existing_install(){
         if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
         then
             # User wants to delete namespace
-            echo "Deleting namespace $DRAGONCHAIN_INSTALLER_DIR (may take several minutes)..."
+            echo "\nDeleting namespace $DRAGONCHAIN_INSTALLER_DIR (may take several minutes)..."
             sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >> $LOG_FILE 2>&1
             errchk $? "sudo kubectl delete namespaces"
 	    
-	    echo "Deleting configuration for $DRAGONCHAIN_INSTALLER_DIR..."
+	    echo "\nDeleting configuration for $DRAGONCHAIN_INSTALLER_DIR..."
             sudo rm $DRAGONCHAIN_INSTALLER_DIR -R
             	    
 	    sleep 10
 	    
-	    echo "Node and configuration for $DRAGONCHAIN_INSTALLER_DIR has been deleted. Please rerun installer to reconfigure this node."
+	    echo "\nNode and configuration for $DRAGONCHAIN_INSTALLER_DIR has been deleted. Please rerun installer to reconfigure this node."
 	    
 	    exit 0
         fi
