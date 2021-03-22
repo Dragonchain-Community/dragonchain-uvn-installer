@@ -336,7 +336,7 @@ check_existing_install(){
         do
             echo -e "/nIf incorrect values were supplied during install or if the node is not functioning, you can Delete it now (\e[91mAll configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted\e[0m)"
             echo -e "/nIf you would like to Upgrade an existing working node, you can also attempt that now"
-	    echo -e "/n/n[Answer yes to Delete, or no to Upgrade]"
+	    echo -e "\e[93m/n/n[Answer yes to Delete, or no to Upgrade]\e[0m"
 	    read ANSWER
             echo
         done
@@ -496,7 +496,7 @@ check_matchmaking_status() {
 
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
         echo -e "\e[2mTo watch the status of this node, type 'sudo watch kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR'\e[0m"
-		echo -e "\e[2mTo watch the status of all nodes, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
+	echo -e "\e[2mTo watch the status of all nodes, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
  
       #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
         #offer_apt_upgrade
