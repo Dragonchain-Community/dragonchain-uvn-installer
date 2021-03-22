@@ -348,8 +348,7 @@ check_existing_install(){
 	    
 	    echo "Deleting configuration for $DRAGONCHAIN_INSTALLER_DIR..."
             sudo rm $DRAGONCHAIN_INSTALLER_DIR -R
-            errchk $? "sudo rm"
-	    
+            	    
 	    sleep 10
 	    
 	    echo "Node and configuration for $DRAGONCHAIN_INSTALLER_DIR has been deleted. Please rerun installer to reconfigure this node."
