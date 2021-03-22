@@ -347,7 +347,7 @@ check_existing_install(){
             errchk $? "sudo kubectl delete namespaces"
 	    
 	    echo "Deleting configuration for $DRAGONCHAIN_INSTALLER_DIR..."
-            sudo rm $DRAGONCHAIN_INSTALLER_DIR -R >> $LOG_FILE 2>&1
+            sudo rm $DRAGONCHAIN_INSTALLER_DIR -R
             errchk $? "sudo rm"
 	    
 	    sleep 10
