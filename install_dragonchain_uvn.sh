@@ -356,7 +356,7 @@ check_existing_install(){
 	    exit 0
         fi
 	
-	printf "\nUpgrading UVN Dragonchain...\n"
+	printf "\nUpgrading UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
         
 	install_dragonchain
 
