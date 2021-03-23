@@ -10,7 +10,7 @@ REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget 
 echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
 echo -e "\e[2mThe name must contain lowercase characters and '-' ONLY\e[0m"
-echo -e "\e[2mTo upgrad or delete a previous installation, type the node name of that installation\e[0m"
+echo -e "\e[2mTo upgrade or delete a previous installation, type the node name of that installation\e[0m"
 
 read -e DRAGONCHAIN_INSTALLER_DIR
 
