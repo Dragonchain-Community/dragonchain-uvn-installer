@@ -6,6 +6,9 @@
 # Variables
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
 
+## Attempt upgrade on all nodes
+upgrade_all_helm_charts
+
 ## Prompt for Dragonchain node name
 echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
@@ -370,11 +373,11 @@ check_existing_install(){
         
 	install_dragonchain
 
-        check_kube_status
+    check_kube_status
 
-        set_dragonchain_public_id
+    set_dragonchain_public_id
 
-        check_matchmaking_status_upgrade
+    check_matchmaking_status_upgrade
 	
 	exit 0
     fi
@@ -576,6 +579,17 @@ offer_apt_upgrade() {
         errchk $? "sudo apt-get upgrade -y"
     fi
 } 
+
+##########################################################################
+## Function upgrade_all_helm_charts
+upgrade_all_helm_charts() {
+while read -r name namespace;
+do
+        sudo helm upgrade --install $name --namespace $namespace dragonchain/dragonchain-k8s
+
+done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
+}
+
 ## Main()
 
 #check for required commands, setup logging
