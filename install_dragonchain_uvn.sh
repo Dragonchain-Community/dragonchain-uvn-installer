@@ -336,7 +336,7 @@ check_existing_install(){
         do
         echo -e "If you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press [u]"
 		echo -e "If you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press [d]"
-	    echo -e "\e[91m(All configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted!)\e[0m"
+	    echo -e "\e[91m(All configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted, but other nodes will be unaffected.)\e[0m"
 	    echo -e "\e[93m\n[u to Upgrade, d to Delete]\e[0m"
 	    read ANSWER
         echo
