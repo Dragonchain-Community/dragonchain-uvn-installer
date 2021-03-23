@@ -332,17 +332,17 @@ check_existing_install(){
         echo -e "\e[93mA previous installation of Dragonchain $DRAGONCHAIN_INSTALLER_DIR (failed or complete) was found.\e[0m"
 
         local ANSWER=""
-        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
+        while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
-            echo -e "If incorrect values were supplied during install or if the node is not functioning, Delete it here."
-	    echo -e "(\e[91mAll configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted\e[0m)"
-            echo -e "\nIf you would like to instead Upgrade $DRAGONCHAIN_INSTALLER_DIR, you can attempt that now."
-	    echo -e "\e[93m\n\n[Answer yes to Delete, or no to Upgrade]\e[0m"
+        echo -e "If you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press [u]"
+		echo -e "If you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press [d]"
+	    echo -e "\e[91m(All configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted!)\e[0m"
+	    echo -e "\e[93m\n\n[u to Upgrade, d to Delete]\e[0m"
 	    read ANSWER
-            echo
+        echo
         done
 
-        if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
+        if [[ "$ANSWER" == "d" || "$ANSWER" == "delete" ]]
         then
             # User wants to delete namespace
             echo -e "\nDeleting namespace $DRAGONCHAIN_INSTALLER_DIR (may take several minutes)..."
