@@ -584,7 +584,7 @@ offer_nodes_upgrade(){
         local ANSWER=""
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
-            echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected. Would you like to Install/Reinstall a node or Upgrade All existing nodes?\e[0m"
+            echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
             echo -e "\e[2mYou have the option to install a new node (including administering/upgrading or deleting existing nodes)\e[0m"
             echo -e "\e[2mor you can upgrade ALL detected nodes to the latest version.\e[0m"
             echo -e "\e[93m\n[i to Install/Administer a node, u to Upgrade ALL nodes]\e[0m" 
