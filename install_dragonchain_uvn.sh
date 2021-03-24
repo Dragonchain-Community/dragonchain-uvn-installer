@@ -6,8 +6,27 @@
 # Variables
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
 
-## Attempt upgrade on all nodes
-upgrade_all_helm_charts
+
+echo -e "\n\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
+sleep 2
+
+## Upgrade existing nodes if present
+echo -e "n\Checking for existing nodes and upgrading..."
+
+DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
+
+if [ $DC_PODS_EXIST -ge 1 ]
+    then
+
+    while read -r name namespace;
+    do
+        sudo helm upgrade --install $name --namespace $namespace dragonchain/dragonchain-k8s
+
+    done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
+
+fi
+
+echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
 
 ## Prompt for Dragonchain node name
 echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
@@ -506,7 +525,7 @@ check_matchmaking_status() {
 
         echo -e "\e[92mYOUR DRAGONCHAIN NODE IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
         echo -e "\e[2mTo watch the status of this node, type 'sudo watch kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR'\e[0m"
-	echo -e "\e[2mTo watch the status of all nodes, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
+	    echo -e "\e[2mTo watch the status of all nodes, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
  
       #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
         #offer_apt_upgrade
