@@ -359,8 +359,6 @@ check_existing_install(){
 	# User wants to attempt upgrade
 	printf "\nUpgrading UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
 
-    sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >> $LOG_FILE 2>&1
-
 	install_dragonchain
 
     check_kube_status
