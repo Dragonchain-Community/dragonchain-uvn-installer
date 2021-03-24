@@ -467,7 +467,7 @@ check_matchmaking_status() {
         echo "ID: $HMAC_ID"
         echo "Key: $HMAC_KEY"
 
-        echo -e "\e[92mYOUR DRAGONCHAIN NODE $DRAGONCHAIN_INSTALLER_DIR IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+        echo -e "\e[92mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
         echo -e "\e[2mTo watch the status of this node, type 'sudo watch kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR'\e[0m"
         echo -e "\e[2mTo watch the status of all nodes, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
 
@@ -476,7 +476,7 @@ check_matchmaking_status() {
 
     else
         #Boo!
-        echo -e "\e[31mYOUR DRAGONCHAIN NODE $DRAGONCHAIN_INSTALLER_DIR IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
     fi
 }
