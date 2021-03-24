@@ -10,7 +10,9 @@ REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget 
 echo -e "\n\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
 sleep 2
 
-## Offer an upgrade existing nodes
+##########################################################################
+## Function offer_nodes_upgrade
+offer_nodes_upgrade(){
 
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
@@ -40,6 +42,9 @@ sleep 2
         fi
 
     fi
+}
+
+offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
 echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
