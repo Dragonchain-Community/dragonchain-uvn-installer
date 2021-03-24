@@ -7,72 +7,6 @@
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
 
 
-echo -e "\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
-
-##########################################################################
-## Function offer_nodes_upgrade
-offer_nodes_upgrade(){
-       DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
-
-        if [ $DC_PODS_EXIST -ge 1 ]
-        then
-        local ANSWER=""
-        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
-        do
-            echo -e "\n\e[93mWould you like to Install [i] a new node or Upgrade [u] all existing nodes? [i or u]\e[0m"
-            read ANSWER
-            echo
-        done
-
-        if [[ "$ANSWER" == "u" || "$ANSWER" == "upgrade" ]]
-        then
-        echo -e "Upgrading all existing nodes..."
-
-        while read -r NAME DRAGONCHAIN_INSTALLER_DIR;
-        do
-        . $DRAGONCHAIN_INSTALLER_DIR/.config
-
-        echo -e "\e[93mSaved configuration values found:\e[0m"
-        echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
-        echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
-        echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
-        echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
-        echo "Node Level = $DRAGONCHAIN_UVN_NODE_LEVEL"
-        echo
-
-        sudo helm upgrade --install $NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
-	    
-        $(check_kube_status)
-
-        $(set_dragonchain_public_id)
-
-        $(check_matchmaking_status_upgrade)
-
-        done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
-
-        echo -e "All nodes have been upgraded successfully. Happy Noding!"
-        exit 0
-
-
-        fi
-
-    fi
-}
-
-## Offer to upgrade all nodes
-offer_nodes_upgrade
-
-## Prompt for Dragonchain node name
-echo -e "\e[94mEnter a Dragonchain node name:\e[0m"
-echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
-echo -e "\e[2mThe name must contain lowercase characters and '-' ONLY\e[0m"
-echo -e "\e[2mTo upgrade or delete a previous installation, type the node name of that installation\e[0m"
-
-read -e DRAGONCHAIN_INSTALLER_DIR
-
-LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
-SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
-
 #Variables may be in .config or from user input
 
 ##########################################################################
@@ -633,7 +567,74 @@ offer_apt_upgrade() {
     fi
 } 
 
+##########################################################################
+## Function offer_nodes_upgrade
+offer_nodes_upgrade(){
+       DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
+
+        if [ $DC_PODS_EXIST -ge 1 ]
+        then
+        local ANSWER=""
+        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
+        do
+            echo -e "\n\e[93mWould you like to Install [i] a new node or Upgrade [u] all existing nodes? [i or u]\e[0m"
+            read ANSWER
+            echo
+        done
+
+        if [[ "$ANSWER" == "u" || "$ANSWER" == "upgrade" ]]
+        then
+        echo -e "Upgrading all existing nodes..."
+
+        while read -r NAME DRAGONCHAIN_INSTALLER_DIR;
+        do
+        . $DRAGONCHAIN_INSTALLER_DIR/.config
+
+        echo -e "\e[93mSaved configuration values found:\e[0m"
+        echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
+        echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
+        echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
+        echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
+        echo "Node Level = $DRAGONCHAIN_UVN_NODE_LEVEL"
+        echo
+
+        sudo helm upgrade --install $NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
+	    
+        $(check_kube_status)
+
+        $(set_dragonchain_public_id)
+
+        $(check_matchmaking_status_upgrade)
+
+        done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
+
+        echo -e "All nodes have been upgraded successfully. Happy Noding!"
+        exit 0
+
+
+        fi
+
+    fi
+}
+
 ## Main()
+
+
+#offer to upgrade all nodes
+offer_nodes_upgrade
+
+echo -e "\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
+
+## Prompt for Dragonchain node name
+echo -e "\e[94mEnter a Dragonchain node name:\e[0m"
+echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
+echo -e "\e[2mThe name must contain lowercase characters and '-' ONLY\e[0m"
+echo -e "\e[2mTo upgrade or delete a previous installation, type the node name of that installation\e[0m"
+
+read -e DRAGONCHAIN_INSTALLER_DIR
+
+LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
+SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 
 #check for required commands, setup logging
 printf "\n\nChecking host OS for necessary components...\n\n"
