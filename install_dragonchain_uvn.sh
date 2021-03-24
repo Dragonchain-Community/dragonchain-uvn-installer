@@ -20,7 +20,7 @@ errchk() {
         printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2"
         exit "$1"
     fi
-    printf "\nPASS: %s\n" "$2" #>> $LOG_FILE
+    printf "\nPASS: %s\n" "$2" >> $LOG_FILE
 }
 
 ##########################################################################
@@ -573,7 +573,11 @@ offer_apt_upgrade() {
 ##########################################################################
 ## Function offer_nodes_upgrade
 offer_nodes_upgrade(){
-       DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
+
+        LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
+        SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
+
+        DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
         if [ $DC_PODS_EXIST -ge 1 ]
         then
