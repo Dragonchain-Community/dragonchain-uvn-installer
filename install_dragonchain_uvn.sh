@@ -326,15 +326,15 @@ check_existing_install(){
 
     if [ $NAMESPACE_EXISTS -ge 1 ]
     then
-        echo -e "\e[93mA previous installation of Dragonchain $DRAGONCHAIN_INSTALLER_DIR (failed or complete) was found.\e[0m"
+        echo -e "\e[93mA previous installation of Dragonchain node $DRAGONCHAIN_INSTALLER_DIR (failed or complete) was found.\e[0m"
 
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
-        echo -e "If you would like to reinstall node $DRAGONCHAIN_INSTALLER_DIR, press [r]"
+        echo -e "If you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press [u]"
 		echo -e "If you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press [d]"
 	    echo -e "\e[91m(All configuration for $DRAGONCHAIN_INSTALLER_DIR will be deleted. Other running nodes will be unaffected.)\e[0m"
-	    echo -e "\e[93m\n[r to Reinstall, d to Delete]\e[0m"
+	    echo -e "\e[93m\n[u to Upgrade, d to Delete]\e[0m"
 	    read ANSWER
         echo
         done
@@ -349,15 +349,15 @@ check_existing_install(){
 	    echo -e "\nDeleting saved configuration for $DRAGONCHAIN_INSTALLER_DIR..."
             sudo rm $DRAGONCHAIN_INSTALLER_DIR -R
             	    
-	    sleep 10
+	    sleep 5
 	    
-	    echo -e "\nNode and configuration data for $DRAGONCHAIN_INSTALLER_DIR has been deleted. Please rerun installer to reconfigure this node."
+	    echo -e "\nConfiguration data for $DRAGONCHAIN_INSTALLER_DIR has been deleted and the node has been terminated. Please rerun installer to reconfigure this node."
 	    
 	    exit 0
         fi
 	
 	# User wants to attempt upgrade
-	printf "\nReinstalling UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
+	printf "\nUpgrading UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
 
     sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >> $LOG_FILE 2>&1
 
@@ -538,14 +538,14 @@ check_matchmaking_status_upgrade() {
     if [ $SUCCESS_CHECK -eq 1 ]
     then
         #SUCCESS!
-        echo -e "\e[92mYOUR DRAGONCHAIN NODE $DRAGONCHAIN_INSTALLER_DIR IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+        echo -e "\e[92mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
         
         #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
         #offer_apt_upgrade
 
     else
         #Boo!
-        echo -e "\e[31mYOUR DRAGONCHAIN NODE $DRAGONCHAIN_INSTALLER_DIR IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
     fi
 }
@@ -585,7 +585,9 @@ offer_nodes_upgrade(){
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
             echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected. Would you like to Install/Reinstall a node or Upgrade All existing nodes?\e[0m"
-            echo -e "\e[93m\n[i to Install/Reinstall, u to Upgrade All]\e[0m" 
+            echo -e "\e[2mYou have the option to install a new node (including administering/upgrading or deleting existing nodes)\e[0m"
+            echo -e "\e[2mor you can upgrade ALL detected nodes to the latest version.\e[0m"
+            echo -e "\e[93m\n[i to Install/Administer a node, u to Upgrade ALL nodes]\e[0m" 
             read ANSWER
             echo
         done
