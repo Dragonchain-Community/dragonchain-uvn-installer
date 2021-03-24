@@ -331,10 +331,10 @@ check_existing_install(){
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
-        echo -e "If you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press [u]"
-		echo -e "If you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press [d]"
-	    echo -e "\e[91m(All configuration for $DRAGONCHAIN_INSTALLER_DIR will be deleted. Other running nodes will be unaffected.)\e[0m"
-	    echo -e "\e[93m\n[u to Upgrade, d to Delete]\e[0m"
+        echo -e "\e[2mIf you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press \e[93m[u]\e[0m"
+		echo -e "\e[2mIf you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press \e[93m[d]\e[0m"
+	    echo -e "\e[91m(All configuration for $DRAGONCHAIN_INSTALLER_DIR will be deleted. Other running nodes will be unaffected)\e[0m"
+	    #echo -e "\e[93m\n[u to Upgrade, d to Delete]\e[0m"
 	    read ANSWER
         echo
         done
@@ -585,9 +585,9 @@ offer_nodes_upgrade(){
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
             echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
-            echo -e "\e[2mYou have the option to install a new node (including administering/upgrading or deleting existing nodes)\e[0m"
-            echo -e "\e[2mor you can upgrade ALL detected nodes to the latest version.\e[0m"
-            echo -e "\e[93m\n[i to Install/Administer a node, u to Upgrade ALL nodes]\e[0m" 
+            echo -e "\e[2mIf you would like to install a new node (including administering/upgrading or deleting existing nodes), press \e[93m[i]\e[0m"
+            echo -e "\e[2mIf you would like to upgrade ALL detected nodes to the latest version, press \e[93m[u]\e[0m"
+            #echo -e "\e[93m\n[i to Install/Administer a node, u to Upgrade ALL nodes]\e[0m" 
             read ANSWER
             echo
         done
