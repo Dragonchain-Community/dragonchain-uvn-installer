@@ -140,7 +140,6 @@ function set_config_values() {
     fi
 }
 
-
 ##########################################################################
 ## Function request_user_defined_values
 request_user_defined_values() {
