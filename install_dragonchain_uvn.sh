@@ -584,7 +584,6 @@ offer_nodes_upgrade() {
 
             done < <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"' | tr -d \")
 
-            echo -e "\n\e[92mNODE UPGRADE PROCESS COMPLETE\e[0m"
             exit 0
 
         fi
