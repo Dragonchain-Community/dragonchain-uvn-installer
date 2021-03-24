@@ -627,7 +627,7 @@ echo -e "\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
-echo -e "\e[94mEnter a Dragonchain node name:\e[0m"
+echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
 echo -e "\e[2mThe name must contain lowercase characters and '-' ONLY\e[0m"
 echo -e "\e[2mTo upgrade or delete a previous installation, type the node name of that installation\e[0m"
