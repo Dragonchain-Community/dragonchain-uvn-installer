@@ -15,7 +15,7 @@ sleep 2
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
         do
-            echo -e "\e[93mWould you like to upgrade all existing ndoes? [yes or no]\e[0m"
+            echo -e "\e[93mWould you like to upgrade all existing nodes? [yes or no]\e[0m"
             read ANSWER
             echo
         done
@@ -33,11 +33,12 @@ sleep 2
         do
         sudo helm upgrade --install $name --namespace $namespace dragonchain/dragonchain-k8s
 
-    done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
+        done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
 
         fi
 
     fi
+    
 ## Prompt for Dragonchain node name
 echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
