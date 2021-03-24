@@ -331,10 +331,10 @@ check_existing_install(){
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
-        echo -e "If you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press [u]"
+        echo -e "If you would like to reinstall node $DRAGONCHAIN_INSTALLER_DIR, press [r]"
 		echo -e "If you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press [d]"
-	    echo -e "\e[91m(All configurations for $DRAGONCHAIN_INSTALLER_DIR will be deleted. Other running nodes will be unaffected.)\e[0m"
-	    echo -e "\e[93m\n[u to Upgrade, d to Delete]\e[0m"
+	    echo -e "\e[91m(All configuration for $DRAGONCHAIN_INSTALLER_DIR will be deleted. Other running nodes will be unaffected.)\e[0m"
+	    echo -e "\e[93m\n[r to Reinstall, d to Delete]\e[0m"
 	    read ANSWER
         echo
         done
@@ -357,8 +357,10 @@ check_existing_install(){
         fi
 	
 	# User wants to attempt upgrade
-	printf "\nUpgrading UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
-        
+	printf "\nReinstalling UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
+
+    sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >> $LOG_FILE 2>&1
+
 	install_dragonchain
 
     check_kube_status
@@ -631,7 +633,7 @@ offer_nodes_upgrade
 echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
 echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
-echo -e "\e[2mTo reconfigure, upgrade or delete a previous installation, type the node name of that installation\e[0m"
+echo -e "\e[2mTo upgrade or delete a specific installation, type the node name of that installation\e[0m"
 
 read -e DRAGONCHAIN_INSTALLER_DIR
 
