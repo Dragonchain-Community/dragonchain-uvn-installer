@@ -7,8 +7,7 @@
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
 
 
-echo -e "\n\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
-sleep 2
+echo -e "\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
 
 ##########################################################################
 ## Function offer_nodes_upgrade
@@ -20,7 +19,7 @@ offer_nodes_upgrade(){
         local ANSWER=""
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
-            echo -e "\e[93mWould you like to Install [i] a new node or Upgrade [u] all existing nodes? [i or u]\e[0m"
+            echo -e "\n\e[93mWould you like to Install [i] a new node or Upgrade [u] all existing nodes? [i or u]\e[0m"
             read ANSWER
             echo
         done
@@ -29,9 +28,9 @@ offer_nodes_upgrade(){
         then
         echo -e "Upgrading all existing nodes..."
 
-        while read -r name namespace;
+        while read -r NAME DRAGONCHAIN_INSTALLER_DIR;
         do
-        . $namespace/.config
+        . $DRAGONCHAIN_INSTALLER_DIR/.config
 
         echo -e "\e[93mSaved configuration values found:\e[0m"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
@@ -41,12 +40,20 @@ offer_nodes_upgrade(){
         echo "Node Level = $DRAGONCHAIN_UVN_NODE_LEVEL"
         echo
 
-        sudo helm upgrade --install $name --namespace $namespace dragonchain/dragonchain-k8s
+        sudo helm upgrade --install $NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
+	    
+        check_kube_status
 
+        set_dragonchain_public_id
+
+        check_matchmaking_status_upgrade
+        
         done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
 
-        echo -e "All nodes have been upgraded successfully. Exiting!"
+        echo -e "All nodes have been upgraded successfully. Happy Noding!"
         exit 0
+
+
         fi
 
     fi
