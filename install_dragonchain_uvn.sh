@@ -471,10 +471,10 @@ check_kube_status() {
 set_dragonchain_public_id() {
     #Parse the full name of the webserver pod
     DRAGONCHAIN_WEBSERVER_POD_NAME=$(sudo kubectl get pod -n $DRAGONCHAIN_INSTALLER_DIR -l app.kubernetes.io/component=webserver | tail -1 | awk '{print $1}')
-    errchk $? "Pod name extraction"
+    errchk $? "Pod name extraction >> $LOG_FILE 2>&1"
 
     DRAGONCHAIN_UVN_PUBLIC_ID=$(sudo kubectl exec -n $DRAGONCHAIN_INSTALLER_DIR $DRAGONCHAIN_WEBSERVER_POD_NAME -- python3 -c "from dragonchain.lib.keys import get_public_id; print(get_public_id())")
-    errchk $? "Public ID lookup"
+    errchk $? "Public ID lookup >> $LOG_FILE 2>&1"
 
     #duck Let's log this in the secrets file with hmac stuff
     echo "Your Chain's Public ID is: $DRAGONCHAIN_UVN_PUBLIC_ID"
