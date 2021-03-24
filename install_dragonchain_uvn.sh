@@ -110,6 +110,7 @@ function set_config_values() {
         . $DRAGONCHAIN_INSTALLER_DIR/.config
 
         echo -e "\e[93mSaved configuration values found:\e[0m"
+        echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
         echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
         echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
@@ -586,7 +587,7 @@ offer_nodes_upgrade(){
         then
         echo -e "Upgrading all existing nodes..."
 
-        while read -r NAME DRAGONCHAIN_INSTALLER_DIR;
+        while read -r DRAGONCHAIN_UVN_NODE_NAME DRAGONCHAIN_INSTALLER_DIR;
         do
         . $DRAGONCHAIN_INSTALLER_DIR/.config
 
@@ -599,8 +600,9 @@ offer_nodes_upgrade(){
         echo "Node Level = $DRAGONCHAIN_UVN_NODE_LEVEL"
         echo
 
-        sudo helm upgrade --install $NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
-	    
+        #sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
+	    install_dragonchain
+
         check_kube_status
 
         set_dragonchain_public_id
@@ -609,9 +611,8 @@ offer_nodes_upgrade(){
 
         done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
 
-        echo -e "\n\e[92mALL NODES HAVE BEEN UPGRADED SUCCESSFULLY!\e[0m"
+        echo -e "\n\e[92mNODE UPGRADE PROCESS COMPLETE\e[0m"
         exit 0
-
 
         fi
 
