@@ -603,8 +603,8 @@ offer_nodes_upgrade(){
         echo "Node Level = $DRAGONCHAIN_UVN_NODE_LEVEL"
         echo
 
-        #sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
-	    install_dragonchain
+        sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
+	    #install_dragonchain
 
         check_kube_status
 
