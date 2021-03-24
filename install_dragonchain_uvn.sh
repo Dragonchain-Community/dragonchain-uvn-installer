@@ -45,7 +45,7 @@ offer_nodes_upgrade(){
 
         done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
 
-        echo -e "All nodes have been upgraded successfully. Exiting."
+        echo -e "All nodes have been upgraded successfully. Exiting!"
         exit 0
         fi
 
