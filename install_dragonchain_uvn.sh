@@ -633,7 +633,7 @@ offer_nodes_upgrade(){
 
 echo -e "\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
 
-# Offer to upgrade all nodes
+## Offer to upgrade all nodes
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
