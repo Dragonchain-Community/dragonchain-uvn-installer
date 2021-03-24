@@ -20,7 +20,7 @@ errchk() {
         printf "\nERROR: RC=%s; CMD=%s\n" "$1" "$2"
         exit "$1"
     fi
-    printf "\nPASS: %s\n" "$2" >> $LOG_FILE
+    printf "\nPASS: %s\n" "$2" #>> $LOG_FILE
 }
 
 ##########################################################################
