@@ -600,11 +600,11 @@ offer_nodes_upgrade(){
 
         sudo helm upgrade --install $NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
 	    
-        $(check_kube_status)
+        check_kube_status
 
-        $(set_dragonchain_public_id)
+        set_dragonchain_public_id
 
-        $(check_matchmaking_status_upgrade)
+        check_matchmaking_status_upgrade
 
         done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
 
@@ -619,11 +619,10 @@ offer_nodes_upgrade(){
 
 ## Main()
 
-
-#offer to upgrade all nodes
-offer_nodes_upgrade
-
 echo -e "\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
+
+# Offer to upgrade all nodes
+offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
 echo -e "\e[94mEnter a Dragonchain node name:\e[0m"
