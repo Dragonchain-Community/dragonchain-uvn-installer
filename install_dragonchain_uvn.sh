@@ -31,6 +31,16 @@ offer_nodes_upgrade(){
 
         while read -r name namespace;
         do
+        . $namespace/.config
+
+        echo -e "\e[93mSaved configuration values found:\e[0m"
+        echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
+        echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
+        echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
+        echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
+        echo "Node Level = $DRAGONCHAIN_UVN_NODE_LEVEL"
+        echo
+        
         sudo helm upgrade --install $name --namespace $namespace dragonchain/dragonchain-k8s
 
         done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
@@ -46,7 +56,7 @@ offer_nodes_upgrade(){
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
-echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
+echo -e "\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
 echo -e "\e[2mThe name must contain lowercase characters and '-' ONLY\e[0m"
 echo -e "\e[2mTo upgrade or delete a previous installation, type the node name of that installation\e[0m"
@@ -615,16 +625,6 @@ offer_apt_upgrade() {
         errchk $? "sudo apt-get upgrade -y"
     fi
 } 
-
-##########################################################################
-## Function upgrade_all_helm_charts
-upgrade_all_helm_charts() {
-while read -r name namespace;
-do
-        sudo helm upgrade --install $name --namespace $namespace dragonchain/dragonchain-k8s
-
-done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
-}
 
 ## Main()
 
