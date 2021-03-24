@@ -18,7 +18,7 @@ offer_nodes_upgrade(){
         if [ $DC_PODS_EXIST -ge 1 ]
         then
         local ANSWER=""
-        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
+        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
             echo -e "\e[93mWould you like to Install [i] a new node or Upgrade [u] all existing nodes? [i or u]\e[0m"
             read ANSWER
@@ -40,7 +40,7 @@ offer_nodes_upgrade(){
         echo "Endpoint Port = $DRAGONCHAIN_UVN_NODE_PORT"
         echo "Node Level = $DRAGONCHAIN_UVN_NODE_LEVEL"
         echo
-        
+
         sudo helm upgrade --install $name --namespace $namespace dragonchain/dragonchain-k8s
 
         done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
