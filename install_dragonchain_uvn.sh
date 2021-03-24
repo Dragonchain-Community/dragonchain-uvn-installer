@@ -13,7 +13,10 @@ sleep 2
 ##########################################################################
 ## Function offer_nodes_upgrade
 offer_nodes_upgrade(){
+       DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
+        if [ $DC_PODS_EXIST -ge 1 ]
+        then
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
         do
@@ -25,11 +28,6 @@ offer_nodes_upgrade(){
         if [[ "$ANSWER" == "u" || "$ANSWER" == "upgrade" ]]
         then
         echo -e "Upgrading all existing nodes..."
-
-        DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
-
-        if [ $DC_PODS_EXIST -ge 1 ]
-        then
 
         while read -r name namespace;
         do
@@ -44,6 +42,7 @@ offer_nodes_upgrade(){
     fi
 }
 
+## Offer to upgrade all nodes
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
