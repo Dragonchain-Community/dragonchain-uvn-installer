@@ -42,12 +42,12 @@ offer_nodes_upgrade(){
 
         sudo helm upgrade --install $NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s
 	    
-        check_kube_status
+        $(check_kube_status)
 
-        set_dragonchain_public_id
+        $(set_dragonchain_public_id)
 
-        check_matchmaking_status_upgrade
-        
+        $(check_matchmaking_status_upgrade)
+
         done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
 
         echo -e "All nodes have been upgraded successfully. Happy Noding!"
