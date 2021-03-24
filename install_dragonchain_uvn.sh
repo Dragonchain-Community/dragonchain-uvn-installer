@@ -110,6 +110,7 @@ function set_config_values() {
         . $DRAGONCHAIN_INSTALLER_DIR/.config
 
         echo -e "\e[93mSaved configuration values found:\e[0m"
+        echo "Namespace = $DRAGONCHAIN_INSTALLER_DIR"
         echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
         echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
@@ -598,7 +599,8 @@ offer_nodes_upgrade(){
         do
         . $DRAGONCHAIN_INSTALLER_DIR/.config
 
-        echo -e "\e[93mSaved configuration values found:\e[0m"
+        echo -e "\n\e[93mUpgrading node:\e[0m"
+        echo "Namespace = $DRAGONCHAIN_INSTALLER_DIR"
         echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
         echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
