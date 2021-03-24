@@ -351,8 +351,9 @@ check_existing_install(){
             	    
 	    sleep 5
 	    
-	    echo -e "\nConfiguration data for $DRAGONCHAIN_INSTALLER_DIR has been deleted and the node has been terminated. Please rerun installer to reconfigure this node."
-	    
+	    echo -e "\nConfiguration data for $DRAGONCHAIN_INSTALLER_DIR has been deleted and the node has been terminated."
+		echo -e "Please rerun installer to reconfigure this node."
+	    	    
 	    exit 0
         fi
 	
@@ -583,7 +584,7 @@ offer_nodes_upgrade(){
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]
         do
             echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
-            echo -e "\e[2mIf you would like to install a new node (including administering/upgrading or deleting existing nodes), press \e[93m[i]\e[0m"
+            echo -e "\e[2mIf you would like to install a new node (including upgrading, repairing or deleting existing nodes), press \e[93m[i]\e[0m"
             echo -e "\e[2mIf you would like to upgrade ALL detected nodes to the latest version, press \e[93m[u]\e[0m"
             #echo -e "\e[93m\n[i to Install/Administer a node, u to Upgrade ALL nodes]\e[0m" 
             read ANSWER
@@ -638,7 +639,7 @@ offer_nodes_upgrade
 echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
 echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
-echo -e "\e[2mTo upgrade or delete a specific installation, type the node name of that installation\e[0m"
+echo -e "\e[2mTo upgrade, repair or delete a specific installation, type the node name of that installation\e[0m"
 
 read -e DRAGONCHAIN_INSTALLER_DIR
 
