@@ -10,24 +10,34 @@ REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget 
 echo -e "\n\n\e[94mWelcome to the Dragonchain Community Installer!\e[0m"
 sleep 2
 
-## Upgrade existing nodes if present
-echo -e "n\Checking for existing nodes and upgrading..."
+## Offer an upgrade existing nodes
 
-DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
+        local ANSWER=""
+        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
+        do
+            echo -e "\e[93mWould you like to upgrade all existing ndoes? [yes or no]\e[0m"
+            read ANSWER
+            echo
+        done
 
-if [ $DC_PODS_EXIST -ge 1 ]
-    then
+        if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
+        then
+        echo -e "Upgrading all existing nodes..."
 
-    while read -r name namespace;
-    do
+        DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
+
+        if [ $DC_PODS_EXIST -ge 1 ]
+        then
+
+        while read -r name namespace;
+        do
         sudo helm upgrade --install $name --namespace $namespace dragonchain/dragonchain-k8s
 
     done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
 
-fi
+        fi
 
-echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
-
+    fi
 ## Prompt for Dragonchain node name
 echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
