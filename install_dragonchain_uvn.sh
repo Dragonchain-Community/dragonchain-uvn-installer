@@ -591,6 +591,7 @@ offer_nodes_upgrade(){
         . $DRAGONCHAIN_INSTALLER_DIR/.config
 
         echo -e "\e[93mSaved configuration values found:\e[0m"
+        echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
         echo "Matchmaking Token = $DRAGONCHAIN_UVN_REGISTRATION_TOKEN"
         echo "Endpoint URL = $DRAGONCHAIN_UVN_ENDPOINT_URL"
