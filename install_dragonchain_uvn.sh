@@ -15,12 +15,12 @@ sleep 2
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]
         do
-            echo -e "\e[93mWould you like to upgrade all existing nodes? [yes or no]\e[0m"
+            echo -e "\e[93mWould you like to Install [i] a new node or Upgrade [u] all existing nodes? [i or u]\e[0m"
             read ANSWER
             echo
         done
 
-        if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]
+        if [[ "$ANSWER" == "u" || "$ANSWER" == "upgrade" ]]
         then
         echo -e "Upgrading all existing nodes..."
 
@@ -35,10 +35,12 @@ sleep 2
 
         done< <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"'| tr -d \")
 
+        echo -e "All nodes have been upgraded successfully. Exiting."
+        exit 0
         fi
 
     fi
-    
+
 ## Prompt for Dragonchain node name
 echo -e "\n\n\e[94mEnter a Dragonchain node name:\e[0m"
 echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
