@@ -587,7 +587,6 @@ offer_nodes_upgrade() {
         fi
 
     fi
-    
 }
 
 
