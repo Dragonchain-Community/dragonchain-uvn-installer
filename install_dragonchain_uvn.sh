@@ -560,7 +560,7 @@ offer_nodes_upgrade() {
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 	
-	MICROK8S_INSTALLED=$(dpkg-query --list | grep -i microk8s)
+	MICROK8S_INSTALLED=$(dpkg-query --list | grep -i "microk8s")
 	if [ $MICROK8S_INSTALLED -eq 0 ]; then
 	
 	prompt_node_name
