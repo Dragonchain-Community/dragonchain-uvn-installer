@@ -557,9 +557,6 @@ offer_nodes_upgrade() {
             read ANSWER
             echo
         done
-    else
-        #Boo!
-        echo -e "balls"
 
         if [[ "$ANSWER" == "u" || "$ANSWER" == "upgrade" ]]; then
             echo -e "Upgrading all existing nodes..."
