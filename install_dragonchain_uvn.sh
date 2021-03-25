@@ -557,6 +557,9 @@ offer_nodes_upgrade() {
             read ANSWER
             echo
         done
+    else
+        #Boo!
+        echo -e "balls"
 
         if [[ "$ANSWER" == "u" || "$ANSWER" == "upgrade" ]]; then
             echo -e "Upgrading all existing nodes..."
@@ -585,8 +588,6 @@ offer_nodes_upgrade() {
             done < <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"' | tr -d \")
 
             exit 0
-		else 
-		echo 
 		
         fi
 
