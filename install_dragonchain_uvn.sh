@@ -546,7 +546,7 @@ offer_nodes_upgrade() {
 
 if ! command -v kubectl &> /dev/null
 then
-    echo "COMMAND could not be found"
+    echo "microk8s could not be found"
     exit
     DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
