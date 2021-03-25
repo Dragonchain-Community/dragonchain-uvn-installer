@@ -585,7 +585,9 @@ offer_nodes_upgrade() {
             done < <(helm list --all-namespaces -o json | jq -c '.[] | "\(.name) \(.namespace)"' | tr -d \")
 
             exit 0
-
+		else 
+		echo 
+		
         fi
 
     fi
