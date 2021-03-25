@@ -556,7 +556,6 @@ then
             echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
             echo -e "\e[2mIf you would like to install a new node (including upgrading, repairing or deleting existing nodes), press \e[93m[i]\e[0m"
             echo -e "\e[2mIf you would like to upgrade ALL detected nodes to the latest version, press \e[93m[u]\e[0m"
-            #echo -e "\e[93m\n[i to Install/Administer a node, u to Upgrade ALL nodes]\e[0m"
             read ANSWER
             echo
         done
