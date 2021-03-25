@@ -44,6 +44,22 @@ trim() {
 }
 
 ##########################################################################
+## Function prompt_node_name
+prompt_node_name() {
+echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
+echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
+echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
+echo -e "\e[2mTo upgrade, repair or delete a specific installation, type the node name of that installation\e[0m"
+
+read -e DRAGONCHAIN_INSTALLER_DIR
+
+LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
+SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
+}
+
+
+
+##########################################################################
 ## Function preflight_check
 preflight_check() {
     # Check for existance of necessary commands
@@ -543,7 +559,12 @@ offer_nodes_upgrade() {
 
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
-
+	if [ dpkg-query --list | grep -i microk8s -eq 0 ]; then
+	
+	prompt_node_name
+	
+	fi
+	
     DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
@@ -598,15 +619,7 @@ echo -e "\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
-echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
-echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
-echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
-echo -e "\e[2mTo upgrade, repair or delete a specific installation, type the node name of that installation\e[0m"
-
-read -e DRAGONCHAIN_INSTALLER_DIR
-
-LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
-SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
+prompt_node_name
 
 #check for required commands, setup logging
 printf "\n\nChecking host OS for necessary components...\n\n"
