@@ -317,7 +317,6 @@ check_existing_install() {
             echo -e "\e[2mIf you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press \e[93m[u]\e[0m"
             echo -e "\e[2mIf you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press \e[93m[d]\e[0m"
             echo -e "\e[91m(All configuration for $DRAGONCHAIN_INSTALLER_DIR will be deleted. Other running nodes will be unaffected)\e[0m"
-            #echo -e "\e[93m\n[u to Upgrade, d to Delete]\e[0m"
             read ANSWER
             echo
         done
@@ -545,6 +544,10 @@ offer_nodes_upgrade() {
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 
+if ! command -v kubectl &> /dev/null
+then
+    echo "COMMAND could not be found"
+    exit
     DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
