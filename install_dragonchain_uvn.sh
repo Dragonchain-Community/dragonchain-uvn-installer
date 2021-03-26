@@ -493,6 +493,46 @@ check_matchmaking_status() {
         #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
         #offer_apt_upgrade
 
+        #offer to install another node or exit
+
+        local ANSWER=""
+        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+            echo -e "\n\e[93mWould you like to install another Dragonchain node? [yes or no].\e[0m"
+            read ANSWER
+            echo
+        done
+
+        if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+
+        ## Prompt for Dragonchain node name
+        prompt_node_name
+
+        #load config values or gather from user
+        set_config_values
+
+        # check for previous installation (failed or successful) and offer reset if found
+        printf "\nChecking for previous installation...\n"
+        check_existing_install
+
+        # must gather node details from user or .config before generating chainsecrets
+        printf "\nGenerating chain secrets...\n"
+        generate_chainsecrets
+
+        printf "\nInstalling UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
+        install_dragonchain
+
+        check_kube_status
+
+        set_dragonchain_public_id
+
+        check_matchmaking_status
+
+        done
+
+        exit 0
+
+        fi
+    
     else
         #Boo!
         echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
