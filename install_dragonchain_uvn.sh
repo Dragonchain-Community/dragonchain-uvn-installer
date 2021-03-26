@@ -527,8 +527,6 @@ check_matchmaking_status() {
 
         check_matchmaking_status
 
-        done
-
         exit 0
 
         fi
