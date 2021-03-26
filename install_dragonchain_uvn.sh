@@ -212,7 +212,6 @@ request_user_defined_values() {
         echo -e "\e[94mEnter the node level for your Dragonchain node (must be between 2 and 4):\e[0m"
         read DRAGONCHAIN_UVN_NODE_LEVEL
         DRAGONCHAIN_UVN_NODE_LEVEL=$(echo $DRAGONCHAIN_UVN_NODE_LEVEL | tr -d '\r')
-        echo
     done
 
     #duck Moved node port firewall rule here in order to run bootstrap before this parameter is created
