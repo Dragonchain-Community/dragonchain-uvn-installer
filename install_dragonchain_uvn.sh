@@ -236,6 +236,9 @@ request_user_defined_values() {
 ##########################################################################
 ## Function patch_server_current
 patch_server_current() {
+
+    LOG_FILE=./dragonchain_uvn_installer_bootstrap.log
+
     #Patch our system current [stable]
     sudo apt-get update >>$LOG_FILE 2>&1
     errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
@@ -252,10 +255,7 @@ bootstrap_environment() {
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
 
     #duck note: might want to check the .conf file for this line to already exist before adding again
-
-    LOG_FILE=./dragonchain_uvn_installer_bootstrap.log
-    SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
-
+      
     echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf >/dev/null
     sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
