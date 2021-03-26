@@ -298,7 +298,7 @@ bootstrap_environment() {
     sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
     sleep 5
-    
+
     # Wait for system to stabilize and avoid race conditions
     sleep 10
 
@@ -669,7 +669,6 @@ offer_nodes_upgrade
 prompt_node_name
 
 #check for required commands, setup logging
-printf "\n\nChecking host OS for necessary components...\n\n"
 preflight_check
 
 #load config values or gather from user
