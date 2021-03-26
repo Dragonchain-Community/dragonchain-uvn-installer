@@ -336,7 +336,7 @@ check_existing_install() {
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
             echo -e "\e[2mIf you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press \e[93m[u]\e[0m"
             echo -e "\e[2mIf you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press \e[93m[d]\e[0m"
-            echo -e "\e[91m(All configuration for $DRAGONCHAIN_INSTALLER_DIR will be deleted. Other running nodes will be unaffected)\e[0m"
+            echo -e "\e[91m(If you delete, all configuration for $DRAGONCHAIN_INSTALLER_DIR will be removed. Other running nodes will be unaffected)\e[0m"
             read ANSWER
             echo
         done
@@ -607,8 +607,8 @@ offer_nodes_upgrade() {
     if [ $DC_PODS_EXIST -ge 1 ]; then
         local ANSWER=""
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
-            echo -e "\e[2mIf you would like to install a new node (including upgrading, repairing or deleting existing nodes), press \e[93m[i]\e[0m"
+            echo -e "\n\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
+            echo -e "\e[2mIf you would like to install a new node (including upgrading, repairing or deleting specific nodes), press \e[93m[i]\e[0m"
             echo -e "\e[2mIf you would like to upgrade ALL detected nodes to the latest version, press \e[93m[u]\e[0m"
             read ANSWER
             echo
@@ -650,7 +650,7 @@ offer_nodes_upgrade() {
 
 ## Main()
 
-echo -e "\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
+echo -e "\n\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
 
 #patch system current
 printf "\nUpdating (patching) host OS current...\n"
