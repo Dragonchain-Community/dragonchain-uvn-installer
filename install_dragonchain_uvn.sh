@@ -645,7 +645,7 @@ offer_nodes_upgrade() {
 
 ## Main()
 
-echo -e "\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
+echo -e "\n\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
 
 #patch system current
 printf "\nUpdating (patching) host OS current...\n"
