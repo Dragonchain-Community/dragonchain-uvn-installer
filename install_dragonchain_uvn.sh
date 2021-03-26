@@ -560,14 +560,6 @@ offer_nodes_upgrade() {
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
     
-    MICROK8S_INSTALLED=$(sudo snap list | grep "microk8s")
-    
-    if ! [ MICROK8S_INSTALLED ]; then
-
-        prompt_node_name
-
-    fi
-    
     DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
@@ -618,7 +610,16 @@ offer_nodes_upgrade() {
 
 echo -e "\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
 
+#patch system current
+printf "\nUpdating (patching) host OS current...\n"
+patch_server_current
+
+#install necessary software, set tunables
+printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
+bootstrap_environment
+
 ## Offer to upgrade all nodes
+printf "\nChecking for Pre-existing Dragonchain nodes to upgrade...\n"
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
@@ -630,14 +631,6 @@ preflight_check
 
 #load config values or gather from user
 set_config_values
-
-#patch system current
-printf "\nUpdating (patching) host OS current...\n"
-patch_server_current
-
-#install necessary software, set tunables
-printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
-bootstrap_environment
 
 # check for previous installation (failed or successful) and offer reset if found
 printf "\nChecking for previous installation...\n"
