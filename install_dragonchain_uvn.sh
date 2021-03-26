@@ -215,6 +215,11 @@ request_user_defined_values() {
         echo
     done
 
+    #duck Moved node port firewall rule here in order to run bootstrap before this parameter is created
+    sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >>$LOG_FILE 2>&1
+    errchk $? "sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1"
+    sleep 2
+
     # Write a fresh config file with user-defined values
     rm -f $DRAGONCHAIN_INSTALLER_DIR/.config
     touch $DRAGONCHAIN_INSTALLER_DIR/.config
@@ -247,6 +252,9 @@ bootstrap_environment() {
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
 
     #duck note: might want to check the .conf file for this line to already exist before adding again
+
+    LOG_FILE=./dragonchain_uvn_installer_bootstrap.log
+    SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 
     echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf >/dev/null
     sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1
@@ -281,10 +289,6 @@ bootstrap_environment() {
 
     sudo ufw default allow outgoing >>$LOG_FILE 2>&1
     errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
-    sleep 2
-
-    sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1"
     sleep 2
 
     sudo ufw allow in on cni0 >>$LOG_FILE 2>&1
