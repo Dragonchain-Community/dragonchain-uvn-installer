@@ -277,24 +277,25 @@ bootstrap_environment() {
     # This should be reviewed - confident we can restrict this further
     sudo ufw --force enable >>$LOG_FILE 2>&1
     errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
+    sleep 10
 
-    sudo ufw allow 22/tcp -w >>$LOG_FILE 2>&1
+    sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
 
-    sudo ufw default allow routed -w >>$LOG_FILE 2>&1
+    sudo ufw default allow routed >>$LOG_FILE 2>&1
     errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
 
-    sudo ufw default allow outgoing -w >>$LOG_FILE 2>&1
+    sudo ufw default allow outgoing >>$LOG_FILE 2>&1
     errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
 
-    sudo ufw allow in on cni0 -w >>$LOG_FILE 2>&1
+    sudo ufw allow in on cni0 >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow in on cni0 >> $LOG_FILE 2>&1"
 
-    sudo ufw allow out on cni0 -w >>$LOG_FILE 2>&1
+    sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 30
+    sleep 10
 
     initialize_microk8s
 
@@ -312,7 +313,7 @@ initialize_microk8s() {
     errchk $? "sudo snap alias microk8s.helm3 helm >> $LOG_FILE 2>&1"
 
     # Wait for system to stabilize and avoid race conditions
-    sleep 30
+    sleep 10
 
     # Install more Microk8s modules
     sudo microk8s.enable registry >>$LOG_FILE 2>&1
