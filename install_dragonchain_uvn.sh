@@ -606,7 +606,7 @@ offer_nodes_upgrade() {
         fi
 
     fi
-	
+	else echo -e "bum"
 prompt_node_name	
 
 fi
