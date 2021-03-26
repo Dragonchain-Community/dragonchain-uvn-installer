@@ -277,15 +277,15 @@ bootstrap_environment() {
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
     #duck To stop ufw errors 'Could not load logging rules', disable logging 
-     
-    sleep 2   
-    sudo ufw logging off >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
-    sleep 2
-    
+       
     sleep 2
     sudo ufw --force enable >>$LOG_FILE 2>&1
     errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
+    sleep 2
+
+    sleep 2   
+    sudo ufw logging off >>$LOG_FILE 2>&1
+    errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
     sleep 2
     
     sleep 2
