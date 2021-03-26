@@ -217,7 +217,7 @@ request_user_defined_values() {
 
     #duck Moved node port firewall rule here in order to run bootstrap before this parameter is created
     sleep 2
-    sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp -w >>$LOG_FILE 2>&1
+    sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1"
     sleep 2
 
@@ -304,7 +304,7 @@ bootstrap_environment() {
     sleep 2
 
     sleep 2
-    sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
+    sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
     sleep 2
 
@@ -620,7 +620,7 @@ offer_nodes_upgrade() {
     if [ $DC_PODS_EXIST -ge 1 ]; then
         local ANSWER=""
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\n\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
+            echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
             echo -e "\e[2mIf you would like to install a new node (including upgrading, repairing or deleting specific nodes), press \e[93m[i]\e[0m"
             echo -e "\e[2mIf you would like to upgrade ALL detected nodes to the latest version, press \e[93m[u]\e[0m"
             read ANSWER
