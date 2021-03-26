@@ -275,7 +275,7 @@ bootstrap_environment() {
 
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
-    sudo ufw --force enable -w >>$LOG_FILE 2>&1
+    sudo ufw --force enable >>$LOG_FILE 2>&1
     errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
 
     sudo ufw allow 22/tcp -w >>$LOG_FILE 2>&1
