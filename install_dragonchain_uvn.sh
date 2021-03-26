@@ -559,8 +559,16 @@ offer_nodes_upgrade() {
 
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
+    
+    MICROK8S_INSTALLED=$(sudo snap list | grep "microk8s")
+    
+    if ! [ MICROK8S_INSTALLED ]; then
 
-    DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")>/dev/null 2>&1
+        prompt_node_name
+
+    fi
+    
+    DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
         local ANSWER=""
