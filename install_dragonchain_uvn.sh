@@ -284,7 +284,7 @@ bootstrap_environment() {
     errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
     sleep 5
 
-    sudo ufw allow 22/tcp -w >>$LOG_FILE 2>&1
+    sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
     sleep 5
 
@@ -296,12 +296,8 @@ bootstrap_environment() {
     errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
     sleep 5
 
-    sudo ufw allow in on cni0 -w >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw allow in on cni0 >> $LOG_FILE 2>&1"
-    sleep 5
-
-    sudo ufw allow out on cni0 -w >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
+    sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
+    errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
     sleep 5
 
     # Wait for system to stabilize and avoid race conditions
