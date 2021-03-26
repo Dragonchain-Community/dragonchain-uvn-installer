@@ -216,6 +216,7 @@ request_user_defined_values() {
     done
 
     #duck Moved node port firewall rule here in order to run bootstrap before this parameter is created
+    sleep 2
     sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp -w >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >> $LOG_FILE 2>&1"
     sleep 2
@@ -276,29 +277,36 @@ bootstrap_environment() {
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
     #duck To stop ufw errors 'Could not load logging rules', disable logging 
+     
+    sleep 2   
     sudo ufw logging off >>$LOG_FILE 2>&1
     errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
-    sleep 5
-
+    sleep 2
+    
+    sleep 2
     sudo ufw --force enable >>$LOG_FILE 2>&1
     errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
-    sleep 5
-
+    sleep 2
+    
+    sleep 2
     sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
-    sleep 5
-
-    sudo ufw default allow routed -w >>$LOG_FILE 2>&1
+    sleep 2
+    
+    sleep 2
+    sudo ufw default allow routed >>$LOG_FILE 2>&1
     errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
-    sleep 5
-
-    sudo ufw default allow outgoing -w >>$LOG_FILE 2>&1
+    sleep 2
+    
+    sleep 2
+    sudo ufw default allow outgoing >>$LOG_FILE 2>&1
     errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
-    sleep 5
+    sleep 2
 
+    sleep 2
     sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
-    sleep 5
+    sleep 2
 
     # Wait for system to stabilize and avoid race conditions
     sleep 10
