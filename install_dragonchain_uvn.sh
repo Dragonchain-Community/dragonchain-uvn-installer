@@ -508,6 +508,9 @@ check_matchmaking_status() {
         ## Prompt for Dragonchain node name
         prompt_node_name
 
+        #check for required commands, setup logging
+        preflight_check
+
         #load config values or gather from user
         set_config_values
 
