@@ -410,23 +410,53 @@ install_dragonchain() {
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
-    # Deploy Helm Chart
-    #
-    # For Raspberry Pi installations, uncomment the last --set line and
-    # on the --set redis.storage.spec.storageClassName line above it, replace >> $LOG_FILE 2>&1 with \
-    sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
-    --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
-    --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
-    --set global.environment.INTERNAL_ID="$DRAGONCHAIN_UVN_INTERNAL_ID" \
-    --set global.environment.DRAGONCHAIN_ENDPOINT="$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT" \
-    --set-string global.environment.LEVEL=$DRAGONCHAIN_UVN_NODE_LEVEL \
-    --set service.port=$DRAGONCHAIN_UVN_NODE_PORT \
-    --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
-    --set redis.storage.spec.storageClassName="microk8s-hostpath" \
-    --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >>$LOG_FILE 2>&1
-    #--set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
+       local ANSWER=""
+        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+            echo -e "\n\e[93mAre you running on Raspberry Pi? [yes or no].\e[0m"
+            read ANSWER
+            echo
+        done
 
-    errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
+        if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+        # User is running Raspberry Pi
+        # Deploy Helm Chart
+        #
+        # For Raspberry Pi installations, uncomment the last --set line and
+        # on the --set redis.storage.spec.storageClassName line above it, replace >> $LOG_FILE 2>&1 with \
+        sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
+        --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
+        --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
+        --set global.environment.INTERNAL_ID="$DRAGONCHAIN_UVN_INTERNAL_ID" \
+        --set global.environment.DRAGONCHAIN_ENDPOINT="$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT" \
+        --set-string global.environment.LEVEL=$DRAGONCHAIN_UVN_NODE_LEVEL \
+        --set service.port=$DRAGONCHAIN_UVN_NODE_PORT \
+        --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
+        --set redis.storage.spec.storageClassName="microk8s-hostpath" \
+        --set redisearch.storage.spec.storageClassName="microk8s-hostpath" \
+        --set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
+        fi
+
+        # User is not running Raspberry Pi
+        # Deploy Helm Chart
+        #
+        # For Raspberry Pi installations, uncomment the last --set line and
+        # on the --set redis.storage.spec.storageClassName line above it, replace >> $LOG_FILE 2>&1 with \
+        sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
+        --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
+        --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
+        --set global.environment.INTERNAL_ID="$DRAGONCHAIN_UVN_INTERNAL_ID" \
+        --set global.environment.DRAGONCHAIN_ENDPOINT="$DRAGONCHAIN_UVN_ENDPOINT_URL:$DRAGONCHAIN_UVN_NODE_PORT" \
+        --set-string global.environment.LEVEL=$DRAGONCHAIN_UVN_NODE_LEVEL \
+        --set service.port=$DRAGONCHAIN_UVN_NODE_PORT \
+        --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
+        --set redis.storage.spec.storageClassName="microk8s-hostpath" \
+        --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >>$LOG_FILE 2>&1
+        #--set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
+
+    errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"       
+
+    fi
+
 }
 
 ##########################################################################
