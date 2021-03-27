@@ -46,18 +46,16 @@ trim() {
 ##########################################################################
 ## Function prompt_node_name
 prompt_node_name() {
-echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
-echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
-echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
-echo -e "\e[2mTo upgrade, repair or delete a specific installation, type the node name of that installation\e[0m"
+    echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
+    echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
+    echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
+    echo -e "\e[2mTo upgrade, repair or delete a specific installation, type the node name of that installation\e[0m"
 
-read -e DRAGONCHAIN_INSTALLER_DIR
+    read -e DRAGONCHAIN_INSTALLER_DIR
 
-LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
-SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
+    LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
+    SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 }
-
-
 
 ##########################################################################
 ## Function preflight_check
@@ -255,7 +253,7 @@ bootstrap_environment() {
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
 
     #duck note: might want to check the .conf file for this line to already exist before adding again
-      
+
     echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf >/dev/null
     sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
@@ -275,28 +273,28 @@ bootstrap_environment() {
 
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
-    #duck To stop ufw errors 'Could not load logging rules', disable logging 
-       
+    #duck To stop ufw errors 'Could not load logging rules', disable logging
+
     sleep 2
     sudo ufw --force enable >>$LOG_FILE 2>&1
     errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
     sleep 2
 
-    sleep 2   
+    sleep 2
     sudo ufw logging off >>$LOG_FILE 2>&1
     errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
     sleep 2
-    
+
     sleep 2
     sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
     errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
     sleep 2
-    
+
     sleep 2
     sudo ufw default allow routed >>$LOG_FILE 2>&1
     errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
     sleep 2
-    
+
     sleep 2
     sudo ufw default allow outgoing >>$LOG_FILE 2>&1
     errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
@@ -410,14 +408,14 @@ install_dragonchain() {
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
-       local ANSWER=""
-        while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-            echo -e "\n\e[93mAre you running on Raspberry Pi? [yes or no].\e[0m"
-            read ANSWER
-            echo
-        done
+    local ANSWER=""
+    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+        echo -e "\n\e[93mAre you running on Raspberry Pi? [yes or no].\e[0m"
+        read ANSWER
+        echo
+    done
 
-        if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
         # User is running Raspberry Pi
         # Deploy Helm Chart
         #
@@ -433,10 +431,10 @@ install_dragonchain() {
         --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
         --set redis.storage.spec.storageClassName="microk8s-hostpath" \
         --set redisearch.storage.spec.storageClassName="microk8s-hostpath" \
-        --set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
-        
-		
-		else
+        --set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >>$LOG_FILE 2>&1
+
+    else
+
         # User is not running Raspberry Pi
         # Deploy Helm Chart
         #
@@ -454,7 +452,7 @@ install_dragonchain() {
         --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >>$LOG_FILE 2>&1
         #--set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
 
-    errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"       
+        errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
 
     fi
 
@@ -544,36 +542,36 @@ check_matchmaking_status() {
 
         if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 
-        ## Prompt for Dragonchain node name
-        prompt_node_name
+            ## Prompt for Dragonchain node name
+            prompt_node_name
 
-        #check for required commands, setup logging
-        preflight_check
+            #check for required commands, setup logging
+            preflight_check
 
-        #load config values or gather from user
-        set_config_values
+            #load config values or gather from user
+            set_config_values
 
-        # check for previous installation (failed or successful) and offer reset if found
-        printf "\nChecking for previous installation...\n"
-        check_existing_install
+            # check for previous installation (failed or successful) and offer reset if found
+            printf "\nChecking for previous installation...\n"
+            check_existing_install
 
-        # must gather node details from user or .config before generating chainsecrets
-        printf "\nGenerating chain secrets...\n"
-        generate_chainsecrets
+            # must gather node details from user or .config before generating chainsecrets
+            printf "\nGenerating chain secrets...\n"
+            generate_chainsecrets
 
-        printf "\nInstalling UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
-        install_dragonchain
+            printf "\nInstalling UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
+            install_dragonchain
 
-        check_kube_status
+            check_kube_status
 
-        set_dragonchain_public_id
+            set_dragonchain_public_id
 
-        check_matchmaking_status
+            check_matchmaking_status
 
-        exit 0
+            exit 0
 
         fi
-    
+
     else
         #Boo!
         echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
@@ -644,7 +642,7 @@ offer_nodes_upgrade() {
 
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
-    
+
     DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
@@ -689,7 +687,6 @@ offer_nodes_upgrade() {
 
     fi
 }
-
 
 ## Main()
 
