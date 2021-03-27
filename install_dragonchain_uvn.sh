@@ -434,8 +434,9 @@ install_dragonchain() {
         --set redis.storage.spec.storageClassName="microk8s-hostpath" \
         --set redisearch.storage.spec.storageClassName="microk8s-hostpath" \
         --set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
-        fi
-
+        
+		
+		else
         # User is not running Raspberry Pi
         # Deploy Helm Chart
         #
