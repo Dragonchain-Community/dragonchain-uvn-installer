@@ -53,10 +53,10 @@ prompt_node_name() {
 
     read -e DRAGONCHAIN_INSTALLER_DIR
 
-    local ANSWER=""
+    local PI=""
     while [[ "$PI" != "y" && "$PI" != "yes" && "$PI" != "n" && "$PI" != "no" ]]; do
         echo -e "\n\e[93mAre you running on Raspberry Pi? [yes or no]\e[0m"
-        read ANSWER
+        read PI
         echo
     done
 
