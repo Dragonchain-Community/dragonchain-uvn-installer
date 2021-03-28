@@ -279,7 +279,7 @@ bootstrap_environment() {
 
     if [ $FIREWALL_RULES -lt 8 ]; then
 
-        echo printf "\nConfiguring default firewall rules...\n"
+        printf "\nConfiguring default firewall rules...\n"
 
         sleep 2
         sudo ufw --force enable >>$LOG_FILE 2>&1
@@ -318,7 +318,7 @@ bootstrap_environment() {
 
     else
 
-        echo printf "\Default firewall rules already configured...\n"
+        printf "Default firewall rules already configured. Continuing..."
 
     fi
 
