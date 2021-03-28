@@ -281,7 +281,7 @@ bootstrap_environment() {
 
         printf "\nConfiguring default firewall rules...\n"
 
-        sleep 2
+        sleep 10
         sudo ufw --force enable >>$LOG_FILE 2>&1
         errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
         sleep 10
