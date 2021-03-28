@@ -53,13 +53,6 @@ prompt_node_name() {
 
     read -e DRAGONCHAIN_INSTALLER_DIR
 
-    local PI=""
-    while [[ "$PI" != "y" && "$PI" != "yes" && "$PI" != "n" && "$PI" != "no" ]]; do
-        echo -e "\n\e[93mAre you running on Raspberry Pi? [yes or no]\e[0m"
-        read PI
-        echo
-    done
-
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 }
@@ -436,13 +429,16 @@ install_dragonchain() {
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
-    if [[ "$PI" == "y" || "$PI" == "yes" ]]; then
-        # User is running Raspberry Pi
+    RASPBERRY_PI=$(sudo ufw status verbose | grep -c -e active -e "allow (outgoing)" -e "allow (routed)" -e 22 -e cni0)
+
+    if [ $RASPBERRY_PI -eq 1 ]; then
+
+        # Running Raspberry Pi
         # Deploy Helm Chart
         #
         # Set CPU limits
 
-        printf "\Installing Dragonchain configuration for Raspberry Pi...\n"
+        printf "\nInstalling Dragonchain for Raspberry Pi...\n"
 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
@@ -460,11 +456,11 @@ install_dragonchain() {
 
     else
 
-        # User is not running Raspberry Pi
+        # Not Running Raspberry Pi
         # Deploy Helm Chart
         #
 
-        printf "\Installing Dragonchain...\n"
+        printf "\nInstalling Dragonchain...\n"
 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
