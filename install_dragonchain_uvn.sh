@@ -429,7 +429,7 @@ install_dragonchain() {
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
-    RASPBERRY_PI=$(sudo ufw status verbose | grep -c -e active -e "allow (outgoing)" -e "allow (routed)" -e 22 -e cni0)
+    RASPBERRY_PI=$(sudo lshw | grep -c "Raspberry")
 
     if [ $RASPBERRY_PI -eq 1 ]; then
 
@@ -472,7 +472,7 @@ install_dragonchain() {
         --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
         --set redis.storage.spec.storageClassName="microk8s-hostpath" \
         --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >>$LOG_FILE 2>&1
-        
+
         errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
 
     fi
