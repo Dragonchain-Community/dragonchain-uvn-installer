@@ -318,7 +318,7 @@ bootstrap_environment() {
 
     else
 
-        printf "Default firewall rules already configured. Continuing..."
+        printf "\nDefault firewall rules already configured. Continuing...\n"
 
     fi
 
@@ -334,7 +334,7 @@ bootstrap_environment() {
 ## Function initialize_microk8s
 initialize_microk8s() {
 
-    printf "Creating Containers..."
+    printf "\nCreating Containers...\n"
 
     # Enable Microk8s modules
     # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
