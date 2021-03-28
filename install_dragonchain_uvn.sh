@@ -312,7 +312,7 @@ bootstrap_environment() {
         sleep 5
 
         sleep 2
-        sudo ufw logging off >>$LOG_FILE 2>&1
+        sudo ufw logging on >>$LOG_FILE 2>&1
         errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
         sleep 5
 
