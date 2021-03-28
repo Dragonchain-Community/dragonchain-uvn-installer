@@ -53,6 +53,13 @@ prompt_node_name() {
 
     read -e DRAGONCHAIN_INSTALLER_DIR
 
+    local ANSWER=""
+    while [[ "$PI" != "y" && "$PI" != "yes" && "$PI" != "n" && "$PI" != "no" ]]; do
+        echo -e "\n\e[93mAre you running on Raspberry Pi? [yes or no]\e[0m"
+        read ANSWER
+        echo
+    done
+
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 }
@@ -429,19 +436,11 @@ install_dragonchain() {
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
-    local ANSWER=""
-    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-        echo -e "\n\e[93mAre you running on Raspberry Pi? [yes or no].\e[0m"
-        read ANSWER
-        echo
-    done
-
-    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+    if [[ "$PI" == "y" || "$PI" == "yes" ]]; then
         # User is running Raspberry Pi
         # Deploy Helm Chart
         #
-        # For Raspberry Pi installations, uncomment the last --set line and
-        # on the --set redis.storage.spec.storageClassName line above it, replace >> $LOG_FILE 2>&1 with \
+        # Set CPU limits 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
         --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
@@ -454,13 +453,13 @@ install_dragonchain() {
         --set redisearch.storage.spec.storageClassName="microk8s-hostpath" \
         --set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >>$LOG_FILE 2>&1
 
+        errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
+
     else
 
         # User is not running Raspberry Pi
         # Deploy Helm Chart
         #
-        # For Raspberry Pi installations, uncomment the last --set line and
-        # on the --set redis.storage.spec.storageClassName line above it, replace >> $LOG_FILE 2>&1 with \
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
         --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
@@ -471,8 +470,7 @@ install_dragonchain() {
         --set dragonchain.storage.spec.storageClassName="microk8s-hostpath" \
         --set redis.storage.spec.storageClassName="microk8s-hostpath" \
         --set redisearch.storage.spec.storageClassName="microk8s-hostpath" >>$LOG_FILE 2>&1
-        #--set cacheredis.resources.limits.cpu=1,persistentredis.resources.limits.cpu=1,webserver.resources.limits.cpu=2,transactionProcessor.resources.limits.cpu=1 >> $LOG_FILE 2>&1
-
+        
         errchk $? "Dragonchain install command >> $LOG_FILE 2>&1"
 
     fi
@@ -556,7 +554,7 @@ check_matchmaking_status() {
 
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-            echo -e "\n\e[93mWould you like to install another Dragonchain node? [yes or no].\e[0m"
+            echo -e "\n\e[93mWould you like to install another Dragonchain node? [yes or no]\e[0m"
             read ANSWER
             echo
         done
