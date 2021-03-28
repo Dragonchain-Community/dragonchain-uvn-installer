@@ -341,7 +341,7 @@ bootstrap_environment() {
 ## Function initialize_microk8s
 initialize_microk8s() {
 
-    printf "\nCreating Containers...\n"
+    printf "\nInitializing microk8s...\n"
 
     # Enable Microk8s modules
     # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
@@ -440,7 +440,10 @@ install_dragonchain() {
         # User is running Raspberry Pi
         # Deploy Helm Chart
         #
-        # Set CPU limits 
+        # Set CPU limits
+
+        printf "\Installing Dragonchain configuration for Raspberry Pi...\n"
+
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
         --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
@@ -460,6 +463,9 @@ install_dragonchain() {
         # User is not running Raspberry Pi
         # Deploy Helm Chart
         #
+
+        printf "\Installing Dragonchain...\n"
+
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
         --set global.environment.REGISTRATION_TOKEN="$DRAGONCHAIN_UVN_REGISTRATION_TOKEN" \
