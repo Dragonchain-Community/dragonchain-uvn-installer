@@ -333,6 +333,9 @@ bootstrap_environment() {
 ##########################################################################
 ## Function initialize_microk8s
 initialize_microk8s() {
+
+    printf "Creating Containers..."
+
     # Enable Microk8s modules
     # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
     sudo microk8s.enable dns storage helm3 >>$LOG_FILE 2>&1
