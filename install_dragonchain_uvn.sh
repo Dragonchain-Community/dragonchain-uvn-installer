@@ -119,7 +119,7 @@ function set_config_values() {
         # Execute config file
         . $DRAGONCHAIN_INSTALLER_DIR/.config
 
-        echo -e "\e[93mSaved configuration values found:\e[0m"
+        echo -e "\n\e[93mSaved configuration values found:\e[0m"
         echo "Namespace = $DRAGONCHAIN_INSTALLER_DIR"
         echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
@@ -163,7 +163,7 @@ request_user_defined_values() {
     # Collect user-configured fields
     # TODO: Sanitize all inputs
 
-    echo -e "\e[94mEnter your Chain ID from the Dragonchain console:\e[0m"
+    echo -e "\n\e[94mEnter your Chain ID from the Dragonchain console:\e[0m"
     read DRAGONCHAIN_UVN_INTERNAL_ID
     DRAGONCHAIN_UVN_INTERNAL_ID=$(echo $DRAGONCHAIN_UVN_INTERNAL_ID | tr -d '\r')
     echo
@@ -358,36 +358,36 @@ check_existing_install() {
     NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c $DRAGONCHAIN_INSTALLER_DIR)
 
     if [ $NAMESPACE_EXISTS -ge 1 ]; then
-        echo -e "\e[93mA previous installation of Dragonchain node $DRAGONCHAIN_INSTALLER_DIR (failed or complete) was found.\e[0m"
+        echo -e "\e[93mA previous installation of Dragonchain node '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
 
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\e[2mIf you would like to upgrade node $DRAGONCHAIN_INSTALLER_DIR, press \e[93m[u]\e[0m"
-            echo -e "\e[2mIf you would like to delete a failed or incorrect installation for node $DRAGONCHAIN_INSTALLER_DIR, press \e[93m[d]\e[0m"
-            echo -e "\e[91m(If you delete, all configuration for $DRAGONCHAIN_INSTALLER_DIR will be removed. Other running nodes will be unaffected)\e[0m"
+            echo -e "\e[2mIf you would like to upgrade node '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
+            echo -e "\e[2mIf you would like to delete a failed or incorrect installation for node '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
+            echo -e "\e[91m(If you delete, all configuration for '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running nodes will be unaffected)\e[0m"
             read ANSWER
             echo
         done
 
         if [[ "$ANSWER" == "d" || "$ANSWER" == "delete" ]]; then
             # User wants to delete namespace
-            echo -e "Deleting node $DRAGONCHAIN_INSTALLER_DIR (may take several minutes)..."
+            echo -e "Deleting node '$DRAGONCHAIN_INSTALLER_DIR' (may take several minutes)..."
             sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >>$LOG_FILE 2>&1
             errchk $? "sudo kubectl delete namespaces"
 
-            echo -e "\nDeleting saved configuration for $DRAGONCHAIN_INSTALLER_DIR..."
+            echo -e "\nDeleting saved configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo rm $DRAGONCHAIN_INSTALLER_DIR -R
 
             sleep 5
 
-            echo -e "\nConfiguration data for $DRAGONCHAIN_INSTALLER_DIR has been deleted and the node has been terminated."
+            echo -e "\nConfiguration data for '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been terminated."
             echo -e "Please rerun the installer to reconfigure this node."
 
             exit 0
         fi
 
         # User wants to attempt upgrade
-        printf "\nUpgrading UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
+        printf "\nUpgrading UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR'...\n"
 
         install_dragonchain
 
@@ -438,7 +438,7 @@ install_dragonchain() {
         #
         # Set CPU limits
 
-        printf "\nInstalling Dragonchain for Raspberry Pi...\n"
+        printf "\nInstalling UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR' for Raspberry Pi...\n"
 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
@@ -460,7 +460,7 @@ install_dragonchain() {
         # Deploy Helm Chart
         #
 
-        printf "\nInstalling Dragonchain...\n"
+        printf "\nInstalling UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR'...\n"
 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
@@ -580,7 +580,6 @@ check_matchmaking_status() {
             printf "\nGenerating chain secrets...\n"
             generate_chainsecrets
 
-            printf "\nInstalling UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
             install_dragonchain
 
             check_kube_status
@@ -742,7 +741,6 @@ check_existing_install
 printf "\nGenerating chain secrets...\n"
 generate_chainsecrets
 
-printf "\nInstalling UVN Dragonchain - $DRAGONCHAIN_INSTALLER_DIR...\n"
 install_dragonchain
 
 check_kube_status
