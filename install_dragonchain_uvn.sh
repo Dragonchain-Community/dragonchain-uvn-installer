@@ -273,39 +273,57 @@ bootstrap_environment() {
 
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
-    #duck To stop ufw errors 'Could not load logging rules', disable logging
+    #duck To stop ufw set errors 'Could not load logging rules', disable then enable logging once set
 
-    sleep 2
-    sudo ufw --force enable >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
-    sleep 2
+    FIREWALL_RULES=$(sudo ufw status verbose | grep -c -e active -e "allow (outgoing)" -e "allow (routed)" -e 22 -e cni0)
 
-    sleep 2
-    sudo ufw logging off >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
-    sleep 2
+    if [ $FIREWALL_RULES -lt 8 ]; then
 
-    sleep 2
-    sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
-    sleep 2
+        echo printf "\nConfiguring default firewall rules...\n"
 
-    sleep 2
-    sudo ufw default allow routed >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
-    sleep 2
+        sleep 2
+        sudo ufw --force enable >>$LOG_FILE 2>&1
+        errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
+        sleep 10
 
-    sleep 2
-    sudo ufw default allow outgoing >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
-    sleep 2
+        sleep 2
+        sudo ufw logging off >>$LOG_FILE 2>&1
+        errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
+        sleep 5
 
-    sleep 2
-    sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
-    errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
-    sleep 2
+        sleep 2
+        sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
+        errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
+        sleep 2
+
+        sleep 2
+        sudo ufw default allow routed >>$LOG_FILE 2>&1
+        errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
+        sleep 10
+
+        sleep 2
+        sudo ufw default allow outgoing >>$LOG_FILE 2>&1
+        errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
+        sleep 10
+
+        sleep 2
+        sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
+        errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
+        sleep 2
+
+        sleep 2
+        sudo ufw logging off >>$LOG_FILE 2>&1
+        errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
+        sleep 5
+
+    else
+
+        echo printf "\Default firewall rules already configured...\n"
+
+    fi
 
     # Wait for system to stabilize and avoid race conditions
+
     sleep 10
 
     initialize_microk8s
