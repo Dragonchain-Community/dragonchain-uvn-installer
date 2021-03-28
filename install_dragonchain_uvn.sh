@@ -299,12 +299,12 @@ bootstrap_environment() {
         sleep 2
         sudo ufw default allow routed >>$LOG_FILE 2>&1
         errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
-        sleep 10
+        sleep 15
 
         sleep 2
         sudo ufw default allow outgoing >>$LOG_FILE 2>&1
         errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
-        sleep 10
+        sleep 15
 
         sleep 2
         sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
