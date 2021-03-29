@@ -6,7 +6,7 @@ This project enables "easy mode" setup and installation of multiple Dragonchain 
 
 Currently, the following limitations are in place for this script to function:
 - Must be run on a Ubuntu linux installation (standard or server version)
-    - Recommended server specs for the current Dragonchain release: 1 CPUs, 2GB RAM
+    - Recommended server specs for the current Dragonchain release: 1 CPUs, 2GB RAM (more CPU and RAM may be required for additional nodes)
 	- Raspberry Pi 2GB, 4GB and 8GB supported. The installer will detect the Raspberry Pi hardware and install with the required CPU limits
 
 ### NOTE: IF YOUR NODE GOES UNHEALTHY ALL OF A SUDDEN, FOLLOW THE NEXT INSTRUCTIONS:
