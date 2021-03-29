@@ -360,13 +360,13 @@ initialize_microk8s() {
         printf "\nmicrok8s initialized...\n"
 
     fi
-    
+
 }
 
 ##########################################################################
 ## Function check_existing_install
 check_existing_install() {
-    NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -w $DRAGONCHAIN_INSTALLER_DIR | grep -c $DRAGONCHAIN_INSTALLER_DIR)
+    NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c -E "(^|\s)$DRAGONCHAIN_INSTALLER_DIR(\s|$))
 
     if [ $NAMESPACE_EXISTS -ge 1 ]; then
         echo -e "\e[93mA previous installation of Dragonchain node '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
