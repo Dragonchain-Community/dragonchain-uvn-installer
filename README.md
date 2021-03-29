@@ -42,7 +42,7 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 
     ```sudo ./install_dragonchain_uvn.sh```
 	
-- Additional ndoes can be installed by choosing option [yes] when prompted at the end of the initial node installation.
+- Additional nodes can be installed by choosing option [yes] when prompted at the end of the initial node installation.
 
 
 ### To UPGRADE a Running Dragonchain Unmanaged Node:
