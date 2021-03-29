@@ -11,7 +11,7 @@ Currently, the following limitations are in place for this script to function:
 
 ### NOTE: IF YOUR NODE GOES UNHEALTHY ALL OF A SUDDEN, FOLLOW THE NEXT INSTRUCTIONS:
 
-An issue with microk8s (not Dragonchain or our software) has been discovered that can cause nodes (especially those installed after approximately April 1st 2020) to go into "unhealthy" status because they aren't able to process blocks.
+An issue with microk8s (not Dragonchain or our software) has been discovered that can cause nodes (especially those installed after approximately April 1st) to go into "unhealthy" status because they aren't able to process blocks.
 
 If you run into this problem, SSH into your node and run the following command:
 
