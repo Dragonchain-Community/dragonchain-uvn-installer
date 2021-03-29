@@ -26,6 +26,7 @@ Terminate the watch with CTRL + C
 
 If you still don't see all "1/1" and "Running," check in Telegram for support.
 
+
 ### To INSTALL a New Dragonchain Unmanaged Node:
 
 - Clone the repo or download the **install_dragonchain_uvn.sh** file
@@ -40,6 +41,9 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 - Run the script with sudo:
 
     ```sudo ./install_dragonchain_uvn.sh```
+	
+- Additional ndoes can be installed by choosing option [yes] when prompted at the end of the initial node installation.
+
 
 ### To UPGRADE a Running Dragonchain Unmanaged Node:
 
@@ -53,6 +57,7 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 - To check the chart version number your Dragonchain nodes are running:
 
 	```sudo helm list --all-namespaces```
+
 
 ### Coming features:
 
