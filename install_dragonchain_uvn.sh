@@ -275,7 +275,7 @@ bootstrap_environment() {
     # This should be reviewed - confident we can restrict this further
     #duck To stop ufw set errors 'Could not load logging rules', disable then enable logging once set
 
-    FIREWALL_RULES=$(sudo ufw status verbose | grep -c -e active -e "allow (outgoing)" -e "allow (routed)" -e 22 -e cni0)
+    FIREWALL_RULES=$(sudo ufw status verbose | grep -c -e active -e "(^|\s)'allow (outgoing)'(\s|$)" -e "(^|\s)'allow (routed)'(\s|$)" -e 22 -e cni0)
 
     if [ $FIREWALL_RULES -lt 8 ]; then
 
@@ -369,7 +369,7 @@ check_existing_install() {
     NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c -E "(^|\s)$DRAGONCHAIN_INSTALLER_DIR(\s|$)")
 
     if [ $NAMESPACE_EXISTS -ge 1 ]; then
-        echo -e "\e[93mA previous installation of Dragonchain node '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
+        echo -e "\n\e[93mA previous installation of Dragonchain node '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
 
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
@@ -394,8 +394,8 @@ check_existing_install() {
             echo -e "\nDeleting firewall configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp
 
-            echo -e "\nConfiguration data for '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been terminated."
-            echo -e "Please rerun the installer to reconfigure this node."
+            echo -e "\n\e[93mConfiguration data for '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been terminated.\e[0m"
+            echo -e "\e[93mPlease rerun the installer to reconfigure this node.\e[0m"
 
             exit 0
         fi
