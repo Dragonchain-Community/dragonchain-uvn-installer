@@ -275,7 +275,7 @@ bootstrap_environment() {
     # This should be reviewed - confident we can restrict this further
     #duck To stop ufw set errors 'Could not load logging rules', disable then enable logging once set
 
-    FIREWALL_RULES=$(sudo ufw status verbose | grep -c -e active -e "(^|\s)'allow (outgoing)'(\s|$)" -e "(^|\s)'allow (routed)'(\s|$)" -e 22 -e cni0)
+    FIREWALL_RULES=$(sudo ufw status verbose | grep -c -Fwf <(printf "%s\n" active 'allow (routed)' 22 cni0))
 
     if [ $FIREWALL_RULES -lt 8 ]; then
 
