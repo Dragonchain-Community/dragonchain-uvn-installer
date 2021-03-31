@@ -394,7 +394,7 @@ check_existing_install() {
             echo -e "\nDeleting firewall configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp
 
-            echo -e "\n\e[93mConfiguration data for '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been terminated.\e[0m"
+            echo -e "\n\e[93mConfiguration data for '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been removed.\e[0m"
             echo -e "\e[93mPlease rerun the installer to reconfigure this node.\e[0m"
 
             exit 0
