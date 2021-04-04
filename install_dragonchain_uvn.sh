@@ -677,6 +677,12 @@ offer_nodes_upgrade() {
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
     SECURE_LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.secure.log
 
+    sudo helm repo add dragonchain https://dragonchain-charts.s3.amazonaws.com >>$LOG_FILE 2>&1
+    errchk $? "sudo helm repo add dragonchain https://dragonchain-charts.s3.amazonaws.com >> $LOG_FILE 2>&1"
+
+    sudo helm repo update >>$LOG_FILE 2>&1
+    errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
+    
     DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
