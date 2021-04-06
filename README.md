@@ -62,7 +62,7 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
     ```sudo ./install_dragonchain_uvn.sh```
 	
 
-- When the installer loads, it should detect pre-existing Dragonchain nodes. Choose option [u] to upgrade all installed Dragonchains.
+- When the installer loads, it should detect pre-existing Dragonchain nodes. Choose option [u] to upgrade all installed nodes.
 
 
 - To check the chart version number your Dragonchain nodes are running:
