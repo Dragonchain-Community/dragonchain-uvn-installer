@@ -42,14 +42,25 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 
     ```sudo ./install_dragonchain_uvn.sh```
 	
+	
 - Additional nodes can be installed by choosing option [yes] when prompted at the end of the initial node installation.
 
 
 ### To UPGRADE Running Dragonchain Unmanaged Node/s:
 
-- Run the same script with sudo:
+- Clone the repo or download the **install_dragonchain_uvn.sh** file
+
+    ```rm -f ./install_dragonchain_uvn.sh && wget https://raw.githubusercontent.com/Dragonchain-Community/dragonchain-uvn-installer/release-v5.0/install_dragonchain_uvn.sh```
+
+
+- Make the script executable:
+
+    ```chmod u+x install_dragonchain_uvn.sh```
+
+- Run the script with sudo:
 
     ```sudo ./install_dragonchain_uvn.sh```
+	
 
 - When the installer loads, it should detect pre-existing Dragonchain nodes. Choose option [u] to upgrade all installed Dragonchains.
 
