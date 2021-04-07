@@ -1,6 +1,8 @@
 # dragonchain-uvn-installer 
 
-This project enables "easy mode" setup and installation of multiple Dragonchain Level 2-4 Unmanaged Verification Nodes
+This project enables "easy mode" setup and installation of a Dragonchain Level 2-4 Unmanaged Verification Node
+
+**Now supports multiple node installations thanks to community member @l0wd0ct0r!**
 
 ### Limitations:
 
@@ -68,10 +70,5 @@ If you still don't see all "1/1" and "Running," check in Telegram for support.
 - To check the chart version number your Dragonchain nodes are running:
 
 	```sudo helm list --all-namespaces```
-
-
-### Coming features:
-
-- Support for pre-built config files for easy automatic deployment
 
 *Dragonchain-Community and this project are not affiliated with Dragonchain, Inc. or the Dragonchain Foundation*
