@@ -616,7 +616,7 @@ check_matchmaking_status() {
 ## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
-	UPGRADABLE=$(sudo apt list --upgradable 2>/dev/null | grep -c /)
+	UPGRADABLE=$(sudo apt list --upgradable 2>/dev/null | grep -c -e core -e lib -e security -e python)
 
     if [ $UPGRADABLE -ge 1 ]; then
 
@@ -635,7 +635,7 @@ offer_apt_upgrade() {
 			errchk $? "sudo apt-get upgrade -y"
 		
 			# Reboot required?
-			REBOOT=$(cat /var/run/reboot-required | grep -c required)
+			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
 			
 			if [ $REBOOT -ge 1 ]; then
 			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
