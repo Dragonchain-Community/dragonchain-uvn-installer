@@ -616,7 +616,7 @@ check_matchmaking_status() {
 ## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
-    echo -e "\e[93mIf you have not recently upgraded the system it is HIGHLY recommended that you do so now to keep it running optimally and securely.\e[0m"
+    echo -e "\e[93mIf you have a newly built system or have not recently upgraded the system it is HIGHLY recommended that you do so now to keep it running optimally and securely.\e[0m"
 
     local ANSWER=""
     while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
