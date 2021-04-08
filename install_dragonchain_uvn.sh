@@ -634,8 +634,11 @@ offer_apt_upgrade() {
 			sudo apt-get upgrade -y
 			errchk $? "sudo apt-get upgrade -y"
 		
-			# Reboot the system
-			echo -e "\n\e[93mThe operating system is now up-to-date, we should now reboot.\e[0m"
+			# Reboot required?
+			REBOOT=$(cat /var/run/reboot-required | grep -c required)
+			
+			if [ $REBOOT -ge 1 ]; then
+			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
 		
 			local ANSWER=""
 			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
@@ -650,7 +653,13 @@ offer_apt_upgrade() {
 					sudo reboot
 					errchk $? "sudo reboot"
 					sleep 5
-				
+					
+			fi
+			
+		else
+		
+		printf "\nUpgrades complete, no reboot required. Continuing...\n"
+		
 		fi
 		
     fi
