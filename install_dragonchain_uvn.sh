@@ -612,6 +612,8 @@ check_matchmaking_status() {
     fi
 }
 
+##########################################################################
+## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
     echo -e "\e[93mIf you have not recently upgraded the system it is HIGHLY recommended that you do so now to keep it running optimally and securely.\e[0m"
@@ -629,10 +631,26 @@ offer_apt_upgrade() {
         errchk $? "sudo apt-get upgrade -y"
 		
 		# Reboot the system
-		echo -e "\n\e[93mTo complete the operating system upgrade we need to reboot the system. Going down for a reboot in 5 seconds...\e[0m"
-		sleep 5
-		sudo reboot
+		echo -e "\n\e[93mTo complete the operating system upgrade we should reboot the system.\e[0m"
+		
+		local ANSWER=""
+		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+			echo -e "Reboot now? [yes or no]"
+			read ANSWER
+			echo
+			done
+
+			if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+			# User wants to reboot
+				echo -e "Going down for a reboot now..."
+				sudo reboot
+				errchk $? "sudo reboot"
+				sleep 5
+				
+		fi
+		
     fi
+	
 }
 
 ##########################################################################
@@ -653,23 +671,6 @@ check_matchmaking_status_upgrade() {
     fi
 }
 
-offer_apt_upgrade() {
-
-    echo -e "\e[93mIt is HIGHLY recommended that you run 'sudo apt-get upgrade -y' at this time to update your operating system.\e[0m"
-
-    local ANSWER=""
-    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-        echo -e "Run the upgrade command now? [yes or no]"
-        read ANSWER
-        echo
-    done
-
-    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
-        # User wants fresh values
-        sudo apt-get upgrade -y
-        errchk $? "sudo apt-get upgrade -y"
-    fi
-}
 
 ##########################################################################
 ## Function offer_nodes_upgrade
