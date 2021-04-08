@@ -615,7 +615,7 @@ check_matchmaking_status() {
 
 offer_apt_upgrade() {
 
-    echo -e "\e[93mIt is HIGHLY recommended that you run 'sudo apt-get upgrade -y' at this time to update your operating system.\e[0m"
+    echo -e "\e[93mIf you have not recently upgraded the system it is HIGHLY recommended that you do so now to keep it running optimally and securely.\e[0m"
 
     local ANSWER=""
     while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
@@ -628,6 +628,11 @@ offer_apt_upgrade() {
         # User wants fresh values
         sudo apt-get upgrade -y
         errchk $? "sudo apt-get upgrade -y"
+		
+		# Reboot the system
+		echo -e "\n\e[93mTo complete the operating system upgrade we need to reboot the system. Going down for a reboot in 5 seconds...\e[0m"
+		sleep 5
+		sudo reboot
     fi
 }
 
