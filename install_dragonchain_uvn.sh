@@ -241,8 +241,7 @@ patch_server_current() {
     sudo apt-get update >>$LOG_FILE 2>&1
     errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
 
-    #    sudo apt-get upgrade -y >> $LOG_FILE 2>&1
-    #    errchk $? "sudo apt-get upgrade -y >> $LOG_FILE 2>&1"
+	offer_apt_upgrade
 }
 
 ##########################################################################
