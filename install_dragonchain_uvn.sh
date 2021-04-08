@@ -635,7 +635,7 @@ offer_apt_upgrade() {
 			errchk $? "sudo apt-get upgrade -y"
 		
 			# Reboot the system
-			echo -e "\n\e[93The operating system is now up-to-date, we should now reboot.\e[0m"
+			echo -e "\n\e[93mThe operating system is now up-to-date, we should now reboot.\e[0m"
 		
 			local ANSWER=""
 			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
