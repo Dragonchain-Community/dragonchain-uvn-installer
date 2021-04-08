@@ -642,9 +642,6 @@ check_matchmaking_status_upgrade() {
         #SUCCESS!
         echo -e "\e[92mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
 
-        #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
-        #offer_apt_upgrade
-
     else
         #Boo!
         echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
@@ -726,6 +723,9 @@ offer_nodes_upgrade() {
         fi
 
     fi
+	
+offer_apt_upgrade
+
 }
 
 ## Main()
