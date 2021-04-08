@@ -616,11 +616,11 @@ check_matchmaking_status() {
 ## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
-    echo -e "\e[93mIf you have a newly built system or have not recently upgraded the system it is HIGHLY recommended that you do so now to keep it running optimally and securely.\e[0m"
+    echo -e "\n\e[93mIf you have a newly built system or have not recently upgraded the system it is HIGHLY recommended that you do so now to keep it running optimally and securely.\e[0m"
 
     local ANSWER=""
     while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-        echo -e "Run the upgrade command now? [yes or no]"
+        echo -e "\n\e[93mRun the upgrade command now? [yes or no]\e[0m"
         read ANSWER
         echo
     done
@@ -635,14 +635,14 @@ offer_apt_upgrade() {
 		
 		local ANSWER=""
 		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-			echo -e "Reboot now? [yes or no]"
+			echo -e "\n\e[93mReboot now? [yes or no]\e[0m"
 			read ANSWER
 			echo
 			done
 
 			if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to reboot
-				echo -e "Going down for a reboot now..."
+				echo -e "OK, going down for a reboot now..."
 				sudo reboot
 				errchk $? "sudo reboot"
 				sleep 5
