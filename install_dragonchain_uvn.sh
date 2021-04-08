@@ -616,11 +616,11 @@ check_matchmaking_status() {
 ## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
-	UPGRADABLE=$(sudo apt list --upgradable | grep -c -e lib -e core)
+	UPGRADABLE=$(sudo apt list --upgradable 2>/dev/null | grep -c -e lib -e core)
 
     if [ $UPGRADABLE -ge 1 ]; then
 
-		echo -e "\n\e[93mThere are core upgrades available for this operating system.\n It is HIGHLY recommended that you install these now to keep thyings running optimally and securely.\e[0m"
+		echo -e "\n\e[93mThere are core upgrades available for this operating system.\nIt is HIGHLY recommended that you install these now to keep thyings running optimally and securely.\e[0m"
 
 		local ANSWER=""
 		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
