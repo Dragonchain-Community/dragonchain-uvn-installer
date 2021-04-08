@@ -653,12 +653,13 @@ offer_apt_upgrade() {
 				
 		fi
 		
-			else
-
-			printf "\nOperating system up-to-date. Continuing...\n"
-		
     fi
 	
+	else
+
+	printf "\nOperating system up-to-date. Continuing...\n"
+	
+	fi
 }
 
 ##########################################################################
