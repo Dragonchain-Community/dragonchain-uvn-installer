@@ -616,40 +616,48 @@ check_matchmaking_status() {
 ## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
-    echo -e "\n\e[93mIf you have a newly built system or have not recently upgraded the system it is HIGHLY recommended that you do so now to keep it running optimally and securely.\e[0m"
+	UPGRADABLE=$(sudo apt list --upgradable | grep -c -e lib -e core)
 
-    local ANSWER=""
-    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-        echo -e "\n\e[93mRun the upgrade command now? [yes or no]\e[0m"
-        read ANSWER
-        echo
-    done
+    if [ $UPGRADABLE -ge 1 ]; then
 
-    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
-        # User wants fresh values
-        sudo apt-get upgrade -y
-        errchk $? "sudo apt-get upgrade -y"
-		
-		# Reboot the system
-		echo -e "\n\e[93mTo complete the operating system upgrade we should reboot the system.\e[0m"
-		
+		echo -e "\n\e[93mThere are core upgrades available for this operating system.\n It is HIGHLY recommended that you install these now to keep thyings running optimally and securely.\e[0m"
+
 		local ANSWER=""
 		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-			echo -e "\n\e[93mReboot now? [yes or no]\e[0m"
+			echo -e "\n\e[93mRun the upgrade command now? [yes or no]\e[0m"
 			read ANSWER
 			echo
-			done
+		done
 
-			if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
-			# User wants to reboot
-				echo -e "OK, going down for a reboot now..."
-				sudo reboot
-				errchk $? "sudo reboot"
-				sleep 5
+		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+			# User wants to upgrade
+			sudo apt-get upgrade -y
+			errchk $? "sudo apt-get upgrade -y"
+		
+			# Reboot the system
+			echo -e "\n\e[93mIf there were upgrades to install listed above, we should now reboot the system.\e[0m"
+		
+			local ANSWER=""
+			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+				echo -e "\n\e[93mReboot now? [yes or no]\e[0m"
+				read ANSWER
+				echo
+				done
+
+				if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+					# User wants to reboot
+					echo -e "OK, going down for a reboot now..."
+					sudo reboot
+					errchk $? "sudo reboot"
+					sleep 5
 				
 		fi
 		
     fi
+	
+	else
+
+	printf "\nOperating system up-to-date. Continuing...\n"
 	
 }
 
@@ -728,8 +736,6 @@ offer_nodes_upgrade() {
         fi
 
     fi
-	
-offer_apt_upgrade
 
 }
 
