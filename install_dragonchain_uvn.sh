@@ -671,6 +671,65 @@ offer_apt_upgrade() {
 	fi
 	
 }
+echo -e "\e[91m(If you delete, all configuration for '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running nodes will be unaffected)\e[0m"
+
+##########################################################################
+## Function offer_microk8s_channel_latest
+##
+## This installer will by default snap to the latest channel, but we need to offer it to folks in the wild snapped to 18
+offer_microk8s_channel_latest() {
+
+    MICROK8S_VERSION_18=$(sudo snap info microk8s  | grep -c 'installed\|1.18')
+
+    if [ $MICROK8S_VERSION_18 -eq 6 ]; then
+
+		echo -e "\n\e[93mYou are running on microk8s snap channel 18. You can upgrade to the latest channel now if you want.\n\e[2mThis is not immediately required however in the future you may need to snap to the latest channel if your nodes become unhealthy.\nOnce upgraded to the latest channel, snap will keep microk8s up-to-date automatically.\e[0m"
+        echo -e "\e[93mPlease note that upgrading to the latest channel will \e[91mSTOP YOUR NODES FROM RUNNING\e[0m \e[93mtemporarily whilst the latest channel is installed.\e[0m"
+		local ANSWER=""
+		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+			echo -e "\n\e[93mWould you like to upgrade to the latest microk8s channel now? [yes or no]\e[0m"
+			read ANSWER
+			echo
+		done
+
+		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+			# User wants to snap to latest channel
+			sudo snap refresh microk8s --channel=latest
+			errchk $? "sudo snap refresh microk8s --channel=latest"
+		
+			# Reboot required?
+			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
+			
+			if [ $REBOOT -ge 1 ]; then
+			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
+		
+			local ANSWER=""
+			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+				echo -e "\n\e[93mReboot now? [yes or no]\e[0m"
+				read ANSWER
+				echo
+				done
+
+				if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+					# User wants to reboot
+					echo -e "OK, going down for a reboot now..."
+					sudo reboot
+					errchk $? "sudo reboot"
+					sleep 5
+					
+			fi
+			
+		else
+		
+		printf "\nUpgrades complete, no reboot required. Continuing...\n"
+		
+		fi
+		
+    fi
+
+    fi
+
+}
 
 ##########################################################################
 ## Function check_matchmaking_status_upgrade
