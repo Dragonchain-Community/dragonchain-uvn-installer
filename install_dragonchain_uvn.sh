@@ -244,7 +244,7 @@ patch_server_current() {
 	offer_apt_upgrade
 
     offer_microk8s_channel_latest
-    
+
 }
 
 ##########################################################################
@@ -686,11 +686,13 @@ offer_microk8s_channel_latest() {
 
     if [ $MICROK8S_VERSION_18 -eq 6 ]; then
 
-		echo -e "\n\e[93mYou are running on microk8s snap channel 18. You can upgrade to the latest channel now if you want.\n\e[2mThis is not immediately required however in the future you may need to snap to the latest channel if your nodes become unhealthy.\nOnce upgraded to the latest channel, snap will keep microk8s up-to-date automatically.\e[0m"
-        echo -e "\e[93mPlease note that upgrading to the latest channel will \e[91mSTOP YOUR NODES FROM RUNNING\e[0m \e[93mtemporarily whilst the latest channel is installed.\e[0m"
+        echo -e "\n\e[93mYou are running on microk8s snap channel 18. This is not the latest channel.\e[0m"
+        echo -e "\e[2mUpgrading to the latest channel is not required, however this\e[0m"
+        echo -e "\e[2mmay be necessary in future if your nodes become unhealthy.\e[0m"
+		echo -e "\n\e[93mPlease note that upgrading to the latest channel will \n\e[91mSTOP YOUR NODES FROM RUNNING\e[0m \n\e[93mtemporarily whilst the latest channel is installed.\e[0m"
 		local ANSWER=""
 		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-			echo -e "\n\e[93mWould you like to upgrade to the latest microk8s channel now? [yes or no]\e[0m"
+			echo -e "\n\e[93mWould you like to upgrade now? [yes or no]\e[0m"
 			read ANSWER
 			echo
 		done
