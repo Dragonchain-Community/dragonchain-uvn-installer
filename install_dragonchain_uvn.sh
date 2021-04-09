@@ -708,6 +708,7 @@ offer_microk8s_channel_latest() {
 			
 			if [ $REBOOT -ge 1 ]; then
 			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
+            echo -e "\e[2mIf you have nodes already configured, fear not, they will automatically restart when we return!\e[0m"
 		
 			local ANSWER=""
 			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
@@ -718,7 +719,7 @@ offer_microk8s_channel_latest() {
 
 				if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 					# User wants to reboot
-					echo -e "OK, going down for a reboot now...\n\nIf you have nodes already configured, fear not, they will automatically restart!"
+					echo -e "OK, going down for a reboot now..."
 					sudo reboot
 					errchk $? "sudo reboot"
 					sleep 5
