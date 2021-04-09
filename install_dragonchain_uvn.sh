@@ -624,7 +624,7 @@ offer_apt_upgrade() {
     if [ $UPGRADABLE -ge 1 ]; then
 
 		echo -e "\n\e[93mThere are important upgrades available for this operating system.\e[0m"
-        echo -e "\e[2mIt is HIGHLY recommended that you install these now to keep things running smoothly.\e[0m"
+        echo -e "\e[2mIt is HIGHLY recommended that you install now to keep things running smoothly.\e[0m"
 
 		local ANSWER=""
 		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
