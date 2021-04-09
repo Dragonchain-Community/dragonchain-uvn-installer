@@ -718,7 +718,7 @@ offer_microk8s_channel_latest() {
 
 				if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 					# User wants to reboot
-					echo -e "OK, going down for a reboot now..."
+					echo -e "OK, going down for a reboot now...\n\nIf you have nodes already configured, fear not, they will automatically restart!"
 					sudo reboot
 					errchk $? "sudo reboot"
 					sleep 5
