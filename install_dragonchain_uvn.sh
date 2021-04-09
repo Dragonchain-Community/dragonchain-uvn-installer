@@ -687,7 +687,7 @@ offer_microk8s_channel_latest() {
 
     if [ $MICROK8S_VERSION_18 -eq 6 ]; then
 
-        echo -e "\n\e[93mYou are running on microk8s snap channel 18. This is not the latest channel.\e[0m"
+        echo -e "\e[93mYou are running on microk8s snap channel 18. This is not the latest channel.\e[0m"
         echo -e "\e[2mUpgrading to the latest channel is not required, however this\e[0m"
         echo -e "\e[2mmay be necessary in future if your nodes become unhealthy.\e[0m"
 		echo -e "\n\e[93mPlease note that upgrading to the latest channel will \n\e[91mSTOP YOUR NODES FROM RUNNING\e[0m \n\e[93mtemporarily whilst the latest channel is installed.\e[0m"
