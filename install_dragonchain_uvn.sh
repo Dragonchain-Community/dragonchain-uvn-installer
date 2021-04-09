@@ -1,5 +1,5 @@
 #!/bin/bash
-
+``
 ## Assumptions
 ## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
 
@@ -643,6 +643,7 @@ offer_apt_upgrade() {
 			
 			if [ $REBOOT -ge 1 ]; then
 			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
+            echo -e "\e[2mIf you have nodes already configured, fear not, they will automatically restart when we return!\e[0m"
 		
 			local ANSWER=""
 			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
