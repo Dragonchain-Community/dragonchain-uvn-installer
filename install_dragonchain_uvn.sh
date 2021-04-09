@@ -683,7 +683,7 @@ offer_apt_upgrade() {
 ## This installer will by default snap to the latest channel, but we need to offer it to folks in the wild snapped to 18
 offer_microk8s_channel_latest() {
 
-    MICROK8S_VERSION_18=$(sudo snap info microk8s  | grep -c 'installed\|1.18')
+    MICROK8S_VERSION_18=$(sudo snap info microk8s | grep -c 'installed\|1.18')
 
     if [ $MICROK8S_VERSION_18 -eq 6 ]; then
 
