@@ -700,8 +700,8 @@ offer_microk8s_channel_latest() {
 
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to snap to latest channel
-			sudo snap refresh microk8s --channel=latest
-			errchk $? "sudo snap refresh microk8s --channel=latest"
+			sudo snap refresh microk8s --channel=latest/stable
+			errchk $? "sudo snap refresh microk8s --channel=latest/stable"
 		
 			# Reboot required?
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
