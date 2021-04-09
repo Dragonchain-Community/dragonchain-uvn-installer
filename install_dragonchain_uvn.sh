@@ -242,6 +242,9 @@ patch_server_current() {
     errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
 
 	offer_apt_upgrade
+
+    offer_microk8s_channel_latest
+    
 }
 
 ##########################################################################
@@ -669,9 +672,9 @@ offer_apt_upgrade() {
 	printf "\nOperating system up-to-date. Continuing...\n"
 	
 	fi
-	
+
 }
-echo -e "\e[91m(If you delete, all configuration for '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running nodes will be unaffected)\e[0m"
+
 
 ##########################################################################
 ## Function offer_microk8s_channel_latest
