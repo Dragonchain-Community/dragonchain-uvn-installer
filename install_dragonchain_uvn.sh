@@ -637,6 +637,9 @@ offer_apt_upgrade() {
 			# User wants to upgrade
 			sudo apt-get upgrade -y
 			errchk $? "sudo apt-get upgrade -y"
+
+			sudo apt upgrade base-files
+			errchk $? "sudo apt upgrade base-files"
 		
 			# Reboot required?
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
