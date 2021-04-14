@@ -619,9 +619,9 @@ check_matchmaking_status() {
 ## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
-	UPGRADABLE=$(sudo apt list --upgradable 2>/dev/null | grep -c -e core -e lib -e security -e python)
+	UPGRADABLE=$(sudo apt list --upgradable 2>/dev/null | grep -c -e base-files -e core -e lib -e security -e python)
 
-    if [ $UPGRADABLE -ge 1 ]; then
+    if [ $UPGRADABLE -ge 6 ]; then
 
 		echo -e "\n\e[93mThere are important upgrades available for this operating system.\e[0m"
         echo -e "\e[2mIt is HIGHLY recommended that you install now to keep things running smoothly.\e[0m"
