@@ -636,10 +636,10 @@ offer_apt_upgrade() {
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to upgrade
 
-			sudo apt upgrade base-files
+			sudo apt upgrade base-files 2>/dev/null
 			errchk $? "sudo apt upgrade base-files"
-            
-			sudo apt-get upgrade -y
+
+			sudo apt-get upgrade -y 2>/dev/null
 			errchk $? "sudo apt-get upgrade -y"
 		
 			# Reboot required?
