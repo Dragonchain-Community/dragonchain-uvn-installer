@@ -636,19 +636,31 @@ offer_apt_upgrade() {
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to upgrade
 
-			sudo apt-get install -y base-files
-			errchk $? "sudo apt-get install -y base-files"
-
 			sudo apt-get upgrade -y
 			errchk $? "sudo apt-get upgrade -y"
-		
+
+            MANUALAPT=$(sudo apt list --upgradable 2>/dev/null | grep -c base-files)
+
+            if [ "$MANUALAPT" -ge 1 ]; then
+
+			    sudo apt-get install -y base-files
+			    errchk $? "sudo apt-get install -y base-files"
+
+			    sudo apt-get install -y linux-generic
+			    errchk $? "sudo apt-get install -y linux-generic"
+
+			    sudo apt-get install -y sosreport
+			    errchk $? "sudo apt-get install -y sosreport"
+
+             fi
+
 			# Reboot required?
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
-			
+
 			if [ $REBOOT -ge 1 ]; then
 			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
             echo -e "\e[2mIf you have nodes already configured, fear not, they will automatically restart when we return!\e[0m"
-		
+
 			local ANSWER=""
 			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
 				echo -e "\n\e[93mReboot now? [yes or no]\e[0m"
@@ -657,26 +669,27 @@ offer_apt_upgrade() {
 				done
 
 				if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
-					# User wants to reboot
-					echo -e "OK, going down for a reboot now..."
-					sudo reboot
-					errchk $? "sudo reboot"
-					sleep 5
-					
+
+                # User wants to reboot
+				echo -e "OK, going down for a reboot now..."
+				sudo reboot
+				errchk $? "sudo reboot"
+				sleep 5
+
 			fi
-			
-		else
-		
-		printf "\nUpgrades complete, no reboot required. Continuing...\n"
-		
+
+		    else
+
+		    printf "\nUpgrades complete, no reboot required. Continuing...\n"
+
 		fi
-		
+
     fi
-	
+
 	else
 
 	printf "\nOperating system up-to-date. Continuing...\n"
-	
+
 	fi
 
 }
@@ -707,14 +720,14 @@ offer_microk8s_channel_latest() {
 			# User wants to snap to specified channel
 			sudo snap refresh microk8s --channel=1.20/stable
 			errchk $? "sudo snap refresh microk8s --channel=1.20/stable"
-		
+
 			# Reboot required?
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
-			
+
 			if [ $REBOOT -ge 1 ]; then
 			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
             echo -e "\e[2mIf you have nodes already configured, fear not, they will automatically restart when we return!\e[0m"
-		
+
 			local ANSWER=""
 			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
 				echo -e "\n\e[93mReboot now? [yes or no]\e[0m"
@@ -728,15 +741,15 @@ offer_microk8s_channel_latest() {
 					sudo reboot
 					errchk $? "sudo reboot"
 					sleep 5
-					
+
 			fi
-			
+
 		else
-		
+
 		printf "\nUpgrades complete, no reboot required. Continuing...\n"
-		
+
 		fi
-		
+
     fi
 
     fi
@@ -774,7 +787,7 @@ offer_nodes_upgrade() {
 
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
-    
+
     DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
