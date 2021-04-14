@@ -445,7 +445,7 @@ install_dragonchain() {
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
-    RASPBERRY_PI=$(sudo lshw | grep -c "Raspberry")
+    RASPBERRY_PI=$(sudo lshw 2>/dev/null | grep -c "Raspberry")
 
     if [ $RASPBERRY_PI -eq 1 ]; then
 
