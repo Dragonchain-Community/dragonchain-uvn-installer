@@ -637,7 +637,7 @@ offer_apt_upgrade() {
 			# User wants to upgrade
 
 			sudo apt upgrade base-files 2>/dev/null
-			errchk $? "sudo apt upgrade base-files"
+			errchk $? "sudo apt upgrade base-files -y"
 
 			sudo apt-get upgrade -y 2>/dev/null
 			errchk $? "sudo apt-get upgrade -y"
