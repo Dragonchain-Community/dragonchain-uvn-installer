@@ -266,8 +266,8 @@ bootstrap_environment() {
 
     # Install microk8s classic via snap package
     # TODO - Revert to stable when refresh-certs is merged
-    sudo snap install microk8s --classic >>$LOG_FILE 2>&1
-    errchk $? "sudo snap install microk8s --classic >> $LOG_FILE 2>&1"
+    sudo snap install microk8s --classic --channel=1.20/stable >>$LOG_FILE 2>&1
+    errchk $? "sudo snap install microk8s --classic --channel=1.20/stable >> $LOG_FILE 2>&1"
 
     # Because we have microk8s, we need to alias kubectl
     sudo snap alias microk8s.kubectl kubectl >>$LOG_FILE 2>&1
@@ -681,14 +681,14 @@ offer_apt_upgrade() {
 ##########################################################################
 ## Function offer_microk8s_channel_latest
 ##
-## This installer will by default snap to the latest channel, but we need to offer it to folks in the wild snapped to 18
+## This installer will by default snap to the the specified channel, but we need to offer it to folks in the wild snapped to older versions
 offer_microk8s_channel_latest() {
 
-    MICROK8S_VERSION_18=$(sudo snap info microk8s | grep -c 'installed\|1.18')
+    MICROK8S_VERSION=$(sudo snap info microk8s | grep -c 'installed.*1.1')
 
-    if [ $MICROK8S_VERSION_18 -eq 6 ]; then
+    if [ $MICROK8S_VERSION -eq 1 ]; then
 
-        echo -e "\e[93mYou are running on microk8s snap channel 18. This is not the latest channel.\e[0m"
+        echo -e "\e[93mYou are running on an older microk8s snap channel.\e[0m"
         echo -e "\e[2mUpgrading to the latest channel is not required, however this\e[0m"
         echo -e "\e[2mmay be necessary in future if your nodes become unhealthy.\e[0m"
 		echo -e "\n\e[93mPlease note that upgrading to the latest channel will \n\e[91mSTOP YOUR NODES FROM RUNNING\e[0m \n\e[93mtemporarily whilst the latest channel is installed.\e[0m"
@@ -700,9 +700,9 @@ offer_microk8s_channel_latest() {
 		done
 
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
-			# User wants to snap to latest channel
-			sudo snap refresh microk8s --channel=latest/stable
-			errchk $? "sudo snap refresh microk8s --channel=latest/stable"
+			# User wants to snap to specified channel
+			sudo snap refresh microk8s --channel=1.20/stable
+			errchk $? "sudo snap refresh microk8s --channel=1.20/stable"
 		
 			# Reboot required?
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
