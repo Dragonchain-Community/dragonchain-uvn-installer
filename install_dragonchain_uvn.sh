@@ -619,7 +619,7 @@ check_matchmaking_status() {
 ## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
-	UPGRADABLE=$(sudo apt list --upgradable 2>/dev/null | grep -c -e core -e lib -e security -e python)
+	UPGRADABLE=$(sudo apt list --upgradable 2>/dev/null | grep -c -e base-files -e core -e lib -e security -e python)
 
     if [ $UPGRADABLE -ge 1 ]; then
 
