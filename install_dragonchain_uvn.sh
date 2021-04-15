@@ -211,7 +211,7 @@ request_user_defined_values() {
             echo -e "\e[91mInvalid port number entered!\e[0m"
         fi
 
-        echo -e "\e[94mEnter the endpoint PORT for your Dragonchain UVN (must be between 30000 and 32767):\e[0m"
+        echo -e "\e[94mEnter the endpoint PORT for your Dragonchain UVN (must be between 30000-32767):\e[0m"
         read DRAGONCHAIN_UVN_NODE_PORT
         DRAGONCHAIN_UVN_NODE_PORT=$(echo $DRAGONCHAIN_UVN_NODE_PORT | tr -d '\r')
         echo
@@ -222,7 +222,7 @@ request_user_defined_values() {
             echo -e "\e[91mInvalid node level entered!\e[0m"
         fi
 
-        echo -e "\e[94mEnter the node level for your Dragonchain UVN (must be between 2 and 4):\e[0m"
+        echo -e "\e[94mEnter the node level for your Dragonchain UVN (must be 2, 3 or 4):\e[0m"
         read DRAGONCHAIN_UVN_NODE_LEVEL
         DRAGONCHAIN_UVN_NODE_LEVEL=$(echo $DRAGONCHAIN_UVN_NODE_LEVEL | tr -d '\r')
     done
