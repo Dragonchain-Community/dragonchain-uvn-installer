@@ -397,7 +397,7 @@ check_existing_install() {
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
             echo -e "\e[2mIf you would like to upgrade UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
-            echo -e "\e[2mIf you would like to delete a failed/incorrect installation of UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
+            echo -e "\e[2mIf you would like to delete a failed UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
             echo -e "\e[91mIf you delete, all configuration for UVN '$DRAGONCHAIN_INSTALLER_DIR' will be removed.\nAll other running UVNs will not be affected.\e[0m"
             read ANSWER
             echo
