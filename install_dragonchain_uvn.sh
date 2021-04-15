@@ -715,6 +715,8 @@ offer_apt_upgrade() {
 
 	printf "\nOperating system up-to-date. Continuing...\n"
 
+    echo
+    
 	fi
 
 }
