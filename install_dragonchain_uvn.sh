@@ -392,7 +392,7 @@ check_existing_install() {
     NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c -E "(^|\s)$DRAGONCHAIN_INSTALLER_DIR(\s|$)")
 
     if [ $NAMESPACE_EXISTS -ge 1 ]; then
-        echo -e "\n\e[93mA previous install of UVN '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
+        echo -e "\n\e[93mAn install of Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
 
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
