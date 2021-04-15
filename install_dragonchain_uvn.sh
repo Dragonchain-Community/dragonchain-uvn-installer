@@ -404,17 +404,18 @@ check_existing_install() {
         done
 
         if [[ "$ANSWER" == "d" || "$ANSWER" == "delete" ]]; then
+
             # User wants to delete namespace
-            echo -e "Deleting node '$DRAGONCHAIN_INSTALLER_DIR'..."
+            printf "Deleting node '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR & spinner
             errchk $? "sudo kubectl delete namespaces"
 
-            echo -e "\nDeleting saved configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
+            printf "\nDeleting saved configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo rm $DRAGONCHAIN_INSTALLER_DIR -R & spinner
 
             sleep 5 & spinner
 
-            echo -e "\nDeleting firewall configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
+            printf "\nDeleting firewall configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp & spinner
 
             echo -e "\n\e[93mConfiguration data for '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been removed.\e[0m"
@@ -436,7 +437,7 @@ check_existing_install() {
         check_matchmaking_status_upgrade
 
         exit 0
-        
+
     fi
 
 }
