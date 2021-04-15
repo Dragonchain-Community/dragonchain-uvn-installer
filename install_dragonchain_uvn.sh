@@ -811,7 +811,6 @@ check_matchmaking_status_upgrade() {
     fi
 }
 
-
 ##########################################################################
 ## Function offer_nodes_upgrade
 offer_nodes_upgrade() {
