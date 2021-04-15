@@ -44,7 +44,8 @@ trim() {
 }
 
 ##########################################################################
-## Progre()
+## Progress spinner
+spinner()
 {
     local pid=$!
     local delay=0.75
@@ -856,15 +857,15 @@ echo -e "\n\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
 
 #patch system current
 printf "\nUpdating (patching) host OS current...\n"
-patch_server_current & spinner
+patch_server_current
 
 #install necessary software, set tunables
 printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
-bootstrap_environment & spinner
+bootstrap_environment
 
 ## Offer to upgrade all nodes
 printf "\nChecking for Pre-existing Dragonchain nodes to upgrade...\n"
-offer_nodes_upgrade & spinner
+offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
 prompt_node_name
