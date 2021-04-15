@@ -422,7 +422,7 @@ check_existing_install() {
         fi
 
         # User wants to attempt upgrade
-        printf "\nUpgrading UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR'...\n"
+        printf "\nUpgrading Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'...\n"
 
         install_dragonchain
 
@@ -495,7 +495,7 @@ install_dragonchain() {
         # Deploy Helm Chart
         #
 
-        printf "\nInstalling UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR'...\n"
+        printf "\nInstalling Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'...\n"
 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
@@ -642,12 +642,12 @@ offer_apt_upgrade() {
 
     if [ $UPGRADABLE -ge 1 ]; then
 
-		echo -e "\n\e[93mThere are important upgrades available for this operating system.\e[0m"
+		echo -e "\n\e[93mThere are important updates available for this operating system.\e[0m"
         echo -e "\e[2mIt is HIGHLY recommended that you install now to keep things running smoothly.\e[0m"
 
 		local ANSWER=""
 		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-			echo -e "\n\e[93mWould you like to upgrade now? [yes or no]\e[0m"
+			echo -e "\n\e[93mWould you like to update now? [yes or no]\e[0m"
 			read ANSWER
 			echo
 		done
@@ -655,7 +655,7 @@ offer_apt_upgrade() {
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to upgrade
 
-            printf "\nUpgrading..."
+            printf "Updating operating system..."
 
 			sudo apt-get upgrade -y >>$LOG_FILE 2>&1 & spinner
 			errchk $? "sudo apt-get upgrade -y >> /dev/null"
@@ -681,7 +681,7 @@ offer_apt_upgrade() {
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
 
 			if [ $REBOOT -ge 1 ]; then
-			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
+			echo -e "\n\e[93mThe operating system needs to restart to complete the update.\e[0m"
             echo -e "\e[2mIf you have nodes already configured, fear not, they will automatically restart when we return!\e[0m"
 
 			local ANSWER=""
@@ -703,7 +703,7 @@ offer_apt_upgrade() {
 
 		    else
 
-		    printf "\nUpgrades complete, no reboot required. Continuing...\n"
+		    printf "\nUpdates complete, no reboot required. Continuing...\n"
 
 		fi
 
@@ -742,7 +742,7 @@ offer_microk8s_channel_latest() {
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to snap to specified channel
 
-            printf "\nUpgrading..."
+            printf "Updating microk8s..."
 
 			sudo snap refresh microk8s --channel=1.20/stable >>$LOG_FILE & spinner
 			errchk $? "sudo snap refresh microk8s --channel=1.20/stable"
@@ -774,7 +774,7 @@ offer_microk8s_channel_latest() {
 
 		else
 
-		printf "\nUpgrades complete, no reboot required. Continuing...\n"
+		printf "\nUpdates complete, no reboot required. Continuing...\n"
 
 		fi
 
