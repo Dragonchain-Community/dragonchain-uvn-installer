@@ -874,7 +874,7 @@ offer_nodes_upgrade() {
 ## Main()
 
 #welcome!!
-echo -e "\n\n\e[94mWelcome to the Dragonchain Unmanaged Verification Node (UVN) Community Installer!\e[0m"
+echo -e "\n\n\e[94mWelcome to the Dragonchain Unmanaged Verification Node (UVN) Community Installer\e[0m"
 
 #patch system current
 printf "\nUpdating (patching) host OS current...\n"
