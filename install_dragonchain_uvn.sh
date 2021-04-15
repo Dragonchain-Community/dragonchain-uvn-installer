@@ -45,12 +45,20 @@ trim() {
 
 ##########################################################################
 ## Progress bar
-prog() {
-    local w=80 p=$1;  shift
-    # create a string of spaces, then change them to dots
-    printf -v dots "%*s" "$(( $p*$w/100 ))" ""; dots=${dots// /.};
-    # print those dots on a fixed-width space plus the percentage etc. 
-    printf "\r\e[K|%-*s| %3d %% %s" "$w" "$dots" "$p" "$*"; 
+progress-bar() {
+  local duration=${1}
+
+    already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
+    remaining() { for ((remain=$elapsed; remain<$duration; remain++)); do printf " "; done }
+    percentage() { printf "| %s%%" $(( (($elapsed)*100)/($duration)*100/100 )); }
+    clean_line() { printf "\r"; }
+
+  for (( elapsed=1; elapsed<=$duration; elapsed++ )); do
+      already_done; remaining; percentage
+      sleep 1
+      clean_line
+  done
+  clean_line
 }
 
 ##########################################################################
@@ -70,6 +78,7 @@ prompt_node_name() {
 ##########################################################################
 ## Function preflight_check
 preflight_check() {
+    progress-bar
     # Check for existance of necessary commands
     for CMD in $REQUIRED_COMMANDS; do
         if ! cmd_exists "$CMD"; then
@@ -259,12 +268,6 @@ patch_server_current() {
 ##########################################################################
 ## Function bootstrap_environment
 bootstrap_environment() {
-
-
-for x in {1..100} ; do
-    prog "$x" still working...
-    sleep .1   # do some work here
-
     #duck
     # Make vm.max_map change current and for next reboot
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
@@ -344,8 +347,6 @@ for x in {1..100} ; do
     sleep 10
 
     initialize_microk8s
-
-done ; echo
 
 }
 
