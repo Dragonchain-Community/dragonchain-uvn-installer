@@ -874,7 +874,7 @@ printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
 
 #install necessary software, set tunables
-printf "\nInstalling required software and setting Dragonchain UVN system configuration..."
+printf "\nInstalling required software and setting Dragonchain UVN configuration..."
 bootstrap_environment
 
 ## Offer to upgrade all nodes
