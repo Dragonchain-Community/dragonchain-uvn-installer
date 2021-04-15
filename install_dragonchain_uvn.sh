@@ -52,11 +52,6 @@ prog() {
     # print those dots on a fixed-width space plus the percentage etc. 
     printf "\r\e[K|%-*s| %3d %% %s" "$w" "$dots" "$p" "$*"; 
 }
-# test loop
-for x in {1..100} ; do
-    prog "$x" still working...
-    sleep .1   # do some work here
-done ; echo
 
 ##########################################################################
 ## Function prompt_node_name
@@ -264,6 +259,12 @@ patch_server_current() {
 ##########################################################################
 ## Function bootstrap_environment
 bootstrap_environment() {
+
+
+for x in {1..100} ; do
+    prog "$x" still working...
+    sleep .1   # do some work here
+
     #duck
     # Make vm.max_map change current and for next reboot
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
@@ -299,43 +300,36 @@ bootstrap_environment() {
 
         sleep 20
         sudo ufw --force enable >>$LOG_FILE 2>&1
-        prog
         errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
         sleep 10
 
         sleep 2
         sudo ufw logging off >>$LOG_FILE 2>&1
-        prog
         errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
         sleep 5
 
         sleep 2
         sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
-        prog
         errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
         sleep 5
 
         sleep 2
         sudo ufw default allow routed >>$LOG_FILE 2>&1
-        prog
         errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
         sleep 15
 
         sleep 2
         sudo ufw default allow outgoing >>$LOG_FILE 2>&1
-        prog
         errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
         sleep 15
 
         sleep 2
         sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
-        prog
         errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
         sleep 5
 
         sleep 2
         sudo ufw logging on >>$LOG_FILE 2>&1
-        prog
         errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
         sleep 5
 
@@ -350,6 +344,8 @@ bootstrap_environment() {
     sleep 10
 
     initialize_microk8s
+
+done ; echo
 
 }
 
