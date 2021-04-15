@@ -662,7 +662,7 @@ offer_apt_upgrade() {
 			sudo apt-get upgrade -y >>$LOG_FILE 2>&1 & spinner
 			errchk $? "sudo apt-get upgrade -y >> /dev/null"
 
-            MANUALAPT=$(sudo apt list --upgradable 2>/dev/null | grep -c base-files)
+            MANUALAPT=$(sudo apt list --upgradable 2>/dev/null | grep -c base-files -e security)
 
             if [ "$MANUALAPT" -ge 1 ]; then
 
@@ -716,7 +716,7 @@ offer_apt_upgrade() {
 	printf "\nOperating system up-to-date. Continuing...\n"
 
     echo
-    
+
 	fi
 
 }
