@@ -47,9 +47,7 @@ trim() {
 ## Progress spinner
 spinner() {
     pid=$! # Process Id of the previous running command
-
     spin='-\|/'
-
     i=0
     while kill -0 $pid 2>/dev/null
     do
