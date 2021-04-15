@@ -281,7 +281,6 @@ bootstrap_environment() {
     if [ $FIREWALL_RULES -lt 8 ]; then
 
         printf "\nConfiguring default firewall rules...\n"
-        echo -e "\e[2m(This may take some time)\e[0m\n"
 
         sleep 20
         sudo ufw --force enable >>$LOG_FILE 2>&1
@@ -317,6 +316,18 @@ bootstrap_environment() {
         sudo ufw logging on >>$LOG_FILE 2>&1
         errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
         sleep 5
+
+        pid=$! # Process Id of the previous running command
+
+        spin='-\|/'
+
+        i=0
+        while kill -0 $pid 2>/dev/null
+        do
+        i=$(( (i+1) %4 ))
+        printf "\r${spin:$i:1}"
+        sleep .1
+        done
 
     else
 
