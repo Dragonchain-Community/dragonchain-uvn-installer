@@ -272,25 +272,27 @@ bootstrap_environment() {
     #duck note: might want to check the .conf file for this line to already exist before adding again
 
     echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf >/dev/null
-    sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1
+    sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
-    sudo apt-get install -y ufw curl jq openssl xxd snapd >>$LOG_FILE 2>&1
+    sudo apt-get install -y ufw curl jq openssl xxd snapd >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
     # TODO - Revert to stable when refresh-certs is merged
-    sudo snap install microk8s --classic --channel=1.20/stable >>$LOG_FILE 2>&1
+    sudo snap install microk8s --classic --channel=1.20/stable >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo snap install microk8s --classic --channel=1.20/stable >> $LOG_FILE 2>&1"
 
     # Because we have microk8s, we need to alias kubectl
-    sudo snap alias microk8s.kubectl kubectl >>$LOG_FILE 2>&1
+    sudo snap alias microk8s.kubectl kubectl >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1"
 
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
     #duck To stop ufw set errors 'Could not load logging rules', disable then enable logging once set
+
+    echo
 
     FIREWALL_RULES=$(sudo ufw status verbose | grep -c -Fwf <(printf "%s\n" active 'allow (routed)' 22 cni0))
 
@@ -871,7 +873,7 @@ printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
 
 #install necessary software, set tunables
-printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
+printf "\nInstalling required software and setting Dragonchain UVN system configuration..."
 bootstrap_environment
 
 ## Offer to upgrade all nodes
