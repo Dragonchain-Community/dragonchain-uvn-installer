@@ -97,7 +97,6 @@ preflight_check() {
         printf "PASS: Sudo configuration in place\n" >>$LOG_FILE
     else
         printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n" >>$LOG_FILE
-        printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n"
         exit 1
     fi
 
@@ -281,7 +280,8 @@ bootstrap_environment() {
 
     if [ $FIREWALL_RULES -lt 8 ]; then
 
-        printf "\nConfiguring default firewall rules...\n"
+        printf "\nConfiguring default firewall rules..."
+        echo -e "\e[2m(This may take some time)\e[0m\n"
 
         sleep 20
         sudo ufw --force enable >>$LOG_FILE 2>&1
