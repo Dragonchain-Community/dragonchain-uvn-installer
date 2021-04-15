@@ -280,7 +280,7 @@ bootstrap_environment() {
 
     if [ $FIREWALL_RULES -lt 8 ]; then
 
-        printf "\nConfiguring default firewall rules..."
+        printf "\nConfiguring default firewall rules...\n"
         echo -e "\e[2m(This may take some time)\e[0m\n"
 
         sleep 20
