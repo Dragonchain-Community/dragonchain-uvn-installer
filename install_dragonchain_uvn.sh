@@ -1,7 +1,7 @@
 #!/bin/bash
 ``
 ## Assumptions
-## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
+## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing)
 
 # Variables
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
