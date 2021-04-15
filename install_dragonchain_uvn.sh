@@ -63,9 +63,9 @@ spinner() {
 ## Function prompt_node_name
 prompt_node_name() {
     echo -e "\n\e[94mEnter a Dragonchain UVN name:\e[0m"
-    echo -e "\e[2mThe name must be unique if you intend to run multiple Dragonchain UVNs\e[0m"
+    echo -e "\e[2mThe name must be unique if you intend to run multiple UVNs\e[0m"
     echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
-    echo -e "\e[2mTo upgrade, repair or delete a specific Dragonchain UVN, type the node name of that installation\e[0m"
+    echo -e "\e[2mTo upgrade, repair or delete a specific UVN, type the node name of that installation\e[0m"
 
     read -e DRAGONCHAIN_INSTALLER_DIR
 
@@ -134,7 +134,7 @@ function set_config_values() {
         # Execute config file
         . $DRAGONCHAIN_INSTALLER_DIR/.config
 
-        echo -e "\n\e[93mSaved configuration values found:\e[0m"
+        echo -e "\n\e[93mSaved Dragonchain UVN configuration values found:\e[0m"
         echo "Namespace = $DRAGONCHAIN_INSTALLER_DIR"
         echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
@@ -148,7 +148,7 @@ function set_config_values() {
         #duck Maybe just add a flag to bypass this for automated installation?
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-            echo -e "\e[93mUse saved configuration? [yes or no]\e[0m"
+            echo -e "\e[93mUse saved UVN configuration? [yes or no]\e[0m"
             read ANSWER
             echo
         done
@@ -219,7 +219,7 @@ request_user_defined_values() {
 
     while [[ ! "$DRAGONCHAIN_UVN_NODE_LEVEL" =~ ^[0-9]+$ ]] || ((DRAGONCHAIN_UVN_NODE_LEVEL < 2 || DRAGONCHAIN_UVN_NODE_LEVEL > 4)); do
         if [[ ! -z "$DRAGONCHAIN_UVN_NODE_LEVEL" ]]; then
-            echo -e "\e[91mInvalid UVN level entered!\e[0m"
+            echo -e "\e[91mInvalid node level entered!\e[0m"
         fi
 
         echo -e "\e[94mEnter the node level for your Dragonchain UVN (must be between 2 and 4):\e[0m"
@@ -392,13 +392,13 @@ check_existing_install() {
     NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c -E "(^|\s)$DRAGONCHAIN_INSTALLER_DIR(\s|$)")
 
     if [ $NAMESPACE_EXISTS -ge 1 ]; then
-        echo -e "\n\e[93mA previous installation of Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
+        echo -e "\n\e[93mA previous install of UVN '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
 
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\e[2mIf you would like to upgrade Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
-            echo -e "\e[2mIf you would like to delete a failed or incorrect installation for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
-            echo -e "\e[91m(If you delete, all configuration for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running nodes will be unaffected)\e[0m"
+            echo -e "\e[2mIf you would like to upgrade UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
+            echo -e "\e[2mIf you would like to delete a failed/incorrect installation of UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
+            echo -e "\e[91mIf you delete, all configuration for UVN '$DRAGONCHAIN_INSTALLER_DIR' will be removed./nAll other running UVNs will not be affected.\e[0m"
             read ANSWER
             echo
         done
@@ -419,7 +419,7 @@ check_existing_install() {
             sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >/dev/null 2>&1 & spinner
 
             echo -e "\n\n\e[93mDragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been terminated and its configuration data has been deleted.\e[0m"
-            echo -e "\e[93mPlease rerun the installer to reconfigure this Dragonchain UVN.\e[0m"
+            echo -e "\e[93mPlease rerun the installer to reconfigure this UVN.\e[0m"
 
             exit 0
 
@@ -613,7 +613,7 @@ check_matchmaking_status() {
             set_config_values
 
             # check for previous installation (failed or successful) and offer reset if found
-            printf "\nChecking for previous installation...\n"
+            printf "\nChecking for previous Dragonchain UVN installation...\n"
             check_existing_install
 
             # must gather node details from user or .config before generating chainsecrets
@@ -738,7 +738,7 @@ offer_microk8s_channel_latest() {
         echo -e "\e[93mYou are running on an older microk8s snap channel.\e[0m"
         echo -e "\e[2mUpgrading to the latest channel is not required, however this\e[0m"
         echo -e "\e[2mmay be necessary in future if your Dragonchain UVNs become unhealthy.\e[0m"
-		echo -e "\n\e[93mPlease note that upgrading to the latest channel will \n\e[91mSTOP YOUR NODES FROM RUNNING\e[0m \n\e[93mtemporarily whilst the latest channel is installed.\e[0m"
+		echo -e "\n\e[93mPlease note that upgrading to the latest channel will \n\e[91mSTOP YOUR UVNs FROM RUNNING\e[0m \n\e[93mtemporarily whilst the latest channel is installed.\e[0m"
 		local ANSWER=""
 		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
 			echo -e "\n\e[93mWould you like to upgrade now? [yes or no]\e[0m"
@@ -831,8 +831,8 @@ offer_nodes_upgrade() {
         local ANSWER=""
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
             echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected.\e[0m"
-            echo -e "\e[2mIf you would like to install a new Dragonchain UVN (including upgrading, repairing or deleting specific nodes), press \e[93m[i]\e[0m"
-            echo -e "\n\e[2mIf you would like to upgrade ALL detected Dragonchain UVNs to the latest version, press \e[93m[u]\e[0m"
+            echo -e "\e[2mIf you would like to install a new UVN (including upgrading, repairing or deleting specific nodes), press \e[93m[i]\e[0m"
+            echo -e "\n\e[2mIf you would like to upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
             read ANSWER
             echo
         done
@@ -898,7 +898,7 @@ preflight_check
 set_config_values
 
 # check for previous installation (failed or successful) and offer reset if found
-printf "\nChecking for previous installation...\n"
+printf "\nChecking for a previous Dragonchain UVN installation...\n"
 check_existing_install
 
 # must gather node details from user or .config before generating chainsecrets
