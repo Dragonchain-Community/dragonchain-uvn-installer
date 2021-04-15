@@ -255,7 +255,7 @@ patch_server_current() {
     LOG_FILE=./dragonchain_uvn_installer_bootstrap.log
 
     #Patch our system current [stable]
-    sudo apt-get update >>$LOG_FILE 2>&1
+    sudo apt-get update >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
 
 	offer_apt_upgrade
@@ -274,20 +274,20 @@ bootstrap_environment() {
     #duck note: might want to check the .conf file for this line to already exist before adding again
 
     echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf >/dev/null
-    sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1
+    sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
-    sudo apt-get install -y ufw curl jq openssl xxd snapd >>$LOG_FILE 2>&1
+    sudo apt-get install -y ufw curl jq openssl xxd snapd >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
     # TODO - Revert to stable when refresh-certs is merged
-    sudo snap install microk8s --classic --channel=1.20/stable >>$LOG_FILE 2>&1
+    sudo snap install microk8s --classic --channel=1.20/stable >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo snap install microk8s --classic --channel=1.20/stable >> $LOG_FILE 2>&1"
 
     # Because we have microk8s, we need to alias kubectl
-    sudo snap alias microk8s.kubectl kubectl >>$LOG_FILE 2>&1
+    sudo snap alias microk8s.kubectl kubectl >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1"
 
     # Setup firewall rules
@@ -300,40 +300,40 @@ bootstrap_environment() {
 
         printf "\nConfiguring default firewall rules...\n"
 
-        sleep 20
+        sleep 20 & spinner
         sudo ufw --force enable >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
-        sleep 10
+        sleep 10 & spinner
 
-        sleep 2
+        sleep 2 & spinner
         sudo ufw logging off >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
+        sleep 2 & spinner
         sudo ufw allow 22/tcp >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
+        sleep 2 & spinner
         sudo ufw default allow routed >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
-        sleep 15
+        sleep 15 & spinner
 
-        sleep 2
+        sleep 2 & spinner
         sudo ufw default allow outgoing >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
-        sleep 15
+        sleep 15 & spinner
 
-        sleep 2
+        sleep 2 & spinner
         sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
+        sleep 2 & spinner
         sudo ufw logging on >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
     else
 
@@ -361,17 +361,17 @@ initialize_microk8s() {
 
         # Enable Microk8s modules
         # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
-        sudo microk8s.enable dns storage helm3 >>$LOG_FILE 2>&1
+        sudo microk8s.enable dns storage helm3 >>$LOG_FILE 2>&1 & spinner
 
         # Alias helm3
-        sudo snap alias microk8s.helm3 helm >>$LOG_FILE 2>&1
+        sudo snap alias microk8s.helm3 helm >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo snap alias microk8s.helm3 helm >> $LOG_FILE 2>&1"
 
         # Wait for system to stabilize and avoid race conditions
         sleep 10
 
         # Install more Microk8s modules
-        sudo microk8s.enable registry >>$LOG_FILE 2>&1
+        sudo microk8s.enable registry >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo microk8s.enable registry >> $LOG_FILE 2>&1"
 
     else
@@ -653,20 +653,20 @@ offer_apt_upgrade() {
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to upgrade
 
-			sudo apt-get upgrade -y >> /dev/null
+			sudo apt-get upgrade -y >>$LOG_FILE 2>&1 & spinner
 			errchk $? "sudo apt-get upgrade -y >> /dev/null"
 
             MANUALAPT=$(sudo apt list --upgradable 2>/dev/null | grep -c base-files)
 
             if [ "$MANUALAPT" -ge 1 ]; then
 
-			    sudo apt-get install -y base-files >> /dev/null
+			    sudo apt-get install -y base-files >>$LOG_FILE 2>&1 & spinner
 			    errchk $? "sudo apt-get install -y base-files"
 
-			    sudo apt-get install -y linux-generic >> /dev/null
+			    sudo apt-get install -y linux-generic >>$LOG_FILE 2>&1 & spinner
 			    errchk $? "sudo apt-get install -y linux-generic"
 
-			    sudo apt-get install -y sosreport >> /dev/null
+			    sudo apt-get install -y sosreport >>$LOG_FILE 2>&1 & spinner
 			    errchk $? "sudo apt-get install -y sosreport"
 
              fi
