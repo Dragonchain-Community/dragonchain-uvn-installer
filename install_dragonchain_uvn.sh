@@ -337,13 +337,13 @@ bootstrap_environment() {
 
         printf "\nDefault firewall rules already configured. Continuing..."
 
-    fi
+    fi    
     
-    echo
-
     # Wait for system to stabilize and avoid race conditions
 
-    sleep 10
+    sleep 10 & spinner
+
+    echo
 
     initialize_microk8s
 
@@ -357,7 +357,7 @@ initialize_microk8s() {
 
     if [ $MICROK8S_INITIALIZED -lt 2 ]; then
 
-        printf "\n\nInitializing microk8s..." & spinner
+        printf "\nInitializing microk8s..." & spinner
 
         # Enable Microk8s modules
         # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
@@ -373,6 +373,8 @@ initialize_microk8s() {
         # Install more Microk8s modules
         sudo microk8s.enable registry >>$LOG_FILE 2>&1
         errchk $? "sudo microk8s.enable registry >> $LOG_FILE 2>&1"
+
+        echo
 
     else
 
@@ -653,24 +655,28 @@ offer_apt_upgrade() {
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to upgrade
 
-			sudo apt-get upgrade -y >>$LOG_FILE 2>&1
+            printf "\nUgrading..."
+
+			sudo apt-get upgrade -y >>$LOG_FILE 2>&1 & spinner
 			errchk $? "sudo apt-get upgrade -y >> /dev/null"
 
             MANUALAPT=$(sudo apt list --upgradable 2>/dev/null | grep -c base-files)
 
             if [ "$MANUALAPT" -ge 1 ]; then
 
-			    sudo apt-get install -y base-files >>$LOG_FILE 2>&1
+			    sudo apt-get install -y base-files >>$LOG_FILE 2>&1 & spinner
 			    errchk $? "sudo apt-get install -y base-files"
 
-			    sudo apt-get install -y linux-generic >>$LOG_FILE 2>&1
+			    sudo apt-get install -y linux-generic >>$LOG_FILE 2>&1 & spinner
 			    errchk $? "sudo apt-get install -y linux-generic"
 
-			    sudo apt-get install -y sosreport >>$LOG_FILE 2>&1
+			    sudo apt-get install -y sosreport >>$LOG_FILE 2>&1 & spinner
 			    errchk $? "sudo apt-get install -y sosreport"
 
              fi
 
+            echo
+            
 			# Reboot required?
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
 
