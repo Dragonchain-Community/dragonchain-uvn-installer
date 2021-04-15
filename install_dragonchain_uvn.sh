@@ -52,7 +52,7 @@ spinner()
     local spinstr='|/-\'
     while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
         local temp=${spinstr#?}
-        printf " [%c]  " "$spinstr"
+        printf "[%c]" "$spinstr"
         local spinstr=$temp${spinstr%"$temp"}
         sleep $delay
         printf "\b\b\b\b\b\b"
@@ -77,7 +77,6 @@ prompt_node_name() {
 ##########################################################################
 ## Function preflight_check
 preflight_check() {
-    progress-bar 100
     # Check for existance of necessary commands
     for CMD in $REQUIRED_COMMANDS; do
         if ! cmd_exists "$CMD"; then
