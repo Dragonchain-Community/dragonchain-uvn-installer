@@ -65,7 +65,7 @@ prompt_node_name() {
     echo -e "\n\e[94mEnter a Dragonchain UVN name:\e[0m"
     echo -e "\e[2mThe name must be unique if you intend to run multiple UVNs\e[0m"
     echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
-    echo -e "\e[2mTo upgrade, repair or delete a specific UVN, type the node name of that installation\e[0m"
+    echo -e "\e[2mTo upgrade, repair or delete a specific UVN, type the name of that installation\e[0m"
 
     read -e DRAGONCHAIN_INSTALLER_DIR
 
