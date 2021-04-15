@@ -44,21 +44,19 @@ trim() {
 }
 
 ##########################################################################
-## Progress bar
-progress-bar() {
-  local duration=${1}
-
-    already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
-    remaining() { for ((remain=$elapsed; remain<$duration; remain++)); do printf " "; done }
-    percentage() { printf "| %s%%" $(( (($elapsed)*100)/($duration)*100/100 )); }
-    clean_line() { printf "\r"; }
-
-  for (( elapsed=1; elapsed<=$duration; elapsed++ )); do
-      already_done; remaining; percentage
-      sleep 1
-      clean_line
-  done
-  clean_line
+## Progre()
+{
+    local pid=$!
+    local delay=0.75
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
 }
 
 ##########################################################################
@@ -654,20 +652,20 @@ offer_apt_upgrade() {
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to upgrade
 
-			sudo apt-get upgrade -y
-			errchk $? "sudo apt-get upgrade -y"
+			sudo apt-get upgrade -y >> /dev/null
+			errchk $? "sudo apt-get upgrade -y >> /dev/null"
 
             MANUALAPT=$(sudo apt list --upgradable 2>/dev/null | grep -c base-files)
 
             if [ "$MANUALAPT" -ge 1 ]; then
 
-			    sudo apt-get install -y base-files
+			    sudo apt-get install -y base-files >> /dev/null
 			    errchk $? "sudo apt-get install -y base-files"
 
-			    sudo apt-get install -y linux-generic
+			    sudo apt-get install -y linux-generic >> /dev/null
 			    errchk $? "sudo apt-get install -y linux-generic"
 
-			    sudo apt-get install -y sosreport
+			    sudo apt-get install -y sosreport >> /dev/null
 			    errchk $? "sudo apt-get install -y sosreport"
 
              fi
@@ -858,15 +856,15 @@ echo -e "\n\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
 
 #patch system current
 printf "\nUpdating (patching) host OS current...\n"
-patch_server_current
+patch_server_current & spinner
 
 #install necessary software, set tunables
 printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
-bootstrap_environment
+bootstrap_environment & spinner
 
 ## Offer to upgrade all nodes
 printf "\nChecking for Pre-existing Dragonchain nodes to upgrade...\n"
-offer_nodes_upgrade
+offer_nodes_upgrade & spinner
 
 ## Prompt for Dragonchain node name
 prompt_node_name
