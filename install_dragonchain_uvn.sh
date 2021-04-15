@@ -78,7 +78,7 @@ prompt_node_name() {
 ##########################################################################
 ## Function preflight_check
 preflight_check() {
-    progress-bar
+    progress-bar 100
     # Check for existance of necessary commands
     for CMD in $REQUIRED_COMMANDS; do
         if ! cmd_exists "$CMD"; then
