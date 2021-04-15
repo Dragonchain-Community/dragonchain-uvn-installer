@@ -339,8 +339,8 @@ bootstrap_environment() {
 
         printf "\nDefault firewall rules already configured. Continuing..."
 
-    fi    
-    
+    fi
+
     # Wait for system to stabilize and avoid race conditions
 
     sleep 10 & spinner
