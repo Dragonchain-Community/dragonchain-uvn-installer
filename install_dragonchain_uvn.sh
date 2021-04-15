@@ -655,7 +655,7 @@ offer_apt_upgrade() {
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to upgrade
 
-            printf "\nUgrading..."
+            printf "\nUpgrading..."
 
 			sudo apt-get upgrade -y >>$LOG_FILE 2>&1 & spinner
 			errchk $? "sudo apt-get upgrade -y >> /dev/null"
@@ -676,7 +676,7 @@ offer_apt_upgrade() {
              fi
 
             echo
-            
+
 			# Reboot required?
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
 
@@ -741,8 +741,13 @@ offer_microk8s_channel_latest() {
 
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to snap to specified channel
-			sudo snap refresh microk8s --channel=1.20/stable 2>/dev/null
+
+            printf "\nUpgrading..."
+
+			sudo snap refresh microk8s --channel=1.20/stable >>$LOG_FILE & spinner
 			errchk $? "sudo snap refresh microk8s --channel=1.20/stable"
+
+            echo
 
 			# Reboot required?
 			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
