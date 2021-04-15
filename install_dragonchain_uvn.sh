@@ -359,21 +359,21 @@ initialize_microk8s() {
 
     if [ $MICROK8S_INITIALIZED -lt 2 ]; then
 
-        printf "\nInitializing microk8s..." & spinner
+        printf "\nInitializing microk8s..."
 
         # Enable Microk8s modules
         # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
-        sudo microk8s.enable dns storage helm3 >>$LOG_FILE 2>&1
+        sudo microk8s.enable dns storage helm3 >>$LOG_FILE 2>&1 & spinner
 
         # Alias helm3
-        sudo snap alias microk8s.helm3 helm >>$LOG_FILE 2>&1
+        sudo snap alias microk8s.helm3 helm >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo snap alias microk8s.helm3 helm >> $LOG_FILE 2>&1"
 
         # Wait for system to stabilize and avoid race conditions
         sleep 10
 
         # Install more Microk8s modules
-        sudo microk8s.enable registry >>$LOG_FILE 2>&1
+        sudo microk8s.enable registry >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo microk8s.enable registry >> $LOG_FILE 2>&1"
 
         echo
