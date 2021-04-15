@@ -62,10 +62,10 @@ spinner() {
 ##########################################################################
 ## Function prompt_node_name
 prompt_node_name() {
-    echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
-    echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
+    echo -e "\n\e[94mEnter a Dragonchain UVN name:\e[0m"
+    echo -e "\e[2mThe name must be unique if you intend to run multiple UVNs\e[0m"
     echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
-    echo -e "\e[2mTo upgrade, repair or delete a specific installation, type the node name of that installation\e[0m"
+    echo -e "\e[2mTo upgrade, repair or delete a specific installation, type the UVN name of that installation\e[0m"
 
     read -e DRAGONCHAIN_INSTALLER_DIR
 
@@ -197,7 +197,7 @@ request_user_defined_values() {
             echo -e "\e[91mInvalid endpoint URL entered!\e[0m"
         fi
 
-        echo -e "\e[94mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
+        echo -e "\e[94mEnter the endpoint URL for your Dragonchain UVN WITHOUT the port:\e[0m"
         echo -e "\e[93mStart with http:// (or https:// if you know you've configured SSL)\e[0m"
         echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
         echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
@@ -211,7 +211,7 @@ request_user_defined_values() {
             echo -e "\e[91mInvalid port number entered!\e[0m"
         fi
 
-        echo -e "\e[94mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
+        echo -e "\e[94mEnter the endpoint PORT for your Dragonchain UVN (must be between 30000 and 32767):\e[0m"
         read DRAGONCHAIN_UVN_NODE_PORT
         DRAGONCHAIN_UVN_NODE_PORT=$(echo $DRAGONCHAIN_UVN_NODE_PORT | tr -d '\r')
         echo
@@ -219,10 +219,10 @@ request_user_defined_values() {
 
     while [[ ! "$DRAGONCHAIN_UVN_NODE_LEVEL" =~ ^[0-9]+$ ]] || ((DRAGONCHAIN_UVN_NODE_LEVEL < 2 || DRAGONCHAIN_UVN_NODE_LEVEL > 4)); do
         if [[ ! -z "$DRAGONCHAIN_UVN_NODE_LEVEL" ]]; then
-            echo -e "\e[91mInvalid node level entered!\e[0m"
+            echo -e "\e[91mInvalid UVN level entered!\e[0m"
         fi
 
-        echo -e "\e[94mEnter the node level for your Dragonchain node (must be between 2 and 4):\e[0m"
+        echo -e "\e[94mEnter the node level for your Dragonchain UVN (must be between 2 and 4):\e[0m"
         read DRAGONCHAIN_UVN_NODE_LEVEL
         DRAGONCHAIN_UVN_NODE_LEVEL=$(echo $DRAGONCHAIN_UVN_NODE_LEVEL | tr -d '\r')
     done
@@ -392,13 +392,13 @@ check_existing_install() {
     NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c -E "(^|\s)$DRAGONCHAIN_INSTALLER_DIR(\s|$)")
 
     if [ $NAMESPACE_EXISTS -ge 1 ]; then
-        echo -e "\n\e[93mA previous installation of Dragonchain node '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
+        echo -e "\n\e[93mA previous installation of Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
 
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\e[2mIf you would like to upgrade node '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
-            echo -e "\e[2mIf you would like to delete a failed or incorrect installation for node '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
-            echo -e "\e[91m(If you delete, all configuration for '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running nodes will be unaffected)\e[0m"
+            echo -e "\e[2mIf you would like to upgrade Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
+            echo -e "\e[2mIf you would like to delete a failed or incorrect installation for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
+            echo -e "\e[91m(If you delete, all configuration for '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running Dragonchain UVNs will be unaffected)\e[0m"
             read ANSWER
             echo
         done
@@ -416,10 +416,10 @@ check_existing_install() {
             sleep 5 & spinner
 
             printf "\n\nDeleting firewall configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
-            sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp & spinner
+            sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >/dev/null 2>&1 & spinner
 
             echo -e "\n\n\e[93mConfiguration data for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been removed.\e[0m"
-            echo -e "\e[93mPlease rerun the installer to reconfigure this node.\e[0m"
+            echo -e "\e[93mPlease rerun the installer to reconfigure this Dragonchain UVN.\e[0m"
 
             exit 0
 
@@ -478,7 +478,7 @@ install_dragonchain() {
         #
         # Set CPU limits
 
-        printf "\nInstalling UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR' for Raspberry Pi...\n"
+        printf "\nInstalling Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' for Raspberry Pi...\n"
 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
@@ -585,9 +585,9 @@ check_matchmaking_status() {
         echo "ID: $HMAC_ID"
         echo "Key: $HMAC_KEY"
 
-        echo -e "\e[92mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
-        echo -e "\e[2mTo watch the status of this node, type 'sudo watch kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR'\e[0m"
-        echo -e "\e[2mTo watch the status of all nodes, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
+        echo -e "\e[92mYOUR DRAGONCHAIN UVN '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+        echo -e "\e[2mTo watch the status of this UVN, type 'sudo watch kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR'\e[0m"
+        echo -e "\e[2mTo watch the status of all UVNs, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
 
         #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
         #offer_apt_upgrade
@@ -596,7 +596,7 @@ check_matchmaking_status() {
 
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-            echo -e "\n\e[93mWould you like to install another Dragonchain node? [yes or no]\e[0m"
+            echo -e "\n\e[93mWould you like to install another Dragonchain UVN? [yes or no]\e[0m"
             read ANSWER
             echo
         done
@@ -634,7 +634,7 @@ check_matchmaking_status() {
 
     else
         #Boo!
-        echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo -e "\e[31mYOUR DRAGONCHAIN UVN '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
     fi
 }
@@ -687,7 +687,7 @@ offer_apt_upgrade() {
 
 			if [ $REBOOT -ge 1 ]; then
 			echo -e "\n\e[93mThe operating system needs to restart to complete the update.\e[0m"
-            echo -e "\e[2mIf you have nodes already configured, fear not, they will automatically restart when we return!\e[0m"
+            echo -e "\e[2mIf you have Dragonchain UVNs already configured, fear not, they will automatically restart when we return!\e[0m"
 
 			local ANSWER=""
 			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
@@ -737,7 +737,7 @@ offer_microk8s_channel_latest() {
 
         echo -e "\e[93mYou are running on an older microk8s snap channel.\e[0m"
         echo -e "\e[2mUpgrading to the latest channel is not required, however this\e[0m"
-        echo -e "\e[2mmay be necessary in future if your nodes become unhealthy.\e[0m"
+        echo -e "\e[2mmay be necessary in future if your Dragonchain UVNs become unhealthy.\e[0m"
 		echo -e "\n\e[93mPlease note that upgrading to the latest channel will \n\e[91mSTOP YOUR NODES FROM RUNNING\e[0m \n\e[93mtemporarily whilst the latest channel is installed.\e[0m"
 		local ANSWER=""
 		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
@@ -761,7 +761,7 @@ offer_microk8s_channel_latest() {
 
 			if [ $REBOOT -ge 1 ]; then
 			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
-            echo -e "\e[2mIf you have nodes already configured, fear not, they will automatically restart when we return!\e[0m"
+            echo -e "\e[2mIf you have Dragonchain UVNs already configured, fear not, they will automatically restart when we return!\e[0m"
 
 			local ANSWER=""
 			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
@@ -802,11 +802,11 @@ check_matchmaking_status_upgrade() {
 
     if [ $SUCCESS_CHECK -eq 1 ]; then
         #SUCCESS!
-        echo -e "\e[92mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+        echo -e "\e[92mYOUR DRAGONCHAIN UVN '$DRAGONCHAIN_INSTALLER_DIR' IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
 
     else
         #Boo!
-        echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo -e "\e[31mYOUR DRAGONCHAIN UVN '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
     fi
 }
@@ -830,20 +830,20 @@ offer_nodes_upgrade() {
     if [ $DC_PODS_EXIST -ge 1 ]; then
         local ANSWER=""
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
-            echo -e "\e[2mIf you would like to install a new node (including upgrading, repairing or deleting specific nodes), press \e[93m[i]\e[0m"
-            echo -e "\e[2mIf you would like to upgrade ALL detected nodes to the latest version, press \e[93m[u]\e[0m"
+            echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected.\e[0m"
+            echo -e "\e[2mIf you would like to install a new UVN (including upgrading, repairing or deleting specific nodes), press \e[93m[i]\e[0m"
+            echo -e "\e[2mIf you would like to upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
             read ANSWER
             echo
         done
 
         if [[ "$ANSWER" == "u" || "$ANSWER" == "upgrade" ]]; then
-            echo -e "Upgrading all existing nodes..."
+            echo -e "Upgrading all existing Dragonchain UVNs..."
 
             while read -r DRAGONCHAIN_UVN_NODE_NAME DRAGONCHAIN_INSTALLER_DIR; do
                 . $DRAGONCHAIN_INSTALLER_DIR/.config
 
-                echo -e "\n\e[93mUpgrading node:\e[0m"
+                echo -e "\n\e[93mUpgrading Dragonchain UVN:\e[0m"
                 echo "Namespace = $DRAGONCHAIN_INSTALLER_DIR"
                 echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
                 echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
@@ -874,7 +874,7 @@ offer_nodes_upgrade() {
 ## Main()
 
 #welcome!!
-echo -e "\n\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
+echo -e "\n\n\e[94mWelcome to the Dragonchain Unmanaged Verification Node (UVN) Community Installer!\e[0m"
 
 #patch system current
 printf "\nUpdating (patching) host OS current...\n"
@@ -885,7 +885,7 @@ printf "Installing required software and setting Dragonchain UVN configuration..
 bootstrap_environment
 
 ## Offer to upgrade all nodes
-printf "\nChecking for Pre-existing Dragonchain nodes to upgrade...\n"
+printf "\nChecking for Pre-existing Dragonchain UVNs to upgrade...\n"
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
