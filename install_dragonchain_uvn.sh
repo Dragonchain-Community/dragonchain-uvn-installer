@@ -370,7 +370,7 @@ initialize_microk8s() {
         errchk $? "sudo snap alias microk8s.helm3 helm >> $LOG_FILE 2>&1"
 
         # Wait for system to stabilize and avoid race conditions
-        sleep 10
+        sleep 10 & spinner
 
         # Install more Microk8s modules
         sudo microk8s.enable registry >>$LOG_FILE 2>&1 & spinner
@@ -874,7 +874,7 @@ printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
 
 #install necessary software, set tunables
-printf "\nInstalling required software and setting Dragonchain UVN configuration..."
+printf "Installing required software and setting Dragonchain UVN configuration..."
 bootstrap_environment
 
 ## Offer to upgrade all nodes
