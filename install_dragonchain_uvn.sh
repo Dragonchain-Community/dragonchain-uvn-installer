@@ -296,48 +296,50 @@ bootstrap_environment() {
 
     if [ $FIREWALL_RULES -lt 8 ]; then
 
-        printf "\nConfiguring default firewall rules..." & spinner
+        printf "\nConfiguring default firewall rules..."
 
-        sleep 20
-        sudo ufw --force enable >>$LOG_FILE 2>&1
+        sleep 20 & spinner
+        sudo ufw --force enable >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
-        sleep 10
+        sleep 10 & spinner
 
-        sleep 2
-        sudo ufw logging off >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw logging off >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
-        sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw allow 22/tcp >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
-        sudo ufw default allow routed >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw default allow routed >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
-        sleep 15
+        sleep 15 & spinner
 
-        sleep 2
-        sudo ufw default allow outgoing >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw default allow outgoing >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
-        sleep 15
+        sleep 15 & spinner
 
-        sleep 2
-        sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
-        sudo ufw logging on >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw logging on >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
         sleep 5
 
     else
 
-        printf "\nDefault firewall rules already configured. Continuing...\n"
+        printf "\nDefault firewall rules already configured. Continuing..."
 
     fi
+    
+    echo
 
     # Wait for system to stabilize and avoid race conditions
 
