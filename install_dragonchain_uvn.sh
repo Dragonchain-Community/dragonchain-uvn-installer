@@ -331,7 +331,7 @@ bootstrap_environment() {
         sleep 2 & spinner
         sudo ufw logging on >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
     else
 
