@@ -301,37 +301,37 @@ bootstrap_environment() {
         printf "\nConfiguring default firewall rules...\n"
 
         sleep 20
-        sudo ufw --force enable >>$LOG_FILE 2>&1
+        sudo ufw --force enable >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
         sleep 10
 
         sleep 2
-        sudo ufw logging off >>$LOG_FILE 2>&1
+        sudo ufw logging off >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
         sleep 5
 
         sleep 2
-        sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
+        sudo ufw allow 22/tcp >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
         sleep 5
 
         sleep 2
-        sudo ufw default allow routed >>$LOG_FILE 2>&1
+        sudo ufw default allow routed >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
         sleep 15
 
         sleep 2
-        sudo ufw default allow outgoing >>$LOG_FILE 2>&1
+        sudo ufw default allow outgoing >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
         sleep 15
 
         sleep 2
-        sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
+        sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
         sleep 5
 
         sleep 2
-        sudo ufw logging on >>$LOG_FILE 2>&1
+        sudo ufw logging on >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
         sleep 5
 
@@ -735,7 +735,7 @@ offer_microk8s_channel_latest() {
 
 		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
 			# User wants to snap to specified channel
-			sudo snap refresh microk8s --channel=1.20/stable
+			sudo snap refresh microk8s --channel=1.20/stable 2>/dev/null & spinner
 			errchk $? "sudo snap refresh microk8s --channel=1.20/stable"
 
 			# Reboot required?
