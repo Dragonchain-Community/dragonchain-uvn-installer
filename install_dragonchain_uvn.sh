@@ -780,6 +780,8 @@ offer_microk8s_channel_latest() {
 
 		printf "\nUpdates complete, no reboot required. Continuing...\n"
 
+        echo
+
 		fi
 
     fi
