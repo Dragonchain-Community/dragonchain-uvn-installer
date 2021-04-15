@@ -398,7 +398,7 @@ check_existing_install() {
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
             echo -e "\e[2mIf you would like to upgrade Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
             echo -e "\e[2mIf you would like to delete a failed or incorrect installation for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
-            echo -e "\e[91m(If you delete, all configuration for '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running Dragonchain UVNs will be unaffected)\e[0m"
+            echo -e "\e[91m(If you delete, all configuration for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running nodes will be unaffected)\e[0m"
             read ANSWER
             echo
         done
