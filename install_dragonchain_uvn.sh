@@ -410,15 +410,15 @@ check_existing_install() {
             sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >>$LOG_FILE 2>&1 & spinner
             errchk $? "sudo kubectl delete namespaces"
 
-            printf "\n\nDeleting saved configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
+            printf "\n\nDeleting saved configuration for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo rm $DRAGONCHAIN_INSTALLER_DIR -R >>$LOG_FILE 2>&1 & spinner
 
             sleep 5 & spinner
 
-            printf "\n\nDeleting firewall configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
+            printf "\n\nDeleting firewall configuration for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >/dev/null 2>&1 & spinner
 
-            echo -e "\n\n\e[93mConfiguration data for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been removed.\e[0m"
+            echo -e "\n\n\e[93mDragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been terminated and its configuration data has been deleted.\e[0m"
             echo -e "\e[93mPlease rerun the installer to reconfigure this Dragonchain UVN.\e[0m"
 
             exit 0
