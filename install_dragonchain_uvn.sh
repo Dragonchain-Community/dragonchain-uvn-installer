@@ -421,6 +421,7 @@ check_existing_install() {
             echo -e "\e[93mPlease rerun the installer to reconfigure this node.\e[0m"
 
             exit 0
+
         fi
 
         # User wants to attempt upgrade
@@ -435,6 +436,7 @@ check_existing_install() {
         check_matchmaking_status_upgrade
 
         exit 0
+        
     fi
 
 }
