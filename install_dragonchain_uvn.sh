@@ -829,7 +829,7 @@ offer_nodes_upgrade() {
     if [ $DC_PODS_EXIST -ge 1 ]; then
         local ANSWER=""
         while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected.\e[0m"
+            echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected:\e[0m"
             echo -e "\e[2mIf you would like to install a new UVN (including upgrading, repairing or\ndeleting specific UVNs), press \e[93m[i]\e[0m"
             echo -e "\n\e[2mIf you would like to upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
             read ANSWER
