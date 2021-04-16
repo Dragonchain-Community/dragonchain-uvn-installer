@@ -418,7 +418,7 @@ check_existing_install() {
             printf "\n\nDeleting firewall configuration for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >/dev/null 2>&1 & spinner
 
-            echo -e "\n\n\e[93mDragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been terminated\nand its configuration data has been deleted.\e[0m"
+            echo -e "\n\n\e[93mDragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been terminated and its configuration\ndata has been deleted.\e[0m"
             echo -e "\e[2mPlease rerun the installer to reconfigure this UVN.\e[0m"
 
             exit 0
@@ -828,11 +828,11 @@ offer_nodes_upgrade() {
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
         local ANSWER=""
-        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" && "$ANSWER" != "f" && "$ANSWER" != "fire" ]]; do
+        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" && "$ANSWER" != "d" && "$ANSWER" != "dragon" ]]; do
             echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected:\e[0m"
             echo -e "\e[2mIf you would like to Install a new UVN (including upgrading, repairing or\ndeleting specific UVNs), press \e[93m[i]\e[0m"
             echo -e "\n\e[2mIf you would like to Upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
-            echo -e "\n\e[2m\e[91mIf you would like to reign Fire on all UVNs and scorch the earth, press \e[93m[f]\e[0m"
+            echo -e "\n\e[2m\e[91mIf you would like to reign Dragon fire on all UVNs and scorch the earth, press \e[93m[d]\e[0m"
             echo -e "\e[2mThis will terminate ALL your UVNs, delete ALL configurations and remove microk8s\e[0m"
             read ANSWER
             echo
@@ -870,7 +870,7 @@ offer_nodes_upgrade() {
 
         if [[ "$ANSWER" == "f" || "$ANSWER" == "fire" ]]; then
 
-                echo -e "\e[91mReigning fire upon ALL!!!\e[0m"
+                echo -e "\e[91mReigning Dragon fire upon ALL!!!\e[0m"
                 sleep 5
 
                 printf "\nRoasting all UVNs and microk8s..."
