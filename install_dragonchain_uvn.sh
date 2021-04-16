@@ -884,7 +884,7 @@ offer_nodes_upgrade() {
                 sudo rm -rf ./*/ & spinner
                 sleep 5 & spinner
 
-            echo -e "\n\n\e[93mAll Dragonchain UVNs and configurations have been deleted and microk8s is removed!\e[0m"
+            echo -e "\n\n\e[93mAll Dragonchain UVNs have been terminated.\nAll configurations have been deleted and microk8s has been removed.\e[0m"
             echo -e "\e[2mRerun the installer to start afresh.\e[0m"
 
             exit 0
