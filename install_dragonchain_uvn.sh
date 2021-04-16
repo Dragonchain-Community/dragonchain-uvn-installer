@@ -832,7 +832,7 @@ offer_nodes_upgrade() {
             echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected:\e[0m"
             echo -e "\e[2mIf you would like to Install a new UVN (including upgrading, repairing or\ndeleting specific UVNs), press \e[93m[i]\e[0m"
             echo -e "\n\e[2mIf you would like to Upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
-            echo -e "\n\e[2m\e[91mIf you would like to reign Dragon fire on all UVNs and scorch the earth, press \e[93m[d]\e[0m"
+            echo -e "\n\e[2m\e[91mIf you want to reign Dragonfire on all UVNs and scorch the earth, press \e[93m[d]\e[0m"
             echo -e "\e[2mThis will terminate ALL your UVNs, delete ALL configurations and remove microk8s\e[0m"
             read ANSWER
             echo
@@ -870,7 +870,7 @@ offer_nodes_upgrade() {
 
         if [[ "$ANSWER" == "f" || "$ANSWER" == "fire" ]]; then
 
-                echo -e "\e[91mReigning Dragon fire upon ALL!!!\e[0m"
+                echo -e "\e[91mReigning Dragonfire upon ALL!!!\e[0m"
                 sleep 5
 
                 printf "\nRoasting all UVNs and microk8s..."
