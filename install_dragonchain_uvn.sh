@@ -908,7 +908,7 @@ printf "Installing required software and setting Dragonchain UVN configuration..
 bootstrap_environment
 
 ## Offer to upgrade all nodes
-printf "\nChecking for Pre-existing Dragonchain UVNs to upgrade...\n"
+printf "\nChecking for Pre-existing Dragonchain UVNs...\n"
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
@@ -921,7 +921,7 @@ preflight_check
 set_config_values
 
 # check for previous installation (failed or successful) and offer reset if found
-printf "\nChecking for a previous Dragonchain UVN installation...\n"
+printf "\nChecking for a previous Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'...\n"
 check_existing_install
 
 # must gather node details from user or .config before generating chainsecrets
