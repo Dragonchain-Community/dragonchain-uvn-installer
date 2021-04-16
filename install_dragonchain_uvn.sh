@@ -870,15 +870,21 @@ offer_nodes_upgrade() {
 
         if [[ "$ANSWER" == "f" || "$ANSWER" == "fire" ]]; then
 
-            printf "\e[91mReigning fire upon ALL!!!"
+                echo -e "\e[91mReigning fire upon ALL!!!\e[0m"
+                sleep 5
 
+                printf "\n\nRoasting all UVNs and microk8s..."
                 sudo snap remove microk8s >>$LOG_FILE 2>&1 & spinner
 
+                printf "\n\nScorching all UVN firewall rules..."
                 sudo ufw status numbered | grep '3[0-9]*/tcp' | awk -F] '{print $1}' | sed 's/\[\s*//' | tac | xargs -n 1 bash -c 'yes|sudo ufw delete $0' >>$LOG_FILE 2>&1 & spinner
+                sleep 5 & spinner
 
+                printf "\n\nSetting saved UVN configurations aflame..."
                 sudo rm -rf ./*/ & spinner
+                sleep 5 & spinner
 
-            echo -e "\n\e[93mAll Dragonchain UVNs and configurations have been deleted and microk8s is removed.\e[0m"
+            echo -e "\n\e[93mAll Dragonchain UVNs and configurations have been deleted and microk8s is removed!\e[0m"
             echo -e "\e[2mRerun the installer to start afresh.\e[0m"            
 
             exit 0
