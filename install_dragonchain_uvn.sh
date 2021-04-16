@@ -418,8 +418,8 @@ check_existing_install() {
             printf "\n\nDeleting firewall configuration for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'..."
             sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >/dev/null 2>&1 & spinner
 
-            echo -e "\n\n\e[93mDragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been terminated and its configuration data has been deleted.\e[0m"
-            echo -e "\e[93mPlease rerun the installer to reconfigure this UVN.\e[0m"
+            echo -e "\n\n\e[93mDragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been terminated\nand its configuration data has been deleted.\e[0m"
+            echo -e "\e[2mPlease rerun the installer to reconfigure this UVN.\e[0m"
 
             exit 0
 
@@ -828,10 +828,12 @@ offer_nodes_upgrade() {
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
         local ANSWER=""
-        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
+        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" && "$ANSWER" != "f" && "$ANSWER" != "fire"]]; do
             echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected:\e[0m"
-            echo -e "\e[2mIf you would like to install a new UVN (including upgrading, repairing or\ndeleting specific UVNs), press \e[93m[i]\e[0m"
-            echo -e "\n\e[2mIf you would like to upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
+            echo -e "\e[2mIf you would like to Install a new UVN (including upgrading, repairing or\ndeleting specific UVNs), press \e[93m[i]\e[0m"
+            echo -e "\n\e[2mIf you would like to Upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
+            echo -e "\n\e[91mIf you would like to reign Fire on all UVNs and scorch the earth, press [f]\e[0m"
+            echo -e "\e[2mThis will lay waste to all your UVNs, delete configurations and remove microk8s\e[0m"
             read ANSWER
             echo
         done
@@ -866,6 +868,22 @@ offer_nodes_upgrade() {
 
         fi
 
+        if [[ "$ANSWER" == "f" || "$ANSWER" == "fire" ]]; then
+        
+            echo -e "\n\e[91mReigning fire upon ALL!!!"
+
+                sudo snap remove microk8s >>$LOG_FILE 2>&1 & spinner
+
+                sudo ufw status numbered | grep '3[0-9]*/tcp' | awk -F] '{print $1}' | sed 's/\[\s*//' | tac | xargs -n 1 bash -c 'yes|sudo ufw delete $0' >>$LOG_FILE 2>&1 & spinner
+
+                sudo rm -rf ./*/ & spinner
+
+            echo -e "\n\e[93mAll Dragonchain UVNs and configurations have been deleted and microk8s is removed.\e[0m"
+            echo -e "\e[2mRerun the installer to start afresh.\e[0m"            
+
+            exit 0
+
+        fi
     fi
 
 }
