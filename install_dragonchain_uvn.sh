@@ -812,7 +812,7 @@ check_matchmaking_status_upgrade() {
 }
 
 ##########################################################################
-## Function offer_nodes_upgrade
+## Function offer_nodes_upgrade - also new install or delete everything!
 offer_nodes_upgrade() {
 
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
@@ -832,7 +832,7 @@ offer_nodes_upgrade() {
             echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected:\e[0m"
             echo -e "\e[2mIf you would like to Install a new UVN (including upgrading, repairing or\ndeleting specific UVNs), press \e[93m[i]\e[0m"
             echo -e "\n\e[2mIf you would like to Upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
-            echo -e "\n\e[91mIf you would like to reign Fire on all UVNs and scorch the earth, press [f]\e[0m"
+            echo -e "\n\e[91mIf you would like to reign Fire on all UVNs and scorch the earth, press \e[93m[f]\e[0m"
             echo -e "\e[2mThis will lay waste to all your UVNs, delete configurations and remove microk8s\e[0m"
             read ANSWER
             echo
@@ -869,8 +869,8 @@ offer_nodes_upgrade() {
         fi
 
         if [[ "$ANSWER" == "f" || "$ANSWER" == "fire" ]]; then
-        
-            echo -e "\n\e[91mReigning fire upon ALL!!!"
+
+            printf "\e[91mReigning fire upon ALL!!!"
 
                 sudo snap remove microk8s >>$LOG_FILE 2>&1 & spinner
 
