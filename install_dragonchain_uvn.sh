@@ -870,7 +870,7 @@ offer_nodes_upgrade() {
 
         if [[ "$ANSWER" == "d" || "$ANSWER" == "dragon" ]]; then
 
-                echo -e "\e[91mReigning Dragonfire upon ALL!!!\e[0m"
+                echo -e "\e[91mReigning Dragonfire over ALL!!!\e[0m"
                 sleep 5
 
                 printf "\nRoasting all UVNs and microk8s..."
