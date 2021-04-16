@@ -833,7 +833,7 @@ offer_nodes_upgrade() {
             echo -e "\e[2mIf you would like to Install a new UVN (including upgrading, repairing or\ndeleting specific UVNs), press \e[93m[i]\e[0m"
             echo -e "\n\e[2mIf you would like to Upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
             echo -e "\n\e[2m\e[91mIf you would like to reign Fire on all UVNs and scorch the earth, press \e[93m[f]\e[0m"
-            echo -e "\e[2mThis will lay waste to all your UVNs, delete configurations and remove microk8s\e[0m"
+            echo -e "\e[2mThis will terminate ALL your UVNs, delete ALL configurations and remove microk8s\e[0m"
             read ANSWER
             echo
         done
