@@ -868,7 +868,7 @@ offer_nodes_upgrade() {
 
         fi
 
-        if [[ "$ANSWER" == "f" || "$ANSWER" == "fire" ]]; then
+        if [[ "$ANSWER" == "d" || "$ANSWER" == "dragon" ]]; then
 
                 echo -e "\e[91mReigning Dragonfire upon ALL!!!\e[0m"
                 sleep 5
