@@ -710,6 +710,8 @@ offer_apt_upgrade() {
 
 		    printf "\nUpdates complete, no reboot required. Continuing...\n"
 
+            echo
+
 		fi
 
     fi
