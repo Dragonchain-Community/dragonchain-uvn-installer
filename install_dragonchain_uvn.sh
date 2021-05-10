@@ -1,7 +1,7 @@
 #!/bin/bash
-
+``
 ## Assumptions
-## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing )
+## Run on Ubuntu 18.04 LTS from AWS (probably will work on others but may be missing)
 
 # Variables
 REQUIRED_COMMANDS="sudo ls grep chmod tee sed touch cd timeout ufw savelog wget curl"
@@ -44,12 +44,28 @@ trim() {
 }
 
 ##########################################################################
+## Progress spinner
+spinner() {
+    local pid=$!
+    local delay=0.25
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
+##########################################################################
 ## Function prompt_node_name
 prompt_node_name() {
-    echo -e "\n\e[94mEnter a Dragonchain node name:\e[0m"
-    echo -e "\e[2mThe name must be unique if you intend to run multiple nodes\e[0m"
+    echo -e "\n\e[94mEnter a Dragonchain UVN name:\e[0m"
+    echo -e "\e[2mThe name must be unique if you intend to run multiple UVNs\e[0m"
     echo -e "\e[2mThe name can contain numbers, lowercase characters and '-' ONLY\e[0m"
-    echo -e "\e[2mTo upgrade, repair or delete a specific installation, type the node name of that installation\e[0m"
+    echo -e "\e[2mTo upgrade, repair or delete a specific UVN, type the name of that installation\e[0m"
 
     read -e DRAGONCHAIN_INSTALLER_DIR
 
@@ -97,7 +113,6 @@ preflight_check() {
         printf "PASS: Sudo configuration in place\n" >>$LOG_FILE
     else
         printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n" >>$LOG_FILE
-        printf "\nERROR: Sudo configuration may not be ideal for this setup. Exiting.\n"
         exit 1
     fi
 
@@ -119,7 +134,7 @@ function set_config_values() {
         # Execute config file
         . $DRAGONCHAIN_INSTALLER_DIR/.config
 
-        echo -e "\n\e[93mSaved configuration values found:\e[0m"
+        echo -e "\n\e[93mSaved Dragonchain UVN configuration values found:\e[0m"
         echo "Namespace = $DRAGONCHAIN_INSTALLER_DIR"
         echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
         echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
@@ -133,7 +148,7 @@ function set_config_values() {
         #duck Maybe just add a flag to bypass this for automated installation?
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-            echo -e "\e[93mUse saved configuration? [yes or no]\e[0m"
+            echo -e "\e[93mUse saved UVN configuration? [yes or no]\e[0m"
             read ANSWER
             echo
         done
@@ -182,7 +197,7 @@ request_user_defined_values() {
             echo -e "\e[91mInvalid endpoint URL entered!\e[0m"
         fi
 
-        echo -e "\e[94mEnter the endpoint URL for your Dragonchain node WITHOUT the port:\e[0m"
+        echo -e "\e[94mEnter the endpoint URL for your Dragonchain UVN WITHOUT the port:\e[0m"
         echo -e "\e[93mStart with http:// (or https:// if you know you've configured SSL)\e[0m"
         echo -e "\e[2mExample with domain name: http://yourdomainname.com\e[0m"
         echo -e "\e[2mExample with IP address: http://12.34.56.78\e[0m"
@@ -196,7 +211,7 @@ request_user_defined_values() {
             echo -e "\e[91mInvalid port number entered!\e[0m"
         fi
 
-        echo -e "\e[94mEnter the endpoint PORT for your Dragonchain node (must be between 30000 and 32767):\e[0m"
+        echo -e "\e[94mEnter the endpoint PORT for your Dragonchain UVN (must be between 30000-32767):\e[0m"
         read DRAGONCHAIN_UVN_NODE_PORT
         DRAGONCHAIN_UVN_NODE_PORT=$(echo $DRAGONCHAIN_UVN_NODE_PORT | tr -d '\r')
         echo
@@ -207,7 +222,7 @@ request_user_defined_values() {
             echo -e "\e[91mInvalid node level entered!\e[0m"
         fi
 
-        echo -e "\e[94mEnter the node level for your Dragonchain node (must be between 2 and 4):\e[0m"
+        echo -e "\e[94mEnter the node level for your Dragonchain UVN (must be 2, 3 or 4):\e[0m"
         read DRAGONCHAIN_UVN_NODE_LEVEL
         DRAGONCHAIN_UVN_NODE_LEVEL=$(echo $DRAGONCHAIN_UVN_NODE_LEVEL | tr -d '\r')
     done
@@ -241,8 +256,10 @@ patch_server_current() {
     sudo apt-get update >>$LOG_FILE 2>&1
     errchk $? "sudo apt-get update >> $LOG_FILE 2>&1"
 
-    #    sudo apt-get upgrade -y >> $LOG_FILE 2>&1
-    #    errchk $? "sudo apt-get upgrade -y >> $LOG_FILE 2>&1"
+	offer_apt_upgrade
+
+    offer_microk8s_channel_latest
+
 }
 
 ##########################################################################
@@ -255,76 +272,80 @@ bootstrap_environment() {
     #duck note: might want to check the .conf file for this line to already exist before adding again
 
     echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf >/dev/null
-    sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1
+    sudo sysctl -w vm.max_map_count=262144 >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo sysctl -w vm.max_map_count=262144 >> $LOG_FILE 2>&1"
 
     # Install jq, openssl, xxd
-    sudo apt-get install -y ufw curl jq openssl xxd snapd >>$LOG_FILE 2>&1
+    sudo apt-get install -y ufw curl jq openssl xxd snapd >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo apt-get install -y ufw curl jq openssl xxd snapd >> $LOG_FILE 2>&1"
 
     # Install microk8s classic via snap package
     # TODO - Revert to stable when refresh-certs is merged
-    sudo snap install microk8s --channel=1.18/stable --classic >>$LOG_FILE 2>&1
-    errchk $? "sudo snap install microk8s --channel=1.18/stable --classic >> $LOG_FILE 2>&1"
+    sudo snap install microk8s --classic --channel=1.20/stable >>$LOG_FILE 2>&1 & spinner
+    errchk $? "sudo snap install microk8s --classic --channel=1.20/stable >> $LOG_FILE 2>&1"
 
     # Because we have microk8s, we need to alias kubectl
-    sudo snap alias microk8s.kubectl kubectl >>$LOG_FILE 2>&1
+    sudo snap alias microk8s.kubectl kubectl >>$LOG_FILE 2>&1 & spinner
     errchk $? "sudo snap alias microk8s.kubectl kubectl >> $LOG_FILE 2>&1"
 
     # Setup firewall rules
     # This should be reviewed - confident we can restrict this further
     #duck To stop ufw set errors 'Could not load logging rules', disable then enable logging once set
 
+    echo
+
     FIREWALL_RULES=$(sudo ufw status verbose | grep -c -Fwf <(printf "%s\n" active 'allow (routed)' 22 cni0))
 
     if [ $FIREWALL_RULES -lt 8 ]; then
 
-        printf "\nConfiguring default firewall rules...\n"
+        printf "\nConfiguring default firewall rules..."
 
-        sleep 20
-        sudo ufw --force enable >>$LOG_FILE 2>&1
+        sleep 20 & spinner
+        sudo ufw --force enable >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw --force enable >> $LOG_FILE 2>&1"
-        sleep 10
+        sleep 10 & spinner
 
-        sleep 2
-        sudo ufw logging off >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw logging off >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging off >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
-        sudo ufw allow 22/tcp >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw allow 22/tcp >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw allow 22/tcp >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
-        sudo ufw default allow routed >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw default allow routed >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw default allow routed >> $LOG_FILE 2>&1"
-        sleep 15
+        sleep 15 & spinner
 
-        sleep 2
-        sudo ufw default allow outgoing >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw default allow outgoing >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw default allow outgoing >> $LOG_FILE 2>&1"
-        sleep 15
+        sleep 15 & spinner
 
-        sleep 2
-        sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw allow in on cni0 >>$LOG_FILE 2>&1 && sudo ufw allow out on cni0 >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw allow in on cni0 && sudo ufw allow out on cni0 >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
-        sleep 2
-        sudo ufw logging on >>$LOG_FILE 2>&1
+        sleep 2 & spinner
+        sudo ufw logging on >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo ufw logging on >> $LOG_FILE 2>&1"
-        sleep 5
+        sleep 5 & spinner
 
     else
 
-        printf "\nDefault firewall rules already configured. Continuing...\n"
+        printf "\nDefault firewall rules already configured. Continuing..."
 
     fi
 
     # Wait for system to stabilize and avoid race conditions
 
-    sleep 10
+    sleep 10 & spinner
+
+    echo
 
     initialize_microk8s
 
@@ -338,22 +359,24 @@ initialize_microk8s() {
 
     if [ $MICROK8S_INITIALIZED -lt 2 ]; then
 
-        printf "\nInitializing microk8s...\n"
+        printf "\nInitializing microk8s..."
 
         # Enable Microk8s modules
         # unable to errchk this command because microk8s.enable helm command will RC=2 b/c nothing for helm to do
-        sudo microk8s.enable dns storage helm3 >>$LOG_FILE 2>&1
+        sudo microk8s.enable dns storage helm3 >>$LOG_FILE 2>&1 & spinner
 
         # Alias helm3
-        sudo snap alias microk8s.helm3 helm >>$LOG_FILE 2>&1
+        sudo snap alias microk8s.helm3 helm >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo snap alias microk8s.helm3 helm >> $LOG_FILE 2>&1"
 
         # Wait for system to stabilize and avoid race conditions
-        sleep 10
+        sleep 10 & spinner
 
         # Install more Microk8s modules
-        sudo microk8s.enable registry >>$LOG_FILE 2>&1
+        sudo microk8s.enable registry >>$LOG_FILE 2>&1 & spinner
         errchk $? "sudo microk8s.enable registry >> $LOG_FILE 2>&1"
+
+        echo
 
     else
 
@@ -369,39 +392,41 @@ check_existing_install() {
     NAMESPACE_EXISTS=$(sudo kubectl get namespaces | grep -c -E "(^|\s)$DRAGONCHAIN_INSTALLER_DIR(\s|$)")
 
     if [ $NAMESPACE_EXISTS -ge 1 ]; then
-        echo -e "\n\e[93mA previous installation of Dragonchain node '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found.\e[0m"
+        echo -e "\n\e[93mAn install of Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' (failed or complete) was found:\e[0m"
 
         local ANSWER=""
         while [[ "$ANSWER" != "d" && "$ANSWER" != "delete" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\e[2mIf you would like to upgrade node '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
-            echo -e "\e[2mIf you would like to delete a failed or incorrect installation for node '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
-            echo -e "\e[91m(If you delete, all configuration for '$DRAGONCHAIN_INSTALLER_DIR' will be removed. Other running nodes will be unaffected)\e[0m"
+            echo -e "\e[2mIf you would like to Upgrade UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[u]\e[0m"
+            echo -e "\n\e[2mIf you would like to Delete a failed UVN '$DRAGONCHAIN_INSTALLER_DIR', press \e[93m[d]\e[0m"
+            echo -e "\e[2m\e[91mIf you delete, UVN '$DRAGONCHAIN_INSTALLER_DIR' will be removed and its configuration deleted.\nThis action will NOT affect any other running UVNs.\e[0m"
             read ANSWER
             echo
         done
 
         if [[ "$ANSWER" == "d" || "$ANSWER" == "delete" ]]; then
+
             # User wants to delete namespace
-            echo -e "Deleting node '$DRAGONCHAIN_INSTALLER_DIR' (may take several minutes)..."
-            sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >>$LOG_FILE 2>&1
+            printf "Deleting Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'..."
+            sudo kubectl delete namespaces $DRAGONCHAIN_INSTALLER_DIR >>$LOG_FILE 2>&1 & spinner
             errchk $? "sudo kubectl delete namespaces"
 
-            echo -e "\nDeleting saved configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
-            sudo rm $DRAGONCHAIN_INSTALLER_DIR -R
+            printf "\n\nDeleting saved configuration for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'..."
+            sudo rm $DRAGONCHAIN_INSTALLER_DIR -R >>$LOG_FILE 2>&1 & spinner
 
-            sleep 5
+            sleep 5 & spinner
 
-            echo -e "\nDeleting firewall configuration for '$DRAGONCHAIN_INSTALLER_DIR'..."
-            sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp
+            printf "\n\nDeleting firewall configuration for Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'..."
+            sudo sudo ufw delete allow $DRAGONCHAIN_UVN_NODE_PORT/tcp >/dev/null 2>&1 & spinner
 
-            echo -e "\n\e[93mConfiguration data for '$DRAGONCHAIN_INSTALLER_DIR' has been deleted and the node has been removed.\e[0m"
-            echo -e "\e[93mPlease rerun the installer to reconfigure this node.\e[0m"
+            echo -e "\n\n\e[93mDragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' has been terminated and its configuration\ndata has been deleted.\e[0m"
+            echo -e "\e[2mPlease rerun the installer to reconfigure this UVN.\e[0m"
 
             exit 0
+
         fi
 
         # User wants to attempt upgrade
-        printf "\nUpgrading UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR'...\n"
+        printf "\nUpgrading Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'...\n"
 
         install_dragonchain
 
@@ -412,6 +437,7 @@ check_existing_install() {
         check_matchmaking_status_upgrade
 
         exit 0
+
     fi
 
 }
@@ -443,7 +469,7 @@ install_dragonchain() {
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
 
-    RASPBERRY_PI=$(sudo lshw | grep -c "Raspberry")
+    RASPBERRY_PI=$(sudo lshw 2>/dev/null | grep -c "Raspberry")
 
     if [ $RASPBERRY_PI -eq 1 ]; then
 
@@ -452,7 +478,7 @@ install_dragonchain() {
         #
         # Set CPU limits
 
-        printf "\nInstalling UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR' for Raspberry Pi...\n"
+        printf "\nInstalling Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR' for Raspberry Pi...\n"
 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
@@ -474,7 +500,7 @@ install_dragonchain() {
         # Deploy Helm Chart
         #
 
-        printf "\nInstalling UVN Dragonchain '$DRAGONCHAIN_INSTALLER_DIR'...\n"
+        printf "\nInstalling Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'...\n"
 
         sudo helm upgrade --install $DRAGONCHAIN_UVN_NODE_NAME --namespace $DRAGONCHAIN_INSTALLER_DIR dragonchain/dragonchain-k8s \
         --set global.environment.DRAGONCHAIN_NAME="$DRAGONCHAIN_UVN_NODE_NAME" \
@@ -559,9 +585,9 @@ check_matchmaking_status() {
         echo "ID: $HMAC_ID"
         echo "Key: $HMAC_KEY"
 
-        echo -e "\e[92mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
-        echo -e "\e[2mTo watch the status of this node, type 'sudo watch kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR'\e[0m"
-        echo -e "\e[2mTo watch the status of all nodes, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
+        echo -e "\e[92mYOUR DRAGONCHAIN UVN '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
+        echo -e "\e[2mTo watch the status of this UVN, type 'sudo watch kubectl get pods -n $DRAGONCHAIN_INSTALLER_DIR'\e[0m"
+        echo -e "\e[2mTo watch all UVNs, type 'sudo watch kubectl get pods --all-namespaces'\e[0m"
 
         #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
         #offer_apt_upgrade
@@ -570,7 +596,7 @@ check_matchmaking_status() {
 
         local ANSWER=""
         while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-            echo -e "\n\e[93mWould you like to install another Dragonchain node? [yes or no]\e[0m"
+            echo -e "\n\e[93mWould you like to install another Dragonchain UVN? [yes or no]\e[0m"
             read ANSWER
             echo
         done
@@ -587,7 +613,7 @@ check_matchmaking_status() {
             set_config_values
 
             # check for previous installation (failed or successful) and offer reset if found
-            printf "\nChecking for previous installation...\n"
+            printf "\nChecking for previous Dragonchain UVN installation...\n"
             check_existing_install
 
             # must gather node details from user or .config before generating chainsecrets
@@ -608,27 +634,165 @@ check_matchmaking_status() {
 
     else
         #Boo!
-        echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo -e "\e[31mYOUR DRAGONCHAIN UVN '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
     fi
 }
 
+##########################################################################
+## Function offer_apt_upgrade
 offer_apt_upgrade() {
 
-    echo -e "\e[93mIt is HIGHLY recommended that you run 'sudo apt-get upgrade -y' at this time to update your operating system.\e[0m"
+	UPGRADABLE=$(sudo apt list --upgradable 2>/dev/null | grep -c -e base-files -e core -e lib -e security -e python)
 
-    local ANSWER=""
-    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-        echo -e "Run the upgrade command now? [yes or no]"
-        read ANSWER
-        echo
-    done
+    if [ $UPGRADABLE -ge 1 ]; then
 
-    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
-        # User wants fresh values
-        sudo apt-get upgrade -y
-        errchk $? "sudo apt-get upgrade -y"
+		echo -e "\n\e[93mThere are important updates available for this operating system.\e[0m"
+        echo -e "\e[2mIt is HIGHLY recommended that you install now to keep things running smoothly.\e[0m"
+
+		local ANSWER=""
+		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+			echo -e "\n\e[93mWould you like to update now? [yes or no]\e[0m"
+			read ANSWER
+			echo
+		done
+
+		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+			# User wants to upgrade
+
+            printf "Updating operating system..."
+
+			sudo apt-get upgrade -y >>$LOG_FILE 2>&1 & spinner
+			errchk $? "sudo apt-get upgrade -y >> /dev/null"
+
+            MANUALAPT=$(sudo apt list --upgradable 2>/dev/null | grep -c -e base-files -e security)
+
+            if [ "$MANUALAPT" -ge 1 ]; then
+
+			    sudo apt-get install -y base-files >>$LOG_FILE 2>&1 & spinner
+			    errchk $? "sudo apt-get install -y base-files"
+
+			    sudo apt-get install -y linux-generic >>$LOG_FILE 2>&1 & spinner
+			    errchk $? "sudo apt-get install -y linux-generic"
+
+			    sudo apt-get install -y sosreport >>$LOG_FILE 2>&1 & spinner
+			    errchk $? "sudo apt-get install -y sosreport"
+
+             fi
+
+            echo
+
+			# Reboot required?
+			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
+
+			if [ $REBOOT -ge 1 ]; then
+			echo -e "\n\e[93mThe operating system needs to restart to complete the update.\e[0m"
+            echo -e "\e[2mIf you have Dragonchain UVNs already configured, fear not, they will automatically restart when we return!\e[0m"
+
+			local ANSWER=""
+			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+				echo -e "\n\e[93mReboot now? [yes or no]\e[0m"
+				read ANSWER
+				echo
+				done
+
+				if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+
+                # User wants to reboot
+				echo -e "OK, going down for a reboot now..."
+				sudo reboot
+				errchk $? "sudo reboot"
+				sleep 5
+
+			fi
+
+		    else
+
+		    printf "\nUpdates complete, no reboot required. Continuing...\n"
+
+            echo
+
+		fi
+
     fi
+
+	else
+
+	printf "\nOperating system up-to-date. Continuing...\n"
+
+    echo
+
+	fi
+
+}
+
+
+##########################################################################
+## Function offer_microk8s_channel_latest
+##
+## This installer will by default snap to the the specified channel, but we need to offer it to folks in the wild snapped to older versions
+offer_microk8s_channel_latest() {
+
+    MICROK8S_VERSION=$(sudo snap info microk8s | grep -c 'installed.*1.1')
+
+    if [ $MICROK8S_VERSION -eq 1 ]; then
+
+        echo -e "\e[93mYou are running on an older microk8s snap channel.\e[0m"
+        echo -e "\e[2mUpgrading to the latest channel is not required, however this\e[0m"
+        echo -e "\e[2mmay be necessary in future if your Dragonchain UVNs become unhealthy.\e[0m"
+		echo -e "\n\e[93mPlease note that upgrading to the latest channel will \n\e[91mSTOP YOUR UVNs FROM RUNNING\e[0m \n\e[93mtemporarily whilst the latest channel is installed.\e[0m"
+		local ANSWER=""
+		while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+			echo -e "\n\e[93mWould you like to upgrade now? [yes or no]\e[0m"
+			read ANSWER
+			echo
+		done
+
+		if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+			# User wants to snap to specified channel
+
+            printf "Updating microk8s..."
+
+			sudo snap refresh microk8s --channel=1.20/stable >>$LOG_FILE & spinner
+			errchk $? "sudo snap refresh microk8s --channel=1.20/stable"
+
+            echo
+
+			# Reboot required?
+			REBOOT=$(cat /var/run/reboot-required 2>/dev/null | grep -c required)
+
+			if [ $REBOOT -ge 1 ]; then
+			echo -e "\n\e[93mThe operating system needs to restart to complete the upgrade.\e[0m"
+            echo -e "\e[2mIf you have Dragonchain UVNs already configured, fear not, they will automatically restart when we return!\e[0m"
+
+			local ANSWER=""
+			while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
+				echo -e "\n\e[93mReboot now? [yes or no]\e[0m"
+				read ANSWER
+				echo
+				done
+
+				if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
+					# User wants to reboot
+					echo -e "OK, going down for a reboot now..."
+					sudo reboot
+					errchk $? "sudo reboot"
+					sleep 5
+
+			fi
+
+		else
+
+		printf "\nUpdates complete, no reboot required. Continuing...\n"
+
+        echo
+
+		fi
+
+    fi
+
+    fi
+
 }
 
 ##########################################################################
@@ -640,38 +804,17 @@ check_matchmaking_status_upgrade() {
 
     if [ $SUCCESS_CHECK -eq 1 ]; then
         #SUCCESS!
-        echo -e "\e[92mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
-
-        #duck Prevent offering upgrade until latest kubernetes/helm issues are resolved
-        #offer_apt_upgrade
+        echo -e "\e[92mYOUR DRAGONCHAIN UVN '$DRAGONCHAIN_INSTALLER_DIR' IS NOW UPGRADED AND REGISTERED WITH THE MATCHMAKING API! HAPPY NODING!\e[0m"
 
     else
         #Boo!
-        echo -e "\e[31mYOUR DRAGONCHAIN NODE '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
+        echo -e "\e[31mYOUR DRAGONCHAIN UVN '$DRAGONCHAIN_INSTALLER_DIR' IS ONLINE BUT THE MATCHMAKING API RETURNED AN ERROR. PLEASE SEE BELOW AND REQUEST HELP IN DRAGONCHAIN TELEGRAM\e[0m"
         echo "$MATCHMAKING_API_CHECK"
     fi
 }
 
-offer_apt_upgrade() {
-
-    echo -e "\e[93mIt is HIGHLY recommended that you run 'sudo apt-get upgrade -y' at this time to update your operating system.\e[0m"
-
-    local ANSWER=""
-    while [[ "$ANSWER" != "y" && "$ANSWER" != "yes" && "$ANSWER" != "n" && "$ANSWER" != "no" ]]; do
-        echo -e "Run the upgrade command now? [yes or no]"
-        read ANSWER
-        echo
-    done
-
-    if [[ "$ANSWER" == "y" || "$ANSWER" == "yes" ]]; then
-        # User wants fresh values
-        sudo apt-get upgrade -y
-        errchk $? "sudo apt-get upgrade -y"
-    fi
-}
-
 ##########################################################################
-## Function offer_nodes_upgrade
+## Function offer_nodes_upgrade - also new install or delete everything!
 offer_nodes_upgrade() {
 
     LOG_FILE=$DRAGONCHAIN_INSTALLER_DIR/dragonchain_uvn_installer.log
@@ -682,26 +825,28 @@ offer_nodes_upgrade() {
 
     sudo helm repo update >>$LOG_FILE 2>&1
     errchk $? "sudo helm repo update >> $LOG_FILE 2>&1"
-    
+
     DC_PODS_EXIST=$(sudo kubectl get pods --all-namespaces | grep -c "dc-")
 
     if [ $DC_PODS_EXIST -ge 1 ]; then
         local ANSWER=""
-        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" ]]; do
-            echo -e "\n\e[93mPre-existing Dragonchain nodes have been detected.\e[0m"
-            echo -e "\e[2mIf you would like to install a new node (including upgrading, repairing or deleting specific nodes), press \e[93m[i]\e[0m"
-            echo -e "\e[2mIf you would like to upgrade ALL detected nodes to the latest version, press \e[93m[u]\e[0m"
+        while [[ "$ANSWER" != "i" && "$ANSWER" != "install" && "$ANSWER" != "u" && "$ANSWER" != "upgrade" && "$ANSWER" != "d" && "$ANSWER" != "dragon" ]]; do
+            echo -e "\n\e[93mPre-existing Dragonchain UVNs have been detected:\e[0m"
+            echo -e "\e[2mIf you would like to Install a new UVN (including upgrading, repairing or\ndeleting specific UVNs), press \e[93m[i]\e[0m"
+            echo -e "\n\e[2mIf you would like to Upgrade ALL detected UVNs to the latest version, press \e[93m[u]\e[0m"
+            echo -e "\n\e[2m\e[91mIf you want to reign Dragonfire on all UVNs and scorch the earth, press \e[93m[d]\e[0m"
+            echo -e "\e[2mThis will terminate ALL your UVNs, delete ALL configurations and remove microk8s\e[0m"
             read ANSWER
             echo
         done
 
         if [[ "$ANSWER" == "u" || "$ANSWER" == "upgrade" ]]; then
-            echo -e "Upgrading all existing nodes..."
+            echo -e "Upgrading all existing Dragonchain UVNs..."
 
             while read -r DRAGONCHAIN_UVN_NODE_NAME DRAGONCHAIN_INSTALLER_DIR; do
                 . $DRAGONCHAIN_INSTALLER_DIR/.config
 
-                echo -e "\n\e[93mUpgrading node:\e[0m"
+                echo -e "\n\e[93mUpgrading Dragonchain UVN:\e[0m"
                 echo "Namespace = $DRAGONCHAIN_INSTALLER_DIR"
                 echo "Name = $DRAGONCHAIN_UVN_NODE_NAME"
                 echo "Chain ID = $DRAGONCHAIN_UVN_INTERNAL_ID"
@@ -725,23 +870,47 @@ offer_nodes_upgrade() {
 
         fi
 
+        if [[ "$ANSWER" == "d" || "$ANSWER" == "dragon" ]]; then
+
+                echo -e "\e[91mReigning Dragonfire over ALL!!!\e[0m"
+                sleep 5
+
+                printf "\nRoasting all UVNs and microk8s..."
+                sudo snap remove microk8s >>$LOG_FILE 2>&1 & spinner
+
+                printf "\n\nScorching all UVN firewall rules..."
+                sudo ufw status numbered | grep '3[0-9]*/tcp' | awk -F] '{print $1}' | sed 's/\[\s*//' | tac | xargs -n 1 bash -c 'yes|sudo ufw delete $0' >>$LOG_FILE 2>&1 & spinner
+                sleep 5 & spinner
+
+                printf "\n\nSetting saved UVN configurations aflame..."
+                sudo rm -rf ./*/ & spinner
+                sleep 5 & spinner
+
+            echo -e "\n\n\e[93mAll Dragonchain UVNs have been terminated.\nAll configurations have been deleted and microk8s has been removed.\e[0m"
+            echo -e "\e[2mRerun the installer to start afresh.\e[0m"
+
+            exit 0
+
+        fi
     fi
+
 }
 
 ## Main()
 
-echo -e "\n\n\e[94mWelcome to the Dragonchain UVN Community Installer!\e[0m"
+#welcome!!
+echo -e "\n\n\e[94mWelcome to the Dragonchain Unmanaged Verification Node (UVN) Community Installer\e[0m"
 
 #patch system current
 printf "\nUpdating (patching) host OS current...\n"
 patch_server_current
 
 #install necessary software, set tunables
-printf "\nInstalling required software and setting Dragonchain UVN system configuration...\n"
+printf "Installing required software and setting Dragonchain UVN configuration..."
 bootstrap_environment
 
 ## Offer to upgrade all nodes
-printf "\nChecking for Pre-existing Dragonchain nodes to upgrade...\n"
+printf "\nChecking for Pre-existing Dragonchain UVNs...\n"
 offer_nodes_upgrade
 
 ## Prompt for Dragonchain node name
@@ -754,7 +923,7 @@ preflight_check
 set_config_values
 
 # check for previous installation (failed or successful) and offer reset if found
-printf "\nChecking for previous installation...\n"
+printf "\nChecking for a previous Dragonchain UVN '$DRAGONCHAIN_INSTALLER_DIR'...\n"
 check_existing_install
 
 # must gather node details from user or .config before generating chainsecrets
